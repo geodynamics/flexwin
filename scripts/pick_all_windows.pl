@@ -4,7 +4,7 @@
 #
 #  pick_all_windows.pl
 #  Carl Tape
-#  04-March-2008
+#  09-June-2008
 #
 #  The script reads in a set of data directories, each labeled as an event ID,
 #  and it copies the data and synthetics into the windowing code, runs the code,

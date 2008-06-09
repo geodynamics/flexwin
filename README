@@ -1,0 +1,120 @@
+################################################################
+   AUTOMEASURE : AUTOMATED MEASUREMENT OF DATA/3D-SYNTHETICS
+################################################################
+
+Alessia Maggi
+alessia@sismo.u-strasbg.fr
+
+
+Welcome to the automeasure package.  The purpose of this package is to
+enable automated measurement of the differences between data and 3D
+synthetics.  
+
+This is only a bare-bones instruction set for the time being.  Better
+instructions will come along, I promise.
+
+COMPILATION
+----------
+Compilation _should_ be as simple as typing :
+
+make
+
+You should end up with an executable (test_code_xcor) and links to two binary
+files (iasp91.hed and iasp91.tbl) that contain the iaspei-91 traveltime
+information.  The program currently requires the iasp91 files (or links to
+them) to be present in the directory from which the code is launched (this
+behaviour can be changed if required).
+
+RUNNING
+------
+./test_code_xcor < input
+
+where the "input" file is as follows:
+
+327
+RAW_DATA/9627721.CI.ADO.BHR.sac.d.fil
+SYNTH/ADO.CI.BHR.new.fil
+MEASURE/ADO.CI.BHR
+RAW_DATA/9627721.CI.ADO.BHT.sac.d.fil
+SYNTH/ADO.CI.BHT.new.fil
+MEASURE/ADO.CI.BHT
+RAW_DATA/9627721.CI.ADO.BHZ.sac.d.fil
+SYNTH/ADO.CI.BHZ.new.fil
+MEASURE/ADO.CI.BHZ
+....
+
+i.e. the number of traces to be measured, followed by (in order) the path to
+the raw data sac file, the path to the synthetic sac file and the path and
+basename for the (many!) output files for that trace.  
+
+
+OUTPUT FILES
+-----------
+All trace-specific outputfiles are written by one of two subroutines in
+seismo_subs.f90 : write_seismos_gmt OR write_measurements_gmt.  The first
+subroutine writes out all the windowing information, the second
+writes the measuremnts and adjoint sources.  All output files are in
+ascii.  All file names start with the basename given in the input file for
+that trace:
+
+basename.obs		= observed seismogram (lowpassed)
+basename.syn		= synthetic seismogram (lowpassed)
+basename.env.obs	= envelope of observed seismogram (lowpassed)
+basename.env.syn	= envelope of synthetic seismogram (lowpassed)
+basename.win		= list of windows with theoretical phase arrival times
+basename.win.qual	= list of windows with F1,F2,Tshift,dlnA values before and after measurement
+basename.phases		= theoretical arrival times of phases
+basename.stalta		= STA/LTA timeseries used to select the windows
+basename.info		= information on the path and some statistics
+
+basename.dtau.n		= dTau information (as fn of freq) for window n
+basename.dlnA.n		= dlnA information (as fn of freq) for window n
+basename.seis.win.n	= synth, obs and reconstructed obs for window n
+basename.adj.win.n	= adjoint source for window n
+
+For details about the file formats, your best bet is to read the write_ subroutines in seismo_subs.f90
+
+
+PLOTTING
+-------
+Several plotting routines (plot_*.sh) are provided as examples for
+plotting seismograms, measurements and adjoint sources.  All plotting is
+done in gmt.  These scripts will need to be modified to suit your
+particular plotting needs.
+
+The script extract_event_windowing_stats.sh extracts statistical
+information on the window selection process, on the measurements.  Again,
+you can use use this script as a template for your own information
+extraction needs.
+
+PACKAGE CONFIGURATION
+--------------------
+The package in svn is (currently) pre-configured for scsn measurement.  All configuring is done in two files:
+user_functions.f90
+user_parameters.f90
+
+The parameters that can be configured are:
+* WIN_LP_PERIOD : the low-pass cutoff applied to the seismograms before window selection of measurement
+* DLNA_BASE : a constant limit of dlnA for window acceptance
+* TSHIFT_BASE : a constant limit of tshift for window acceptance
+* F2_BASE : a constant limit of F2 for window acceptance
+* STALTA_BASE : a water level that controls the definition of windows (this should not really be changed much, if at all)
+* DEBUG : a logical flag to indicate whether debugging information should be output or not (this flag does not do much at the moment)
+
+The user_functions.f90 file describes how the window selection /
+acceptance parameters vary with time.  This feature allows the
+seismologist to finely tune the picking criteria using information about
+the path, the event and any other a-priori knowledge.  The current
+configuration of this file (for scsn data) allows for varying the dlnA and
+Tshift limits depending on whether the window is in the "Pnl" regime or
+the "SW" regime (limits and regimes are as described in Qinya's
+inversion.txt file).  It also allows for changing the sta/lta water level
+with time (for example to make it much harder for late arriving phases to
+be picked).
+
+In order to use this algorithm on a different dataset (global, short
+period, etc.), both the user_functions.f90 and the user_parameters.f90
+must be edited accordingly.
+
+NOTE: FOR THE NEW SETTINGS OF USER_FUNCTIONS AND USER_PARAMETERS TO TAKE
+EFFECT YOU MUST FIRST "MAKE CLEAN" to remove the .mod files, AND THEN RECOMPILE (MAKE).

@@ -1,0 +1,44 @@
+# @configure_input@
+
+FC = @FC@
+FCFLAGS = @FCFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+
+PROGS = test2
+
+test2_LIBS = -lSacLib -lsac -lutil -ltau -lnumrec
+test2_OBJS = \
+	io_subs.o \
+	maxima.o \
+	measure_windows_xcorr.o \
+	measurement_module.o \
+	seismo_subs.o \
+	select_windows_stalta2.o \
+	travel_times.o \
+	user_functions.o \
+	user_parameters.o \
+	xcorr-measure.o \
+	$(empty)
+
+
+all: $(PROGS)
+
+.SUFFIXES:
+.SUFFIXES: .f .F .f90 .o
+
+.F.o:
+	$(FC) $(FCFLAGS) -c -o $@ $<
+
+.f.o:
+	$(FC) $(FCFLAGS) -c -o $@ $<
+
+.f90.o:
+	$(FC) $(FCFLAGS) -c -o $@ $<
+
+
+test2: test2.f90 $(test2_OBJS)
+	$(FC) $(FCFLAGS) test2.f90 -o test2 $(test2_OBJS) $(LDFLAGS) $(test2_LIBS) $(LIBS)
+
+clean:
+	rm -f $(PROGS) *.o *.mod

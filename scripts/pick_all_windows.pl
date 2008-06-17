@@ -94,12 +94,10 @@ if($idataset == 1) {
 
 # specify various directories (MUST BE MODIFIED FOR EACH USER)
 $dir0 = "/net/denali/scratch1/carltape/svn/cig/seismo/3D";
-$dir_win_code = "$dir0/automeasure_work";
-$dir_win_run  = "$dir0/automeasure_data/socal_3Dsyn_dat";
-#$dir_win_code = "$dir0/automeasure_work_copy2";
-#$dir_win_run  = "$dir0/automeasure_data/socal_3Dsyn_dat_copy2";
-#$dir_win_code = "$dir0/automeasure_work_copy3";
-#$dir_win_run  = "$dir0/automeasure_data/socal_3Dsyn_dat_copy3";
+$dir_win_code = "$dir0/ADJOINT_TOMO_WORK/flexwin";
+$dir_win_run  = "$dir0/flexwin_run";
+#$dir_win_code = "$dir0/ADJOINT_TOMO_WORK/flexwin_copy2";
+#$dir_win_run  = "$dir0/flexwin_run_copy2";
 $dir_scripts  = "${dir_win_code}/scripts";
 
 # scripts for preparing data and synthetics

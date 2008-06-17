@@ -24,7 +24,7 @@
 #     prepare_meas_all.pl
 #
 #  EXAMPLES:
-#     /net/denali/scratch1/carltape/svn/specfem/automeasure_work/scripts/pick_all_windows_local.pl
+#     /net/denali/scratch1/carltape/svn/cig/seismo/3D/ADJOINT_TOMO_WORK/flexwin/scripts/pick_all_windows_local.pl
 #
 #     pick_all_windows_local.pl 2/40 1/1/1/1 input MEASURE
 #     pick_all_windows_local.pl 6/40 1/1/1/0 input MEASURE
@@ -39,7 +39,7 @@ if (@ARGV < 4) {die("Usage: pick_all_windows_local.pl  Tmin/Tmax idebug/iplot/im
 ($Ts,$ibools,$input,$dir) = @ARGV;
 
 # specify source code directory (MUST BE MODIFIED FOR EACH USER)
-$dir_win_code = "/net/denali/scratch1/carltape/svn/cig/seismo/3D/automeasure_work";
+$dir_win_code = "/net/denali/scratch1/carltape/svn/cig/seismo/3D/ADJOINT_TOMO_WORK/flexwin";
 
 $dir_scripts = "${dir_win_code}/scripts";
 if (not -e ${dir_win_code}) {die("check if ${dir_win_code} exist or not\n")}

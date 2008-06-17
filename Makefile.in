@@ -7,8 +7,9 @@ LIBS = @LIBS@
 
 PROGS = test2
 
-test2_LIBS = -lSacLib -lsac -lutil -ltau -lnumrec
+test2_LIBS = -lSacLib -lsac -ltau
 test2_OBJS = \
+	distaz.o \
 	io_subs.o \
 	maxima.o \
 	measure_windows_xcorr.o \
@@ -42,3 +43,12 @@ test2: test2.f90 $(test2_OBJS)
 
 clean:
 	rm -f $(PROGS) *.o *.mod
+
+
+measure_windows_xcorr.o: measurement_module.o
+
+seismo_subs.o: user_parameters.o
+
+measure_windows_xcorr.o: xcorr-measure.o
+
+io_subs.o measurement_module.o measure_windows_xcorr.o select_windows_stalta2.o user_functions.o: seismo_subs.o

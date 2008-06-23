@@ -7,11 +7,14 @@ FFLAGS = ${OPT}
 
 A_CODE=/home/alessia/code
 
-OPTLIBDIR=/opt/seismo-util/lib
-LIBDIR=${A_CODE}/lib
-INCDIR=${A_CODE}/include
-SHARE=${A_CODE}/share
-LIBS= -lSacLib -lsac -ltau -lm 
+SACLIBDIR=/opt/sac/lib
+QDSACLIBDIR=qd_sac
+TAULIBDIR=ttimes_mod
+#LIBDIR=${A_CODE}/lib
+#INCDIR=${A_CODE}/include
+#SHARE=${A_CODE}/share
+#LIBS= -lSacLib -lsac -ltau -lm 
+LIBS= -lsacio -lqd_sac -ltau -lm 
 
 PROGS= test2
 default:${PROGS} 
@@ -29,16 +32,15 @@ SUFFIXES = .f .o .f90 .F .mod
 .SUFFIXES: $(SUFFIXES)
 
 .f.o:
-	$(FC) ${FFLAGS} -c -o $@ $< -I${INCDIR}
+	$(FC) ${FFLAGS} -c -o $@ $< 
 .F.o:
-	$(FC) ${FFLAGS} -c -o $@ $< -I${INCDIR}
+	$(FC) ${FFLAGS} -c -o $@ $< 
 .f90.o:
-	$(FC) ${FFLAGS} -c -o $@ $< -I${INCDIR}
+	$(FC) ${FFLAGS} -c -o $@ $< 
 
 
 test2:test2.f90 ${LIB2}
-	$(FC) ${FFLAGS} test2.f90 -o test2 ${LIB2} -L${LIBDIR} -L${OPTLIBDIR} ${LIBS} 
-	if [ ! -e iasp91.hed ] ; then ( ln -s ${SHARE}/iasp91.hed . ; ln -s ${SHARE}/iasp91.tbl . ) ; fi
+	$(FC) ${FFLAGS} test2.f90 -o test2 ${LIB2} -Lttimes_mod -Lqd_sac -L${SACLIBDIR} ${LIBS} 
 
 clean:
 	rm -f  ${LIB2} ${PROGS} *.o *.mod

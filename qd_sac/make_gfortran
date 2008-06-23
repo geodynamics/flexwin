@@ -1,0 +1,45 @@
+libname = libqd_sac.a
+F77 = gfortran
+F90 = gfortran
+CC = gcc
+
+F77FLAGS = -O2 -m32
+F90FLAGS = -O2 -m32
+CCFLAGS = -O2 -m32
+
+F77SRC =  \
+      dbh/apply    dbh/c1roots   dbh/design  dbh/lptbr \
+      dbh/beroots  dbh/c2roots   dbh/lpthp \
+      dbh/bilin2   dbh/chebparm  dbh/lp      dbh/warp  \
+      dbh/buroots  dbh/cutoffs   dbh/lptbp   dbh/xapiir  \
+      icm/dcpft    icm/taper icm/getran \
+      icm/dseis  icm/polezero  icm/rmean icm/rtrend 
+
+
+F90SRC = icm/transfer
+CSRC = hec/cfft      hec/corr1  hec/dcops                hec/hilenv \
+      hec/convolve  hec/corr2  hec/hec_fortran_wrapper  hec/nextpow2
+
+F77OBJ = $(patsubst %,%.o,$(F77SRC))
+F90OBJ = $(patsubst %,%.o,$(F90SRC))
+COBJ = $(patsubst %,%.o,$(CSRC))
+OBJ = $(F77OBJ) $(F90OBJ) $(COBJ)
+
+lib:  $(OBJ)
+	ar rvu $(libname) $(OBJ)
+
+$(F90OBJ): %.o : %.f90
+	$(F90) -o $*.o $(F90FLAGS) -c $*.f90
+
+$(F77OBJ):  %.o: %.f
+	$(F77) -o $*.o $(F77FLAGS) -c $*.f > /dev/null
+
+$(COBJ): %.o: %.c
+	$(CC) -o $*.o $(CCFLAGS) -c $*.c
+
+.PHONY: clean cleanall
+clean:
+	\rm -f */*.o */*~
+cleanall:
+	\rm -f */*.o *.a
+

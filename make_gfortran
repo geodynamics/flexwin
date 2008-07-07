@@ -8,15 +8,15 @@ FFLAGS = ${OPT}
 A_CODE=/home/alessia/code
 
 SACLIBDIR=/opt/sac/lib
-QDSACLIBDIR=qd_sac
+QDSACLIBDIR=../SacLib
 TAULIBDIR=ttimes_mod
 #LIBDIR=${A_CODE}/lib
 #INCDIR=${A_CODE}/include
 #SHARE=${A_CODE}/share
 #LIBS= -lSacLib -lsac -ltau -lm 
-LIBS= -lsacio -lqd_sac -ltau -lm 
+LIBS= -lsacio -lSacLib -ltau -lm 
 
-PROGS= test2
+PROGS= flexwin
 default:${PROGS} 
 
 LIBSRC2=distaz.f user_parameters.f90  seismo_subs.f90  user_functions.f90 maxima.f90 travel_times.f90 measurement_module.f90 xcorr-measure.f90 measure_windows_xcorr.f90 io_subs.f90 select_windows_stalta2.f90
@@ -39,8 +39,8 @@ SUFFIXES = .f .o .f90 .F .mod
 	$(FC) ${FFLAGS} -c -o $@ $< 
 
 
-test2:test2.f90 ${LIB2}
-	$(FC) ${FFLAGS} test2.f90 -o test2 ${LIB2} -Lttimes_mod -Lqd_sac -L${SACLIBDIR} ${LIBS} 
+flexwin:flexwin.f90 ${LIB2}
+	$(FC) ${FFLAGS} flexwin.f90 -o flexwin ${LIB2} -Lttimes_mod -L${QDSACLIBDIR} -L${SACLIBDIR} ${LIBS} 
 
 clean:
 	rm -f  ${LIB2} ${PROGS} *.o *.mod

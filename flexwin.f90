@@ -1,9 +1,5 @@
-!
-! $Id:$
-!
-
 !----------------------------------------------------
-program test2
+program flexwin
 
 use seismo_variables
 
@@ -36,22 +32,17 @@ do i = 1, n_seis
   if (DEBUG) write(*,*) 'DEBUG : selecting windows'
   call select_windows_stalta2()
 
-  !if (DEBUG) write(*,*) 'DEBUG : making xcorr measurements'
-  !call measure_windows_xcorr
 
   if(MAKE_SEISMO_PLOTS) then
      if (DEBUG) write(*,*) 'DEBUG : writing output seismos'
      call write_seismos_gmt(basename(i))
-     !if (DEBUG) write(*,*) 'DEBUG : writing output measurements'
-     !call write_measurements_gmt(basename(i))
   endif
 
   if(MAKE_WINDOW_FILES) then
      if (DEBUG) write(*,*) 'DEBUG : writing mt input'
-     !call write_mt_input(basename(i),obs_name(i),syn_name(i))
      call write_mt_input_2(basename(i),obs_name(i),syn_name(i))
   endif
 
 enddo
 
-end program test2
+end program flexwin

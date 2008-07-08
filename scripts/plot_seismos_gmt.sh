@@ -125,12 +125,11 @@ END
 psbasemap -R$region -J$proj -B${t_step}:"Time (s)":/S -O -U/0/-0.75/$basename >> $out
 #psbasemap -R$region -J$proj -B${t_step}:"Time (s)":/S -O >> $out
 
-bbox=`grep "%%BoundingBox: " $out | tail -1 `
-sed s/"$bbox"/"%"/ $out | sed s/"%%BoundingBox: (atend)"/"$bbox"/ > t1.$$
-epsffit -c -s 10 10 600 780 t1.$$ $out
-epstopdf $out
-rm t1.$$
-#rm $out  # remove eps file
+#bbox=`grep "%%BoundingBox: " $out | tail -1 `
+#sed s/"$bbox"/"%"/ $out | sed s/"%%BoundingBox: (atend)"/"$bbox"/ > t1.$$
+#epsffit -c -s 10 10 600 780 t1.$$ $out
+#epstopdf $out
+#rm t1.$$
 
 #echo $out
 #gv $out

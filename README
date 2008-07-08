@@ -70,7 +70,7 @@ compile and run: libsacio.a and libSacLib.a.  Eventually, both libraries
 will be distributed by IRIS as part of the SAC package (at the moment only
 libsacio is distributed this way).  For the time being, you should compile
 libSacLib.a using the source code in the SacLib directory that accompanies
-flexwin.  
+flexwin (instructions later).  
 
 IMPORTANT NOTE: The SacLib directory is a temporary fix.  The SAC source code
 from which the SacLib library is compiled is proprietary and should not be
@@ -97,8 +97,7 @@ directory) type: "make -f make_gfortran".
 flexwin/ttimes_mod directory type: "make -f make_gfortran".  This will compile
 libtau.a, and two programs, remodl and setbrn.  The makefile will also run
 remodl and setbrn to create the iasp91.hed and iasp91.tbl files.  You should
-then type "make -f make_gfortran install" to install the iasp91 files in the
-root flexwin directory.
+then type "make -f make_gfortran install" to install the iasp91 files.
 
 (3) Compile flexwin.  Edit the make_gfortran file in the flexwin root directory to ensure the SACLIBDIR variable points to the location of your SAC libraries (by default /opt/sac/lib).  Then type "make -f make_gfortran".
 
@@ -117,8 +116,8 @@ should match those found in the MEASURE.orig
 subdirectory.
 
 You can also test the basic plotting script by running "./plot_seismos_gmt.sh
-MEASURE/ABKT.II.LHZ", whose output will be MEASURE/ABKT.II.LHZ.seis.eps and a
-corresponding .pdf file.
+MEASURE/ABKT.II.LHZ", whose output will be MEASURE/ABKT.II.LHZ.seis.eps.   Note
+that plotting scripts require GMT.
 
 
 

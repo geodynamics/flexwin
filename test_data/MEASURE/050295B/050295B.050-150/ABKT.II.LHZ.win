@@ -1,8 +1,0 @@
-# NUM_WIN =          7
-   1    1053.60   1484.60   10 PKPdf    PKiKP    pPKPdf   pPKiKP   sPKPdf   sPKiKP   PP       SKPdf    SKiKP    PKSdf   
-   2    1720.60   2067.60   10 Sdiff    PKKPdf   pSdiff   sSdiff   SP       PS       SKKPbc   PKKSbc   SKKPdf   PKKSdf  
-   3    2067.60   2458.60    5 SKKSac   SKKSdf   P'P'df   SS       S'S'ac  
-   4    2458.60   2671.60    0
-   5    2851.60   3108.60    2 S'S'ac   S'S'df  
-   6    3108.60   3406.60    0
-   7    3502.60   3938.60    0

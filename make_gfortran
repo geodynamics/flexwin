@@ -5,15 +5,9 @@ FC = gfortran
 CFLAGS = ${OPT}
 FFLAGS = ${OPT} 
 
-A_CODE=/home/alessia/code
-
 SACLIBDIR=/opt/sac/lib
 QDSACLIBDIR=../SacLib
 TAULIBDIR=ttimes_mod
-#LIBDIR=${A_CODE}/lib
-#INCDIR=${A_CODE}/include
-#SHARE=${A_CODE}/share
-#LIBS= -lSacLib -lsac -ltau -lm 
 LIBS= -lsacio -lSacLib -ltau -lm 
 
 PROGS= flexwin
@@ -40,8 +34,9 @@ SUFFIXES = .f .o .f90 .F .mod
 
 
 flexwin:flexwin.f90 ${LIB2}
-	$(FC) ${FFLAGS} flexwin.f90 -o flexwin ${LIB2} -Lttimes_mod -L${QDSACLIBDIR} -L${SACLIBDIR} ${LIBS} 
+	$(FC) ${FFLAGS} flexwin.f90 -o flexwin ${LIB2} -L${TAULIBDIR} -L${QDSACLIBDIR} -L${SACLIBDIR} ${LIBS} 
 
 clean:
 	rm -f  ${LIB2} ${PROGS} *.o *.mod
+	rm -f  iasp91.*
 

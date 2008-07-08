@@ -148,30 +148,6 @@
 
 !----------------------------------------------------------------------
 
-  subroutine write_win_qual_aux_gmt(basename)
-  use seismo_variables
-  implicit none
-
-  character*120 :: basename
-  character*240 :: file_win
-  integer :: i
-
-  ! set filename	
-  file_win=trim(basename)//'.win.qual'
-
-  open(unit=11, file=file_win)
-  write(11,'("# NUM_WIN = ",i10)') num_win
-  write(11,*) "# i win_start win_end Tshift CC dlnA "
-  do i = 1, num_win
-    write(11,'(i4,5(1x,f10.5))') i, win_start(i), win_end(i), &
-                                 CC(i),Tshift(i),dlnA(i)
-  end do
-  close(11)
-
-  end subroutine 
-
-!----------------------------------------------------------------------
-
   subroutine read_win_qual_gmt(basename)
   use seismo_variables
   implicit none
@@ -191,7 +167,7 @@
   do i = 1, num_win
   ! read file, ignoring input "quality" values
     read(11,'(i4,5(1x,f10.5))') i_dummy, win_start(i), win_end(i), &
-                                 CC(i),Tshift(i),dlnA(i)
+                                 Tshift(i),CC(i),dlnA(i)
     ! calculate indexes for start and and of windows 
     i_start(i)=1+int((win_start(i)-b)/dt)
     i_end(i)  =1+int((win_end(i)  -b)/dt)
@@ -245,7 +221,6 @@
   max_sta_lta = maxval(STA_LTA)
   max_s2n = maxval(S2N_LIMIT)
 
-  ! write the seismograms and envelopes and f1f2
   ! open the files
   open(unit=15, file=file_stalta)
   ! write the header - with f2 quality

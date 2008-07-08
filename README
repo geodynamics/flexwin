@@ -1,35 +1,132 @@
 ################################################################
-   AUTOMEASURE : AUTOMATED MEASUREMENT OF DATA/3D-SYNTHETICS
+   FLEXWIN - AUTOMATED WINDOW SELECTION - BETA TEST VERSION
 ################################################################
 
 Alessia Maggi
 alessia@sismo.u-strasbg.fr
 
+Welcome to the flexwin package.  The purpose of this package is to
+select windows on pairs of observed and synthetic seismograms on which
+measurements can subsequently be made.
 
-Welcome to the automeasure package.  The purpose of this package is to
-enable automated measurement of the differences between data and 3D
-synthetics.  
+This is a bare-bones instruction set.  For more details read the flexwin manual (latex/flexwin_manual.pdf) and the flexwin article (latex/flexwin_paper.pdf).
 
-This is only a bare-bones instruction set for the time being.  Better
-instructions will come along, I promise.
+IMPORTANT NOTE: This beta test release contains some code that is under a
+licence that makes it non-distributable.  As flexwin beta testers, you are NOT
+authorized to pass on any part of this distribution to third parties.  This
+restriction will be removed as soon as flexwin is officially released.
+
+
+
+THE PACKAGE
+-----------
+
+The package contains the flexwin code and documentation, as well as a set of
+test data, examples of user files for different scenarios, and a set of utility
+scripts that may be useful for running flexwin on large datasets.
+
+The contents of the flexwin directory are as follows:
+
+flexwin
+|-- Makefile.in
+|-- PAR_FILE
+|-- README
+|-- TODOs
+|-- configure
+|-- configure.ac
+|-- distaz.f
+|-- flexwin.f90
+|-- io_subs.f90
+|-- latex
+|-- make_gfortran
+|-- make_intel
+|-- make_intel_caltech
+|-- maxima.f90
+|-- measure_windows_xcorr.f90
+|-- measurement_module.f90
+|-- scripts
+|-- seismo_subs.f90
+|-- select_windows_stalta2.f90
+|-- test_data
+|-- travel_times.f90
+|-- ttimes_mod
+|-- user_files
+|-- user_functions.f90
+|-- user_parameters.f90
+`-- xcorr-measure.f90
+
+5 directories, 24 files
+
+
 
 COMPILATION
-----------
-Compilation _should_ be as simple as typing :
+-----------
 
-make
+FLEXWIN requires the following libraries external to the package in order to
+compile and run: libsacio.a and libSacLib.a.  Eventually, both libraries
+will be distributed by IRIS as part of the SAC package (at the moment only
+libsacio is distributed this way).  For the time being, you should compile
+libSacLib.a using the source code in the SacLib directory that accompanies
+flexwin.  
 
-You should end up with an executable (test_code_xcor) and links to two binary
-files (iasp91.hed and iasp91.tbl) that contain the iaspei-91 traveltime
-information.  The program currently requires the iasp91 files (or links to
-them) to be present in the directory from which the code is launched (this
-behaviour can be changed if required).
+IMPORTANT NOTE: The SacLib directory is a temporary fix.  The SAC source code
+from which the SacLib library is compiled is proprietary and should not be
+distributed by anyone other than IRIS.  Brian Savage - the author of SacLib -
+is currently working on a new version of the library that will be distributed
+with future versions of SAC.  The official release of flexwin will require
+linkage to this new library.  
 
-RUNNING
-------
-./test_code_xcor < input
+If your compiler of choice is gfortran, then you should be able to use the
+make_gfortran makefiles with only minor modifications (notably you may need to
+change the search path for the libsacio.a library).  If you prefer another
+compiler, you should modify the OPT and FC lines in the makefiles accordingly.   
+IMPORTANT NOTE: All the code is compiled with the -m32 option, which makes
+32bit binaries.  This option is currently required to enable compatibility with
+SAC.  Future versions of the SAC distribution may no longer require this
+compatibility flag.
 
-where the "input" file is as follows:
+Steps to compile the flexwin package:
+
+(1) Compile libSacLib.a.  In the SacLib directory (which is outside the flexwin
+directory) type: "make -f make_gfortran".
+
+(2) Compile libtau.a and create iasp91.hed and iasp91.tbl.  In the
+flexwin/ttimes_mod directory type: "make -f make_gfortran".  This will compile
+libtau.a, and two programs, remodl and setbrn.  The makefile will also run
+remodl and setbrn to create the iasp91.hed and iasp91.tbl files.  You should
+then type "make -f make_gfortran install" to install the iasp91 files in the
+root flexwin directory.
+
+(3) Compile flexwin.  Edit the make_gfortran file in the flexwin root directory to ensure the SACLIBDIR variable points to the location of your SAC libraries (by default /opt/sac/lib).  Then type "make -f make_gfortran".
+
+You should end up with the flexwin executable.  The program requires the iasp91
+files (or links to them) to be present in the directory from which the code is
+launched. 
+
+
+TEST DATA SET
+-------------
+
+You should test your compiled code on the test_data dataset provided.  In the
+flexwin/test_data directory, type "./flexwin < input.test".  The results of your
+run will be found in the MEASURE/050295B/050295B.050-150 subdirectory, and
+should match those found in the MEASURE.orig/050295B/050295B.050-150
+subdirectory.
+
+You can also test the basic plotting script by running "./plot_seismos_gmt.sh
+MEASURE/050295B/050295B.050-150/ABKT.II.LHZ", whose output will be
+MEASURE/050295B/050295B.050-150/ABKT.II.LHZ.seis.eps and a corresponding .pdf
+file.
+
+
+
+RUNNING FLEXWIN
+---------------
+In general, flexwin is run as follows:
+
+./flexwin < input
+
+where the "input" file is formatted as follows:
 
 327
 RAW_DATA/9627721.CI.ADO.BHR.sac.d.fil
@@ -48,6 +145,7 @@ the raw data sac file, the path to the synthetic sac file and the path and
 basename for the (many!) output files for that trace.  
 
 
+
 OUTPUT FILES
 -----------
 All trace-specific outputfiles are written by one of two subroutines in
@@ -57,26 +155,29 @@ writes the measuremnts and adjoint sources.  All output files are in
 ascii.  All file names start with the basename given in the input file for
 that trace:
 
-basename.obs		= observed seismogram (lowpassed)
-basename.syn		= synthetic seismogram (lowpassed)
-basename.env.obs	= envelope of observed seismogram (lowpassed)
-basename.env.syn	= envelope of synthetic seismogram (lowpassed)
+basename.obs		= ascii observed seismogram (filtered) 
+basename.syn		= ascii synthetic seismogram (filtered)
+basename.obs_lp.sac = sac observed seismogram (filtered)
+basename.syn_lp.sac = sac synthetic seismogram (filtered)
+basename.env.obs	= ascii envelope of observed seismogram (filtered)
+basename.env.syn	= ascii envelope of synthetic seismogram (filtered)
 basename.win		= list of windows with theoretical phase arrival times
-basename.win.qual	= list of windows with F1,F2,Tshift,dlnA values before and after measurement
+basename.win.qual	= list of windows with Tshift,CC,dlnA values 
 basename.phases		= theoretical arrival times of phases
-basename.stalta		= STA/LTA timeseries used to select the windows
+basename.stalta		= STA:LTA timeseries used to select the windows, 
+                    and the time-dependent values of the STA:LTA water 
+                    level, the CC limit, the Tshift limit, the dlnA 
+                    limit and the window signal to noise limit.
 basename.info		= information on the path and some statistics
 
-basename.dtau.n		= dTau information (as fn of freq) for window n
-basename.dlnA.n		= dlnA information (as fn of freq) for window n
-basename.seis.win.n	= synth, obs and reconstructed obs for window n
-basename.adj.win.n	= adjoint source for window n
-
-For details about the file formats, your best bet is to read the write_ subroutines in seismo_subs.f90
+For more details about the file formats, your best bet is to read the write_
+subroutines in io_subs.f90.
 
 
-PLOTTING
+
+SCRIPTS
 -------
+
 Several plotting routines (plot_*.sh) are provided as examples for
 plotting seismograms, measurements and adjoint sources.  All plotting is
 done in gmt.  These scripts will need to be modified to suit your
@@ -87,34 +188,11 @@ information on the window selection process, on the measurements.  Again,
 you can use use this script as a template for your own information
 extraction needs.
 
-PACKAGE CONFIGURATION
---------------------
-The package in svn is (currently) pre-configured for scsn measurement.  All configuring is done in two files:
-user_functions.f90
-user_parameters.f90
 
-The parameters that can be configured are:
-* WIN_LP_PERIOD : the low-pass cutoff applied to the seismograms before window selection of measurement
-* DLNA_BASE : a constant limit of dlnA for window acceptance
-* TSHIFT_BASE : a constant limit of tshift for window acceptance
-* F2_BASE : a constant limit of F2 for window acceptance
-* STALTA_BASE : a water level that controls the definition of windows (this should not really be changed much, if at all)
-* DEBUG : a logical flag to indicate whether debugging information should be output or not (this flag does not do much at the moment)
 
-The user_functions.f90 file describes how the window selection /
-acceptance parameters vary with time.  This feature allows the
-seismologist to finely tune the picking criteria using information about
-the path, the event and any other a-priori knowledge.  The current
-configuration of this file (for scsn data) allows for varying the dlnA and
-Tshift limits depending on whether the window is in the "Pnl" regime or
-the "SW" regime (limits and regimes are as described in Qinya's
-inversion.txt file).  It also allows for changing the sta/lta water level
-with time (for example to make it much harder for late arriving phases to
-be picked).
+CONFIGURING FLEXWIN FOR YOUR SCENARIO
+-------------------------------------
 
-In order to use this algorithm on a different dataset (global, short
-period, etc.), both the user_functions.f90 and the user_parameters.f90
-must be edited accordingly.
-
-NOTE: FOR THE NEW SETTINGS OF USER_FUNCTIONS AND USER_PARAMETERS TO TAKE
-EFFECT YOU MUST FIRST "MAKE CLEAN" to remove the .mod files, AND THEN RECOMPILE (MAKE).
+After having read the flexwin article (latex/flexwin_paper.pdf) to learn how
+flexwin works, you should refer to the flexwin manual
+(latex/flexwin_manual.pdf) for basic configuration instructions.

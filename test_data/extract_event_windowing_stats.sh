@@ -1,1 +1,0 @@
-../scripts/extract_event_windowing_stats.sh

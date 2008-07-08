@@ -62,6 +62,9 @@ flexwin
 COMPILATION
 -----------
 
+NOTE: Do NOT use the configure script for beta test compilation.  It will not
+work.
+
 FLEXWIN requires the following libraries external to the package in order to
 compile and run: libsacio.a and libSacLib.a.  Eventually, both libraries
 will be distributed by IRIS as part of the SAC package (at the moment only
@@ -109,14 +112,13 @@ TEST DATA SET
 
 You should test your compiled code on the test_data dataset provided.  In the
 flexwin/test_data directory, type "./flexwin < input.test".  The results of your
-run will be found in the MEASURE/050295B/050295B.050-150 subdirectory, and
-should match those found in the MEASURE.orig/050295B/050295B.050-150
+run will be found in the MEASURE subdirectory, and
+should match those found in the MEASURE.orig
 subdirectory.
 
 You can also test the basic plotting script by running "./plot_seismos_gmt.sh
-MEASURE/050295B/050295B.050-150/ABKT.II.LHZ", whose output will be
-MEASURE/050295B/050295B.050-150/ABKT.II.LHZ.seis.eps and a corresponding .pdf
-file.
+MEASURE/ABKT.II.LHZ", whose output will be MEASURE/ABKT.II.LHZ.seis.eps and a
+corresponding .pdf file.
 
 
 
@@ -148,12 +150,9 @@ basename for the (many!) output files for that trace.
 
 OUTPUT FILES
 -----------
-All trace-specific outputfiles are written by one of two subroutines in
-seismo_subs.f90 : write_seismos_gmt OR write_measurements_gmt.  The first
-subroutine writes out all the windowing information, the second
-writes the measuremnts and adjoint sources.  All output files are in
-ascii.  All file names start with the basename given in the input file for
-that trace:
+
+Most output files are in ascii.  All file names start with the basename given
+in the input file for that trace:
 
 basename.obs		= ascii observed seismogram (filtered) 
 basename.syn		= ascii synthetic seismogram (filtered)

@@ -3,7 +3,7 @@
 #==========================================================
 #
 #  Carl Tape
-#  19-June-2007
+#  03-July-2007
 #  process_data_and_syn.pl
 #
 #  This script processes data and 3D-Socal-SEM synthetics for Southern California.
@@ -33,15 +33,16 @@
 if (@ARGV < 7) {die("Usage: process_data_and_syn.pl idata isyn syn_ext dat_ext sps Tmin/Tmax \n")}
 ($idata,$isyn,$syn_ext,$dat_ext,$sps,$Trange,$pdir) = @ARGV;
 
-$smodel = "m03";   # KEY: model iteration index
+$smodel = "m04";   # KEY: model iteration index
 $iexecute = 0;
 $ilist = 1;
 
-# THESE MUST BE DONE IN SEQUENTIAL ORDER
 $iprocess0 = 0;
-$iprocess1 = 1;    # only done ONCE, no matter how many band-pass filters you use
-$iprocess2 = 0;    # only done ONCE, no matter how many band-pass filters you use
-$iprocess3 = 0;
+
+# THESE MUST BE DONE IN SEQUENTIAL ORDER
+$iprocess1 = 0;    # only done ONCE, no matter how many band-pass filters you use
+$iprocess2 = 1;    # cut records and pad zeros (and bandpass, if iprocess3=1)
+$iprocess3 = 1;    # bandpass filter (iprocess2=1 also)
 
 #$Lrange = "-l -40/220";
 #$Lrange = " ";
@@ -101,7 +102,15 @@ if($ilist == 1) {
 #die("testing");
 
 # write the C-shell script to file
-$cshfile = "process_data_and_syn.csh";
+if($idata==1 && $isyn==1) {
+   $cshfile = "process_data_and_syn.csh";
+} elsif($idata==1 && $isyn==0) {
+   $cshfile = "process_data.csh";
+} elsif($idata==0 && $isyn==1) {
+   $cshfile = "process_syn.csh";
+} else {
+   die("check idata and isyn\n");
+}
 print "\nWriting to $cshfile ...\n";
 open(CSH,">$cshfile");
 
@@ -111,8 +120,8 @@ if($iprocess0==1) {
 }
 
 $imin = 1; $imax = $ncmt;  # default
-#$imin = 1; $imax = $imin;
-#$imin = 1; $imax = 160;
+#$imin = 1; $imax = 96;
+#$imin = 174; $imax = $imin;
 
 #----------------------------------------------------------------------
 
@@ -132,34 +141,47 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
   print "$ievent, $imax, Event $eid\n";
   print CSH "echo $ievent, $imax, Event $eid\n";
 
+  # data and synthetics directories
+  $dirsyn = "${dirsyn0}/${eid}";
+  $dirdat = "${dirdat0}/${eid}";
+  $dirdat_pro_1 = "${dirdat0}/${eid}/$pdir";
+  $dirsyn_pro_1 = "${dirsyn0}/${eid}/$pdir";
+  $dirdat_pro_2 = "${dirdat_pro_1}/$pdirbpass";
+  $dirsyn_pro_2 = "${dirsyn_pro_1}/$pdirbpass";
+
+  # cut times file
+  $cutfile = "$dirdat/${eid}_cut";
+  $cutfile_done = "${cutfile}_done";
+
+  # optional -- delete pre-processed directories
+  #print CSH "rm -rf $dirsyn/PRO*\n";
+  #print CSH "rm -rf $dirdat/PRO*\n";
+
   #----------------------------------------------------------------------
   # PROCESSING PART 0: check the number of processed synthetic files for each event
 
   if ($iprocess0 == 1) {
-     $dirsyn = "${dirsyn0}/${eid}";
-     $dirsyn_pro = "$dirsyn/$pdir";
-     if(-e $dirsyn_pro) {
-       ($nfile,undef,undef) = split(" ",`ls -1 $dirsyn/$pdir/* | wc`);
+     if(-e ${dirsyn_pro_1}) {
+       ($nfile,undef,undef) = split(" ",`ls -1 ${dirsyn_pro_1}/* | wc`);
        print SYN "$eid $nfile\n";
      }
   }
 
   #----------------------------------------------------------------------
-  # PROCESSING PART 1: assigning SAC headers and interpolating
+  # PROCESSING PART 1: assign SAC headers, interpolate, and pick P and S arrivals (based on a 1D socal model)
 
   if ($iprocess1 == 1) {
 
-    # synthetics -- NOTE: convolve with half-duration (prior to interpolating)
+    # synthetics -- this will convolve with the source half-duration (prior to interpolating)
     if ($isyn == 1) {
-      $dirsyn = "${dirsyn0}/${eid}";
       if (-e $dirsyn) {
-	if (not -e "$dirsyn/$pdir") {
+	if (not -e ${dirsyn_pro_1}) {
 	  print CSH "cd $dirsyn\n";
           #print CSH "mv $pdir ${pdir}_OLD\n";
 	  #print CSH "\\rm -rf $pdir\n";
 	  print CSH "process_trinet_syn_new.pl -S -m $cmtfile -h -a $stafile -s $sps -p -d $pdir -x ${syn_ext} *.${syn_suffix0} \n";
 	} else {
-	  print "$pdir already exists\n";
+	  print "dir ${dirsyn_pro_1} already exists\n";
 	}
       } else {
 	print "$dirsyn does not exist\n";
@@ -168,15 +190,14 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
     # data
     if ($idata == 1) {
-      $dirdat = "${dirdat0}/${eid}";
       if (-e $dirdat) {
-	if (not -e "$dirdat/$pdir") {
+	if (not -e ${dirdat_pro_1}) {
 	print CSH "cd $dirdat\n";
         #print CSH "mv $pdir ${pdir}_OLD\n";
 	#print CSH "\\rm -rf $pdir; mkdir $pdir\n";
 	print CSH "process_cal_data.pl -m $cmtfile -p -s $sps -d $pdir -x ${dat_ext} *.${dat_suffix0}\n";
 	} else {
-	  print "$pdir already exists\n";
+	  print "dir ${dirdat_pro_1} already exists\n";
 	}
       } else {
 	print "$dirdat does not exist\n";
@@ -237,73 +258,149 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
   }
 
   #----------------------------------------------------------------------
-  # PROCESSING PART 2: cutting records and padding zeros
+  # PROCESSING PART 2: cutting records, padding zeros, and bandpass
 
-  if ($iprocess2 == 1 || $iprocess3 == 1) {
+  if ($iprocess2 == 1) {
 
-    # both the processed synthetics and processed data directories must exist
-    # base directories containing pre-processed data and synthetics
-    $dirdat = "${dirdat0}/${eid}/$pdir";
-    $dirsyn = "${dirsyn0}/${eid}/$pdir";
-    $dirdat_pro = "$dirdat/$pdirbpass";
-    $dirsyn_pro = "$dirsyn/$pdirbpass";
+    # BOTH the (initially) processed synthetics and data directories must exist
 
-    if ( (not -e $dirdat) || (not -e $dirsyn) ) {
-      print "--> dirdat $dirdat and dirsyn $dirsyn do not both exist\n";
+    if ( (not -e ${dirdat_pro_1}) || (not -e ${dirsyn_pro_1}) ) {
+      print "--> dirdat ${dirdat_pro_1} and dirsyn ${dirsyn_pro_1} do not both exist\n";
 
     } else {
-      if ( (-e $dirdat_pro && $idata==1) || (-e $dirsyn_pro && $isyn==1) ) {
-	if ($idata == 1) {
-	  print "$dirdat_pro already exists\n";
+
+      if ( (-e ${dirdat_pro_2} && $idata==1) || (-e ${dirsyn_pro_2} && $isyn==1) ) {
+        if ($idata == 1) {
+	  print "${dirdat_pro_2} already exists\n";
 	}
 	if ($isyn == 1) {
-	  print "$dirsyn_pro already exists\n";
+	  print "${dirsyn_pro_2} already exists\n";
 	}
 
       } else {
 
-	if ($iprocess2 == 1) {
-     
-	  # base directories containing pre-processed data and synthetics
-	  $dirdat = "${dirdat0}/${eid}/$pdir";
-	  $dirsyn = "${dirsyn0}/${eid}/$pdir";
+	if (-f $cutfile_done) {
+	  print "cutfile ${cutfile_done} already exists -- now bandpass\n";
+
+          if ($iprocess3==0) {
+	    print "set iprocess3=1 if you want to bandpass\n";
+
+          } else {
+	    print "iprocess3=1 -- now bandpass\n";
+
+	    if ($isyn == 1) {
+	      if (-e ${dirsyn_pro_1}) {
+		if (not -e ${dirsyn_pro_2}) {
+		  print CSH "cd ${dirsyn_pro_1}\n";
+		  #print CSH "\\rm -rf $pdirbpass\n";
+		  print CSH "process_trinet_syn_new.pl -S -t $Trange -d $pdirbpass -x $Ttag *.${syn_suffix} \n";
+		  print CSH "cd $pdirbpass\n";
+		  print CSH "rotate.pl *E.${syn_suffix}.${Ttag}\n";
+
+		} else {
+		  print "$pdirbpass already exists\n";
+		}
+	      } else {
+		print "${dirsyn_pro_1} does not exist\n";
+	      }
+	    }			# isyn
+
+	    # data
+	    if ($idata == 1) {
+	      if (-e ${dirdat_pro_1}) {
+		if (not -e ${dirdat_pro_2}) {
+
+		  $ofile1 = "${eid}_ofile";
+		  $ofile2 = "${eid}_no_pz_files";
+		  $odir = "${dirdat0}/CHECK_DIR";
+		  print CSH "mkdir -p $odir\n";
+
+		  print CSH "cd ${dirdat_pro_1}\n";
+		  #print CSH "\\rm -rf $pdirbpass\n";
+		  print CSH "process_cal_data.pl -i none -t $Trange -d $pdirbpass -x $Ttag *.${dat_suffix} > $ofile1\n";
+		  print CSH "grep skip $ofile1 | awk '{print \$7}' > $ofile2\n";
+		  print CSH "\\cp $ofile1 $ofile2 $odir\n";
+
+		  print CSH "cd $pdirbpass\n";
+		  print CSH "rotate.pl *E.${dat_suffix}.${Ttag}\n";
+
+		} else {
+		  print "$pdirbpass already exists\n";
+		}
+	      } else {
+		print "${dirdat_pro_1} does not exist\n";
+	      }
+	    }			# idata
+
+          }			# iprocess3==1
+
+	} elsif (-f $cutfile) {
+	  print "cutfile $cutfile exists -- now read it in sac and execute\n";
+
+	  # read cut file
+	  open(IN,"$cutfile"); @lines = <IN>; close(IN); $nlines = @lines;
+
+	  $sacfile = "sac.mac";
+	  `echo echo on > $sacfile`;
+	  `echo readerr badfile fatal >> $sacfile`;
+
+	  for ($j = 1; $j <= $nlines; $j++) {
+
+	    $line = $lines[$j-1]; chomp($line);
+	    ($datfile,$synfile,$b,$e,$npt,$dt) = split(" ",$line);
+            print "$j out of $nlines -- $datfile\n";
+	    #print "-- $datfile -- $synfile -- $b -- $e -- $npt -- $dt -- \n";
+
+	    # cut records and fill zeros
+	    `echo r $datfile $synfile >> $sacfile`;
+	    `echo cuterr fillz >> $sacfile`;
+	    `echo "cut $b n $npt" >> $sacfile`;
+	    `echo r $datfile $synfile >> $sacfile`; # cut both
+	    `echo cut off >> $sacfile`;
+	    `echo w over >> $sacfile`;
+
+	  } 
+	  `echo quit >> $sacfile`;
+
+          # KEY: execute SAC command
+	  `sac $sacfile`;
+	  `sleep 5s`;
+	  `rm $sacfile`;
+	  print "\n Done with pre-processing, part 2\n";
+	  `mv $cutfile ${cutfile_done}`;
+
+	} else {
+
+	  print "\nWriting to $cutfile ...\n";
+          open(CUT,">$cutfile");
 
 	  # grab all DATA files
-	  @files = glob("${dirdat}/*");
+	  @files = glob("${dirdat_pro_1}/*");
 	  $nfile = @files;
 	  print "\n $nfile data files to line up with synthetics\n";
 
-	  #------------------------
-
-	  `echo echo on > sac.mac`;
-	  `echo readerr badfile fatal >> sac.mac`;
-
-	  foreach $file (@files) { 
-	    # read the sac headers
-	    (undef,$net,$sta,$chan) = split(" ",`saclst knetwk kstnm kcmpnm f $file`);
+	  foreach $datfile (@files) { 
+	    # read the sac headers -- network, station, component
+	    (undef,$net,$sta,$chan) = split(" ",`saclst knetwk kstnm kcmpnm f $datfile`);
 	    $comp = `echo $chan | awk '{print substr(\$1,3,1)}'`;
 	    chomp($comp);
-	    #print "\n $net $sta $chan $comp\n";
 
 	    # synthetics are always BH_ component
-	    $synt = "${dirsyn}/${sta}.${net}.BH${comp}.${syn_suffix}";
-	    #print "\n $file $synt ";
+	    $synfile = "${dirsyn_pro_1}/${sta}.${net}.BH${comp}.${syn_suffix}";
 
 	    # if the synthetic file exists, then go on
-	    if (-f $synt) { 
-	      print "\n $file $synt"; # only list files that are pairs
+	    if (-f $synfile) {
+	      print "$datfile $synfile\n"; # only list files that are pairs
 
 	      # get info on data and synthetics
-	      `echo r $file >> sac.mac`;
-	      `echo r $synt >> sac.mac`;
-	      (undef,$bd,$ed,$deltad,$nptd) = split(" ",`saclst b e delta npts f $file`);
-	      (undef,$bs,$es,$deltas,$npts) = split(" ",`saclst b e delta npts f $synt`);
+	      (undef,$bd,$ed,$deltad,$nptd) = split(" ",`saclst b e delta npts f $datfile`);
+	      (undef,$bs,$es,$deltas,$npts) = split(" ",`saclst b e delta npts f $synfile`);
 	      $tlend = $ed - $bd;
 	      $tlens = $es - $bs;
     
 	      # dt should be the same for both records ALREADY
 	      if (log($deltad/$deltas) > 0.01) {
-		print "$file $synt\n";
+		print "$datfile $synfile\n";
 		print "DT values are not close enough: $deltad, $deltas\n";
 		die("fix the DT values\n");
 	      } else {
@@ -321,7 +418,6 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	      if ($b0 < $bmin) {
 		$b0 = $bmin;
 	      }
-
 	      if ($ed < $es) {
 		$e0 = $ed;
 	      } else {
@@ -330,10 +426,11 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
 	      $b = $b0;
 	      $tlen0 = $e0 - $b;
-	      $tlen = $tfac * $tlen0; # extend record length
+	      $tlen = $tfac * $tlen0; # extend record length (if desired)
 	      $e = $b0 + $tlen;
-
 	      $npt = int( ($e-$b)/$dt );
+
+              print CUT "$datfile $synfile $b $e $npt $dt\n";
 
 	      if (0==1) {
 		print "\n Data : $bd $ed $deltad $nptd -- $tlend";
@@ -345,80 +442,166 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 		print "\n $tlen = $tfac * ($e0 - $b)";
 		print "\n $e = $b0 + $tlen \n";
 	      }
-
-	      # cut records and fill zeros
-	      `echo r $file $synt >> sac.mac`;
-	      `echo cuterr fillz >> sac.mac`;
-	      `echo "cut $b n $npt" >> sac.mac`;
-	      `echo r $file $synt >> sac.mac`; # cut both
-	      `echo cut off >> sac.mac`;
-	      `echo w over >> sac.mac`;
-	    }
-
-	  } 
-	  `echo quit >> sac.mac`;
-	  `sac sac.mac`;	# KEY: EXECUTE the SAC commands
-	  `rm sac.mac`;
-
-	  print "\n Done with pre-processing, part 2\n";
+	    }			# if synfile exists
+	  }			# for all data files
+          print "\n Done making cutfile $cutfile\n";
+          close(CUT);
 
 	}
-
-	#----------------------------------------------------------------------
-	# PROCESSING PART 3: band-pass filter and rotate
-
-	if ($iprocess3 == 1) {
-
-	  if ($isyn == 1) {
-	    $dirsyn = "${dirsyn0}/${eid}/$pdir";
-	    if (-e $dirsyn) {
-	      if (not -e "$dirsyn/$pdirbpass") {
-		print CSH "cd $dirsyn\n";
-		#print CSH "\\rm -rf $pdirbpass\n";
-		print CSH "process_trinet_syn_new.pl -S -t $Trange -d $pdirbpass -x $Ttag *.${syn_suffix} \n";
-		print CSH "cd $pdirbpass\n";
-		print CSH "rotate.pl *E.${syn_suffix}.${Ttag}\n";
-
-	      } else {
-		print "$pdirbpass already exists\n";
-	      }
-	    } else {
-	      print "$dirsyn does not exist\n";
-	    }
-	  }			# isyn
+      }				# if data (or syn) have already been bandpass filtered
+    }				# dirdat_pro_1 and dirsyn_pro_1 exist
+  }				# iprocess2=1
 
 
-	  # data
-	  if ($idata == 1) {
-	    $dirdat = "${dirdat0}/${eid}/$pdir";
-	    if (-e $dirdat) {
-	      if (not -e "$dirdat/$pdirbpass") {
+#	if ($iprocess2 == 1) {
+#	  # grab all DATA files
+#	  @files = glob("${dirdat_pro_1}/*");
+#	  $nfile = @files;
+#	  print "\n $nfile data files to line up with synthetics\n";
 
-		$ofile1 = "${eid}_ofile";
-		$ofile2 = "${eid}_no_pz_files";
-		$odir = "${dirdat0}/CHECK_DIR";
-		print CSH "mkdir -p $odir\n";
+#	  #------------------------
 
-		print CSH "cd $dirdat\n";
-		#print CSH "\\rm -rf $pdirbpass\n";
-		print CSH "process_cal_data.pl -i none -t $Trange -d $pdirbpass -x $Ttag *.${dat_suffix} > $ofile1\n";
-		print CSH "grep skip $ofile1 | awk '{print \$7}' > $ofile2\n";
-		print CSH "\\cp $ofile1 $ofile2 $odir\n";
+#          $sacfile = "sac.mac";
+#	  `echo echo on > $sacfile`;
+#	  `echo readerr badfile fatal >> $sacfile`;
 
-		print CSH "cd $pdirbpass\n";
-		print CSH "rotate.pl *E.${dat_suffix}.${Ttag}\n";
+#	  foreach $file (@files) { 
+#	    # read the sac headers -- network, station, component
+#	    (undef,$net,$sta,$chan) = split(" ",`saclst knetwk kstnm kcmpnm f $file`);
+#	    $comp = `echo $chan | awk '{print substr(\$1,3,1)}'`;
+#	    chomp($comp);
+#	    #print "\n $net $sta $chan $comp\n";
 
-	      } else {
-		print "$pdirbpass already exists\n";
-	      }
-	    } else {
-	      print "$dirdat does not exist\n";
-	    }
-	  }   # idata
-	}     # iprocess3=1
-      }       # if data (or syn) have already been bandpass filtered
-    }         # dirdat and dirsyn exist
-  }           # iprocess2=1 or iprocess3=1
+#	    # synthetics are always BH_ component
+#	    $synt = "${dirsyn_pro_1}/${sta}.${net}.BH${comp}.${syn_suffix}";
+#	    #print "\n $file $synt ";
+
+#	    # if the synthetic file exists, then go on
+#	    if (-f $synt) { 
+#	      print "\n $file $synt"; # only list files that are pairs
+
+#	      # get info on data and synthetics
+#	      `echo r $file >> $sacfile`;
+#	      `echo r $synt >> $sacfile`;
+#	      (undef,$bd,$ed,$deltad,$nptd) = split(" ",`saclst b e delta npts f $file`);
+#	      (undef,$bs,$es,$deltas,$npts) = split(" ",`saclst b e delta npts f $synt`);
+#	      $tlend = $ed - $bd;
+#	      $tlens = $es - $bs;
+    
+#	      # dt should be the same for both records ALREADY
+#	      if (log($deltad/$deltas) > 0.01) {
+#		print "$file $synt\n";
+#		print "DT values are not close enough: $deltad, $deltas\n";
+#		die("fix the DT values\n");
+#	      } else {
+#		$dt = $deltad;
+#	      }
+
+#	      # determine the cut for the records
+#	      # b = earliest start time
+#	      # e = earliest end time, multiplied by some factor
+#	      if ($bd < $bs) {
+#		$b0 = $bd;
+#	      } else {
+#		$b0 = $bs;
+#	      }
+#	      if ($b0 < $bmin) {
+#		$b0 = $bmin;
+#	      }
+
+#	      if ($ed < $es) {
+#		$e0 = $ed;
+#	      } else {
+#		$e0 = $es;
+#	      }
+
+#	      $b = $b0;
+#	      $tlen0 = $e0 - $b;
+#	      $tlen = $tfac * $tlen0;   # extend record length (if desired)
+#	      $e = $b0 + $tlen;
+
+#	      $npt = int( ($e-$b)/$dt );
+
+#	      if (0==1) {
+#		print "\n Data : $bd $ed $deltad $nptd -- $tlend";
+#		print "\n Syn  : $bs $es $deltas $npts -- $tlens";
+#		print "\n b0, e0, tlen0 : $b0, $e0, $tlen0 ";
+#		print "\n   b : $bd, $bs, $b ";
+#		print "\n   e : $ed, $es, $e ";
+#		print "\n npt : $nptd, $npts, $npt ";
+#		print "\n $tlen = $tfac * ($e0 - $b)";
+#		print "\n $e = $b0 + $tlen \n";
+#	      }
+
+#	      # cut records and fill zeros
+#	      `echo r $file $synt >> $sacfile`;
+#	      `echo cuterr fillz >> $sacfile`;
+#	      `echo "cut $b n $npt" >> $sacfile`;
+#	      `echo r $file $synt >> $sacfile`; # cut both
+#	      `echo cut off >> $sacfile`;
+#	      `echo w over >> $sacfile`;
+#	    }
+
+#	  } 
+#	  `echo quit >> $sacfile`;
+#	  `sac $sacfile`;	# KEY: EXECUTE the SAC commands
+#          `sleep 5s`;
+#	  `rm $sacfile`;
+
+#	  print "\n Done with pre-processing, part 2\n";
+
+#	}
+
+#	#----------------------------------------------------------------------
+#	# PROCESSING PART 3: band-pass filter and rotate
+
+#	if ($iprocess3 == 1) {
+
+#	  if ($isyn == 1) {
+#	    if (-e ${dirsyn_pro_1}) {
+#	      if (not -e ${dirsyn_pro_2}) {
+#		print CSH "cd ${dirsyn_pro_1}\n";
+#		#print CSH "\\rm -rf $pdirbpass\n";
+#		print CSH "process_trinet_syn_new.pl -S -t $Trange -d $pdirbpass -x $Ttag *.${syn_suffix} \n";
+#		print CSH "cd $pdirbpass\n";
+#		print CSH "rotate.pl *E.${syn_suffix}.${Ttag}\n";
+
+#	      } else {
+#		print "$pdirbpass already exists\n";
+#	      }
+#	    } else {
+#	      print "${dirsyn_pro_1} does not exist\n";
+#	    }
+#	  }			# isyn
+
+
+#	  # data
+#	  if ($idata == 1) {
+#	    if (-e ${dirdat_pro_1}) {
+#	      if (not -e ${dirdat_pro_2}) {
+
+#		$ofile1 = "${eid}_ofile";
+#		$ofile2 = "${eid}_no_pz_files";
+#		$odir = "${dirdat0}/CHECK_DIR";
+#		print CSH "mkdir -p $odir\n";
+
+#		print CSH "cd ${dirdat_pro_1}\n";
+#		#print CSH "\\rm -rf $pdirbpass\n";
+#		print CSH "process_cal_data.pl -i none -t $Trange -d $pdirbpass -x $Ttag *.${dat_suffix} > $ofile1\n";
+#		print CSH "grep skip $ofile1 | awk '{print \$7}' > $ofile2\n";
+#		print CSH "\\cp $ofile1 $ofile2 $odir\n";
+
+#		print CSH "cd $pdirbpass\n";
+#		print CSH "rotate.pl *E.${dat_suffix}.${Ttag}\n";
+
+#	      } else {
+#		print "$pdirbpass already exists\n";
+#	      }
+#	    } else {
+#	      print "${dirdat_pro_1} does not exist\n";
+#	    }
+#	  }   # idata
+#	}     # iprocess3=1
 
 }
 
@@ -426,6 +609,7 @@ if($iprocess0==1) {close(SYN);}
 
 #======================
 close(CSH);
+print "closing $cshfile\n";
 if($iexecute==1) {system("csh -f $cshfile");}
 
 print "\n ";

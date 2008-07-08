@@ -38,8 +38,8 @@
 #     prepare_meas_all.pl
 #
 #  EXAMPLES:
-#    pick_all_windows.pl m03 0 6/40   1/203 1/1/1/0 1 0     # both, T = 6s
-#    pick_all_windows.pl m03 0 2/40   1/203 1/1/1/1 1 0     # both, T = 2s
+#    pick_all_windows.pl m04 0 6/40   1/203 1/1/1/0 1 0     # both, T = 6s
+#    pick_all_windows.pl m04 0 2/40   1/203 1/1/1/1 1 0     # both, T = 2s
 #
 #    pick_all_windows.pl m00 0 6/40 179/179 1/1/0/0 1 0     # plots only
 #    pick_all_windows.pl m00 0 6/40 179/179 0/0/1/0 1 0     # measurement code only
@@ -94,9 +94,9 @@ if($idataset == 1) {
 
 # specify various directories (MUST BE MODIFIED FOR EACH USER)
 $dir0 = "/net/denali/scratch1/carltape/svn/cig/seismo/3D";
-$dir_win_code = "$dir0/ADJOINT_TOMO_WORK/flexwin";
+$dir_win_code = "$dir0/ADJOINT_TOMO/flexwin_work";
 $dir_win_run  = "$dir0/flexwin_run";
-#$dir_win_code = "$dir0/ADJOINT_TOMO_WORK/flexwin_copy2";
+#$dir_win_code = "$dir0/ADJOINT_TOMO/flexwin_work_copy2";
 #$dir_win_run  = "$dir0/flexwin_run_copy2";
 $dir_scripts  = "${dir_win_code}/scripts";
 
@@ -191,7 +191,7 @@ if (not -f ${userfun_file_in}) {die("check if PAR_FILE ${userfun_file_in} exist 
 `cp ${userfun_file_in} ${userfun_file}`;
 
 # name of executable windowing code (in $dir_win_code)
-$win_execute = "test2";
+$win_execute = "flexwin";
 
 # make command for windowing code
 $make = "make -f make_intel_caltech";

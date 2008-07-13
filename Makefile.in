@@ -5,10 +5,10 @@ FCFLAGS = @FCFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 
-PROGS = test2
+PROGS = flexwin
 
-test2_LIBS = -lSacLib -lsac -ltau
-test2_OBJS = \
+flexwin_LIBS = -lSacLib -lsac -ltau
+flexwin_OBJS = \
 	distaz.o \
 	io_subs.o \
 	maxima.o \
@@ -38,8 +38,8 @@ all: $(PROGS)
 	$(FC) $(FCFLAGS) -c -o $@ $<
 
 
-test2: test2.f90 $(test2_OBJS)
-	$(FC) $(FCFLAGS) test2.f90 -o test2 $(test2_OBJS) $(LDFLAGS) $(test2_LIBS) $(LIBS)
+flexwin: flexwin.f90 $(flexwin_OBJS)
+	$(FC) $(FCFLAGS) flexwin.f90 -o flexwin $(flexwin_OBJS) $(LDFLAGS) $(flexwin_LIBS) $(LIBS)
 
 clean:
 	rm -f $(PROGS) *.o *.mod

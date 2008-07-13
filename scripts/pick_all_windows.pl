@@ -38,8 +38,8 @@
 #     prepare_meas_all.pl
 #
 #  EXAMPLES:
-#    pick_all_windows.pl m04 0 6/40   1/203 1/1/1/0 1 0     # both, T = 6s
-#    pick_all_windows.pl m04 0 2/40   1/203 1/1/1/1 1 0     # both, T = 2s
+#    pick_all_windows.pl m05 0 6/40   1/203 1/1/1/0 1 0     # both, T = 6s
+#    pick_all_windows.pl m05 0 2/40   1/203 1/1/1/1 1 0     # both, T = 2s
 #
 #    pick_all_windows.pl m00 0 6/40 179/179 1/1/0/0 1 0     # plots only
 #    pick_all_windows.pl m00 0 6/40 179/179 0/0/1/0 1 0     # measurement code only

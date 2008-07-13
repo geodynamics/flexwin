@@ -15,7 +15,7 @@ INCDIR=${A_CODE}/include
 SHARE=${A_CODE}/share
 LIBS= -lSacLib -lsac -lutil -ltau -lnumrec -lm 
 
-PROGS= test2
+PROGS= flexwin
 default:${PROGS} 
 
 LIBSRC2=user_parameters.f90 seismo_subs.f90 user_functions.f90 select_windows_stalta2.f90 maxima.f90 travel_times.f90 measurement_module.f90 xcorr-measure.f90 measure_windows_xcorr.f90 io_subs.f90 
@@ -38,8 +38,8 @@ SUFFIXES = .f .o .f90 .F .mod
 	$(FC) ${FFLAGS} -c -o $@ $< -I${INCDIR}
 
 
-test2:test2.f90 ${LIB2}
-	$(FC) ${FFLAGS} test2.f90 -o test2 ${LIB2} -L${LIBDIR} -L${OPTLIBDIR} ${LIBS} 
+flexwin:flexwin.f90 ${LIB2}
+	$(FC) ${FFLAGS} flexwin.f90 -o flexwin ${LIB2} -L${LIBDIR} -L${OPTLIBDIR} ${LIBS} 
 	if [ ! -e iasp91.hed ] ; then ( ln -s ${SHARE}/iasp91.hed . ; ln -s ${SHARE}/iasp91.tbl . ) ; fi
 
 clean:

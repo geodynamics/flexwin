@@ -11,7 +11,7 @@ dnl You must have recent versions of Autoconf and Automake installed.
 
 AC_PREREQ(2.61)
 AC_INIT([flexwin], [1.0], [cig-seismo@geodynamics.org])
-AC_CONFIG_SRCDIR([test2.f90])
+AC_CONFIG_SRCDIR([flexwin.f90])
 
 
 # Checks for programs.

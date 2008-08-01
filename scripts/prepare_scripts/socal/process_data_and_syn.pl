@@ -3,7 +3,7 @@
 #==========================================================
 #
 #  Carl Tape
-#  12-July-2007
+#  24-July-2007
 #  process_data_and_syn.pl
 #
 #  This script processes data and 3D-Socal-SEM synthetics for Southern California.
@@ -20,24 +20,24 @@
 #    Trange    band-pass filter
 #
 #  ORDER OF OPERATIONS:
-#    ~/UTILS/process_data_and_syn.pl 1 1 0 d d 20 6/40 PROCESSED    # data, initial processing
-#    ~/UTILS/process_data_and_syn.pl 1 0 1 d d 20 6/40 PROCESSED    # syn, initial processing
-#    ~/UTILS/process_data_and_syn.pl 2 1 1 d d 20 6/40 PROCESSED    # both, create cut files
-#    ~/UTILS/process_data_and_syn.pl 3 1 0 d d 20 6/40 PROCESSED    # data, execute cut file
-#    ~/UTILS/process_data_and_syn.pl 3 0 1 d d 20 6/40 PROCESSED    # syn, execute cut file
+#    ~/UTILS/process_data_and_syn.pl 1 m07 1 0 d d 20 6/40 PROCESSED    # data, initial pre-processing
+#    ~/UTILS/process_data_and_syn.pl 1 m07 0 1 d d 20 6/40 PROCESSED    # syn, initial pre-processing
+#    ~/UTILS/process_data_and_syn.pl 2 m07 1 1 d d 20 6/40 PROCESSED    # both, create cut files
+#    ~/UTILS/process_data_and_syn.pl 3 m07 1 0 d d 20 6/40 PROCESSED    # data, execute cut file
+#    ~/UTILS/process_data_and_syn.pl 3 m07 0 1 d d 20 6/40 PROCESSED    # syn, execute cut file
 #
-#    ~/UTILS/process_data_and_syn.pl 4 1 0 d d 20 6/40 PROCESSED    # data, bandpass T=6-40
-#    ~/UTILS/process_data_and_syn.pl 4 0 1 d d 20 6/40 PROCESSED    # syn, bandpass T=6-40
+#    ~/UTILS/process_data_and_syn.pl 4 m07 1 0 d d 20 6/40 PROCESSED    # data, bandpass T=6-40
+#    ~/UTILS/process_data_and_syn.pl 4 m07 0 1 d d 20 6/40 PROCESSED    # syn, bandpass T=6-40
 #
-#    ~/UTILS/process_data_and_syn.pl 4 1 0 d d 20 2/40 PROCESSED    # data, bandpass T=2-40
-#    ~/UTILS/process_data_and_syn.pl 4 0 1 d d 20 2/40 PROCESSED    # syn, bandpass T=2-40
+#    ~/UTILS/process_data_and_syn.pl 4 m07 1 0 d d 20 2/40 PROCESSED    # data, bandpass T=2-40
+#    ~/UTILS/process_data_and_syn.pl 4 m07 0 1 d d 20 2/40 PROCESSED    # syn, bandpass T=2-40
 #
 #==========================================================
 
-if (@ARGV < 8) {die("Usage: process_data_and_syn.pl idata isyn syn_ext dat_ext sps Tmin/Tmax pdir\n")}
-($iprocess,$idata,$isyn,$syn_ext,$dat_ext,$sps,$Trange,$pdir) = @ARGV;
+if (@ARGV < 9) {die("Usage: process_data_and_syn.pl iprocess smodel idata isyn syn_ext dat_ext sps Tmin/Tmax pdir\n")}
+($iprocess,$smodel,$idata,$isyn,$syn_ext,$dat_ext,$sps,$Trange,$pdir) = @ARGV;
 
-$smodel = "m05";   # KEY: model iteration index
+#$smodel = "m05";   # KEY: model iteration index
 $iexecute = 0;
 $ilist = 1;
 
@@ -62,8 +62,8 @@ $dat_suffix = "${dat_suffix0}.${dat_ext}";
 
 # directories
 #$CMT_list = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_${smodel}";
-$dir_source = "/net/sierra/raid1/carltape/results/SOURCES/socal_7";
-$dirCMT    = "${dir_source}/v7_files";
+$dir_source = "/net/sierra/raid1/carltape/results/SOURCES/socal_9";
+$dirCMT    = "${dir_source}/v9_files";
 $CMT_list  = "${dir_source}/EIDs_only_eid";
 $dirdat0    = "/net/sierra/raid1/carltape/socal/socal_3D/DATA/FINAL";
 $dirsyn0    = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_${smodel}";
@@ -124,8 +124,8 @@ if($iprocess==0) {
 }
 
 $imin = 1; $imax = $ncmt;  # default
-#$imin = 1; $imax = 96;
-#$imin = 178; $imax = $imin;
+#$imin = 101; $imax = $ncmt;
+#$imin = 204; $imax = $imin;
 
 #----------------------------------------------------------------------
 
@@ -261,7 +261,10 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
 	# if the synthetic file exists, then go on
 	if (-f $synfile) {
-	  print "$datfile $synfile\n"; # only list files that are pairs
+          # only list files that are pairs
+          # only base name is used for syn file
+          $synfile_base = `basename $synfile`; chomp($synfile_base);
+	  print "$datfile $synfile_base\n";
 
 	  # get info on data and synthetics
 	  (undef,$bd,$ed,$deltad,$nptd) = split(" ",`saclst b e delta npts f $datfile`);
@@ -295,6 +298,12 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	    $e0 = $es;
 	  }
 
+          # avoid events 14263716 and 14179292
+          # --> adjust the simulation times, rather than the cut times
+          #if($eid == 14179288 || $eid == 14263712) {
+          #   $e0 = 120;
+          #}
+
 	  $b = $b0;
 	  $tlen0 = $e0 - $b;
 	  $tlen = $tfac * $tlen0; # extend record length (if desired)
@@ -303,7 +312,7 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
 	  #print CUT "$datfile $synfile $b $e $npt $dt\n";
 	  print CUTDAT "$datfile $b $e $npt $dt\n";
-	  print CUTSYN "$synfile $b $e $npt $dt\n";
+	  print CUTSYN "$synfile_base $b $e $npt $dt\n";
 
 	  if (0==1) {
 	    print "\n Data : $bd $ed $deltad $nptd -- $tlend";
@@ -386,8 +395,9 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
     #------------------
 
     if ($isyn == 1) {
-      if (-e ${dirsyn_pro_2}) {
-	print "--> dirsyn ${dirsyn_pro_2} already exists\n";
+      if ( (-e ${dirsyn_pro_2}) || (not -e ${dirsyn_pro_1}) ) {
+        if ( -e ${dirsyn_pro_2}) {print "--> dirsyn ${dirsyn_pro_2} already exists\n";}
+        if ( not -e ${dirsyn_pro_1} ) {print "--> dirsyn ${dirsyn_pro_1} does not exist\n";}
 
       } else {
 	if (-f $cutfile_syn_done) {
@@ -410,7 +420,12 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	    for ($j = 1; $j <= $nlines; $j++) {
 
 	      $line = $lines[$j-1]; chomp($line);
-	      ($synfile,$b,$e,$npt,$dt) = split(" ",$line);
+	      ($synfile_base,$b,$e,$npt,$dt) = split(" ",$line);
+
+              # KEY: indicate the base directory
+              $synfile = "${dirsyn_pro_1}/${synfile_base}";
+              if (not -f $synfile) {die("synfile $synfile does not exist");}
+
 	      print "$j out of $nlines -- $synfile\n";
 	      #print "-- $datfile -- $synfile -- $b -- $e -- $npt -- $dt -- \n";
 

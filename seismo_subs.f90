@@ -299,8 +299,10 @@
   !write(*,*)'sampling rate dt=',dt
 
 ! check start times are equal
-  if(abs(b1-b2).gt.dt) then
+  if(abs(b1-b2).gt.2.0*dt) then
     write(*,*)
+    write(*,*) 'b1, b2, dt, abs(b1-b2), 2*dt:'
+    write(*,*) b1, b2, dt, abs(b1-b2), 2.0*dt
     write(*,*)' !!! start times differ, program stop !!!'
     write(*,*)
     stop

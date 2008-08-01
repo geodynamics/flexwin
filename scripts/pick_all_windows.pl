@@ -38,13 +38,11 @@
 #     prepare_meas_all.pl
 #
 #  EXAMPLES:
-#    pick_all_windows.pl m05 0 6/40   1/203 1/1/1/0 1 0     # both, T = 6s
-#    pick_all_windows.pl m05 0 2/40   1/203 1/1/1/1 1 0     # both, T = 2s
+#    pick_all_windows.pl m07 0 6/40   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-40s
+#    pick_all_windows.pl m07 0 2/40   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-40s
 #
-#    pick_all_windows.pl m00 0 6/40 179/179 1/1/0/0 1 0     # plots only
-#    pick_all_windows.pl m00 0 6/40 179/179 0/0/1/0 1 0     # measurement code only
-#
-#    pick_all_windows.pl m00 0 6/40  54/54  1/1/1/0 1 0     # both (54=14095540 :  body wave mode for 6s)
+#    pick_all_windows.pl m00 0 6/40 179/179 1/1/0/0 1 0     # make plots only, T = 6-40s
+#    pick_all_windows.pl m00 0 6/40 179/179 0/0/1/0 1 0     # make WINDOWS file, T = 6-40s
 #
 #==========================================================
 
@@ -106,13 +104,11 @@ $dir_prepare = "${dir_scripts}/prepare_scripts/${sdataset}";
 # scripts for user files
 $dir_user = "${dir_win_code}/user_files";
 
-#$odir         = "/home/carltape/UTILS/test";
-#$odir         = "/net/sierra/raid1/carltape/results/WINDOWS/model_pre_${smodel}";
+# directory to collect COPIES of various output files
 $odir         = "/net/sierra/raid1/carltape/results/WINDOWS/model_${smodel}";
 
 # run directory for windows, measurements, adjoint sources, and kernels
 $rundir = "/net/sierra/raid1/carltape/socal/socal_3D/RUNS";
-#$rundir = "/net/sierra/raid1/carltape/socal/socal_3D/RUNS_TEST";
 
 #-------------------------------------
 

@@ -27,7 +27,7 @@
 #    iexecute      boolean: whether to execute the Shell script
 #
 #  DIRECTORIES:
-#    dir_data       directory containing data directories
+#    dir_data      directory containing data directories
 #    dir_syn       directory containing synthetics directories
 #    dir_win_code  directory for compiling the windowing code
 #    dir_win_run   directory for running the windowing code
@@ -39,6 +39,7 @@
 #
 #  EXAMPLES:
 #    pick_all_windows.pl m07 0 6/40   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-40s
+#    pick_all_windows.pl m07 0 4/40   1/204 1/1/1/1 1 0     # 
 #    pick_all_windows.pl m07 0 2/40   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-40s
 #
 #    pick_all_windows.pl m00 0 6/40 179/179 1/1/0/0 1 0     # make plots only, T = 6-40s
@@ -362,7 +363,9 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	print CSH "\\cp ${reclist_dist} ${reclist_out}\n";
 
 	# generate composite PDF file using plot_windows_all.pl
-        # NOTE: This takes a long time, and is not really necessary if you plot them in mt_measure_adj
+        # NOTE: This takes a long time, and is not really necessary
+        #       if have already determined the windowing code parameters
+        #       and you are planning to plot them in mt_measure_adj.
         if($iplotall == 1) {
 	   $pdffile = "$odir/${eout}_all.pdf";
 	   print CSH "${plot_windows_perl} ${dir_win_code} ${dir_win_run_meas} ${reclist_dist} $pdffile\n";

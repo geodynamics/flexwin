@@ -41,18 +41,18 @@ subroutine set_up_criteria_arrays
   ! see Liu et al. (2004), p. 1755, but note that the PARENTHESES
   ! that are listed in the publication should not be there
   ! THESE ARE PROBABLY NOT ACCURATE ENOUGH FOR LONGER PATHS.
-
-  Sw_start  = -15.0 + dist_km/3.5
-  Sw_end    =  35.0 + dist_km/3.1
-
   if (BODY_WAVE_ONLY) then
      !Pnl_start =  P_pick - 5.0
      !S_end     =  S_pick + 5.0
      Pnl_start =  P_pick - 2.5*WIN_MIN_PERIOD
      S_end     =  S_pick + 2.5*WIN_MIN_PERIOD
+     Sw_start  = -15.0 + dist_km/3.5
+     Sw_end    =  35.0 + dist_km/3.1
 
   else
      Pnl_start =  -5.0 + dist_km/7.8
+     Sw_start  = -15.0 + dist_km/3.5
+     Sw_end    =  35.0 + dist_km/3.1
      S_end     =  Sw_start
   endif
 
@@ -77,28 +77,26 @@ subroutine set_up_criteria_arrays
 
      ! raises STA/LTA water level after surface wave arrives
      if (BODY_WAVE_ONLY) then
-
-        !if(time.gt.S_end) then
-        if(time.gt.Sw_end) then
+        if(time.gt.S_end) then
            STALTA_W_LEVEL(i) = 10.*STALTA_BASE
         endif
-     
+
      else
-!!$        ! set time- and distance-specific Tshift and DlnA to mimic Qinya's criteria
-!!$        ! (see Liu et al., 2004, p. 1755; note comment above)
-!!$        if(time.ge.Pnl_start .and. time.lt.Sw_start) then
-!!$           !DLNA_LIMIT(i) = 1.5  ! ratio is 2.5, and dlna is ratio-1
-!!$           TSHIFT_LIMIT(i) = 3.0 + dist_km/80.0
-!!$        endif
-!!$        if(time.ge.Sw_start .and. time.le.Sw_end) then
-!!$           !DLNA_LIMIT(i) = 1.5  ! ratio is 2.5, and dlna is ratio-1
-!!$           TSHIFT_LIMIT(i) = 3.0 + dist_km/50.0
-!!$        endif
+        ! set time- and distance-specific Tshift and DlnA to mimic Qinya's criteria
+        ! (see Liu et al., 2004, p. 1755; note comment above)
+        if(time.ge.Pnl_start .and. time.lt.Sw_start) then
+           !DLNA_LIMIT(i) = 1.5  ! ratio is 2.5, and dlna is ratio-1
+           TSHIFT_LIMIT(i) = 3.0 + dist_km/80.0
+        endif
+        if(time.ge.Sw_start .and. time.le.Sw_end) then
+           !DLNA_LIMIT(i) = 1.5  ! ratio is 2.5, and dlna is ratio-1
+           TSHIFT_LIMIT(i) = 3.0 + dist_km/50.0
+        endif
 
         ! double the STA/LTA water level after the surface waves
-        !if(time.gt.Sw_end) then
-        !   STALTA_W_LEVEL(i) = 2.0*STALTA_BASE
-        !endif
+        if(time.gt.Sw_end) then
+           STALTA_W_LEVEL(i) = 2.0*STALTA_BASE
+        endif
 
      endif
 

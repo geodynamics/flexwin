@@ -57,7 +57,7 @@ WINDOW_AMP_BASE                 = 4.0
 # -------------------------------------------------------------
 # Fine tuning constants 
 C_0  (internal minima)          = 1.0
-C_1  (small windows)            = 6.0
+C_1  (small windows)            = 5.0
 C_2  (prominence)               = 0.0
 C_3a (separation height)        = 4.0 
 C_3b (separation time)          = 2.5 

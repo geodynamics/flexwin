@@ -43,7 +43,7 @@ for file in DATA/* ; do
     #fi
 
   else
-     echo $synt >> t3
+     echo $out >> t3
   fi
 
 done

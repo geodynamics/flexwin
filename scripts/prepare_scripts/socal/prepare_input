@@ -1,33 +1,35 @@
 #!/bin/sh
 
-if [ -e t1 ] ; then ( rm t1 ) ; fi
-if [ -e t2 ] ; then ( rm t2 ) ; fi
-if [ -e t3 ] ; then ( rm t3 ) ; fi
+# update by Qinya -- 
+#   theoretically t2 should not exist after process_data_and_syn.pl
+rm -f t1 t2 t3
 
 n=0
-for file in DATA/* ; do
+# only processing ?H[RTZ] components for the windowing code
+for file in DATA/*.?H[RTZ].* ; do
 
+  # take network, station, channel and comp info from the sac headers
   net=`saclst knetwk f $file | awk '{print $2}'`
   sta=`saclst kstnm f $file | awk '{print $2}'`
   chan=`saclst kcmpnm f $file | awk '{print $2}'`
-  #net=`echo $file | awk -F"." '{print $2}'`
-  #sta=`echo $file | awk -F"." '{print $3}'`
-  #chan=`echo $file | awk -F"." '{print $4}'`
   comp=`echo $chan | awk '{print substr($1,3,1)}'`
   #echo $net $sta $chan $comp
 
   # synthetics are always BH_
   #synt=SYN/${sta}.${net}.BH${comp}.semd.sac.d
-  synt=`ls SYN/${sta}.${net}.BH${comp}*`
+  #synt=`ls SYN/${sta}.${net}.BH${comp}*`
+  nsynt=`ls -1 SYN/${sta}.${net}.BH${comp}* | wc | awk '{print $1}'`
+
   out=MEASURE/${sta}.${net}.${chan}
 
-  if [ -e $synt ] ; then
+  if [ $nsynt == 1 ] ; then # data with unique syn match
 
-  b1=`saclst b f $file | awk '{print $2}'`
-  b2=`saclst b f $synt | awk '{print $2}'`
-  db=$(echo "sqrt(($b1 - $b2)^2)" | bc)
-  dt1=`saclst delta f $file | awk '{print $2}'`
-  dt2=`saclst delta f $synt | awk '{print $2}'`
+    synt=`ls SYN/${sta}.${net}.BH${comp}*`
+    b1=`saclst b f $file | awk '{print $2}'`
+    b2=`saclst b f $synt | awk '{print $2}'`
+    db=$(echo "sqrt(($b1 - $b2)^2)" | bc)
+    dt1=`saclst delta f $file | awk '{print $2}'`
+    dt2=`saclst delta f $synt | awk '{print $2}'`
 
     flag=`echo "$db 2*$dt1" | awk '{if ($1 < $2) print -1; else print 1}'`
     #if [ `echo "$dt1 - $dt2"| bc` = 0 ] ; then
@@ -43,7 +45,7 @@ for file in DATA/* ; do
     #fi
 
   else
-     echo $out >> t3
+     echo "SYN/${sta}.${net}.BH${comp}*" >> t3
   fi
 
 done
@@ -51,18 +53,17 @@ done
 # input file for window code
 echo $n > input
 cat t1 >> input
-rm t1
+rm -f t1
 
 # list of probable bad data files
-rm input_bad
-cat t2 >> input_bad
-rm t2
+if [ -e "t2" ]; then
+   mv t2 input_bad
+fi
 
 # list of missing synthetic files
-rm input_no_syn
-cat t3 >> input_no_syn
-rm t3
-
+if [ -e "t3" ]; then
+   mv t3 input_no_syn
+fi
 
 
 

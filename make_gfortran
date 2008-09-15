@@ -2,7 +2,7 @@
 
 OPT= -m32 -ffixed-line-length-132 -Wall
 FC = gfortran
-CFLAGS=`sac-config --cflags` ${OPT}
+CFLAGS= ${OPT}
 
 TAULIBDIR=ttimes_mod
 SACLIBDIR=${SACHOME}/lib

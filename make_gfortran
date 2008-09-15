@@ -12,7 +12,7 @@ LIBS= -lsacio -lsac -ltau -lm
 PROGS= flexwin
 default:${PROGS} 
 
-LIBSRC2=distaz.f user_parameters.f90  seismo_subs.f90  user_functions.f90 maxima.f90 travel_times.f90 measurement_module.f90 xcorr-measure.f90 measure_windows_xcorr.f90 io_subs.f90 select_windows_stalta2.f90
+LIBSRC2=distaz.f user_parameters.f90  seismo_subs.f90  user_functions.f90 maxima.f90 travel_times.f90 io_subs.f90 select_windows_stalta2.f90
 
 
 LIB2=libmeasure2.a

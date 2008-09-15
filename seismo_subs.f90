@@ -330,10 +330,10 @@
   call getkhv('kcmpnm', kcmpnm, nerr)
   call getkhv('knetwk', knetwk, nerr)
 
-  !if (BODY_WAVE_ONLY) then
+  if (BODY_WAVE_ONLY) then
      call getfhv('t1', P_pick, nerr)
      call getfhv('t2', S_pick, nerr)
-  !endif
+  endif
 
   ! CHT: why does this output as:  FMP     BHR     CI      
   if (DEBUG) write(*,*) kstnm, kcmpnm, knetwk 

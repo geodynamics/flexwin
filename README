@@ -11,11 +11,6 @@ measurements can subsequently be made.
 
 This is a bare-bones instruction set.  For more details read the flexwin manual (latex/flexwin_manual.pdf) and the flexwin article (latex/flexwin_paper.pdf).
 
-IMPORTANT NOTE: This beta test release contains some code that is under a
-licence that makes it non-distributable.  As flexwin beta testers, you are NOT
-authorized to pass on any part of this distribution to third parties.  This
-restriction will be removed as soon as flexwin is officially released.
-
 
 
 THE PACKAGE
@@ -62,22 +57,9 @@ flexwin
 COMPILATION
 -----------
 
-NOTE: Do NOT use the configure script for beta test compilation.  It will not
-work.
-
 FLEXWIN requires the following libraries external to the package in order to
-compile and run: libsacio.a and libSacLib.a.  Eventually, both libraries
-will be distributed by IRIS as part of the SAC package (at the moment only
-libsacio is distributed this way).  For the time being, you should compile
-libSacLib.a using the source code in the SacLib directory that accompanies
-flexwin (instructions later).  
-
-IMPORTANT NOTE: The SacLib directory is a temporary fix.  The SAC source code
-from which the SacLib library is compiled is proprietary and should not be
-distributed by anyone other than IRIS.  Brian Savage - the author of SacLib -
-is currently working on a new version of the library that will be distributed
-with future versions of SAC.  The official release of flexwin will require
-linkage to this new library.  
+compile and run: libsacio.a and libsac.a. Both libraries
+are distributed by IRIS as part of the SAC package (version 101.2 and above).  
 
 If your compiler of choice is gfortran, then you should be able to use the
 make_gfortran makefiles with only minor modifications (notably you may need to
@@ -90,16 +72,13 @@ compatibility flag.
 
 Steps to compile the flexwin package:
 
-(1) Compile libSacLib.a.  In the SacLib directory (which is outside the flexwin
-directory) type: "make -f make_gfortran".
-
-(2) Compile libtau.a and create iasp91.hed and iasp91.tbl.  In the
+(1) Compile libtau.a and create iasp91.hed and iasp91.tbl.  In the
 flexwin/ttimes_mod directory type: "make -f make_gfortran".  This will compile
 libtau.a, and two programs, remodl and setbrn.  The makefile will also run
 remodl and setbrn to create the iasp91.hed and iasp91.tbl files.  You should
 then type "make -f make_gfortran install" to install the iasp91 files.
 
-(3) Compile flexwin.  Edit the make_gfortran file in the flexwin root directory to ensure the SACLIBDIR variable points to the location of your SAC libraries (by default /opt/sac/lib).  Then type "make -f make_gfortran".
+(2) Compile flexwin.  Edit the make_gfortran file in the flexwin root directory to ensure the SACLIBDIR variable points to the location of your SAC libraries (by default $SACHOME/lib).  Then type "make -f make_gfortran".
 
 You should end up with the flexwin executable.  The program requires the iasp91
 files (or links to them) to be present in the directory from which the code is
@@ -109,8 +88,7 @@ launched.
 TEST DATA SET
 -------------
 
-You should test your compiled code on the test_data dataset provided.  In the
-flexwin/test_data directory, type "./flexwin < input.test".  The results of your
+You should test your compiled code on the test_data dataset provided.  In the flexwin/test_data directory, type "./flexwin < input.test".  The results of your
 run will be found in the MEASURE subdirectory, and
 should match those found in the MEASURE.orig
 subdirectory.

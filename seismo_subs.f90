@@ -469,15 +469,21 @@
   double precision, intent(in) :: delta_t
 
   real, dimension(:), allocatable :: x_sngl
-  real delta_t_sngl 
+!  real delta_t_sngl 
 
   allocate(x_sngl(n))
 
   x_sngl(1:n) = sngl(x(1:n))
-  delta_t_sngl = sngl(delta_t)
+!  delta_t_sngl = sngl(delta_t)
 
+  ! old version - uses old SacLib
   ! does band-pass filter
-  call xapiir(x_sngl,n,'BU',sngl(TRBDNDW),sngl(APARM),IORD,'BP',sngl(FSTART),sngl(FEND),delta_t_sngl,PASSES)
+  !call xapiir(x_sngl,n,'BU',sngl(TRBDNDW),sngl(APARM),IORD,'BP',sngl(FSTART),sngl(FEND),delta_t_sngl,PASSES)
+
+
+  ! new version, uses subroutines in libsac.a
+  ! does band-pass filter
+  call xapiir(x_sngl,n,'BU',TRBDNDW,APARM,IORD,'BP',FSTART,FEND,delta_t,PASSES)
 
   x_filt(1:n) = dble(x_sngl(1:n))
 

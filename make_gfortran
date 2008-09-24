@@ -37,5 +37,8 @@ flexwin:flexwin.f90 ${LIB2}
 
 clean:
 	rm -f  ${LIB2} ${PROGS} *.o *.mod
+
+cleanall:
 	rm -f  iasp91.*
+	cd $TAULIBDUR ; make -f make_gfortran clean
 

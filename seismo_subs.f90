@@ -341,6 +341,10 @@
   ! calculate distances and azimuths
   call distaz(evla,evlo,stla,stlo,azimuth,backazimuth,dist_deg,dist_km)
 
+  ! Frequency limits may be conditional on station or event information
+  ! so call user function to modify them if required
+  call modify_T0_T1_on_condition
+
   if(RUN_BANDPASS) then
      ! clean up the seismograms
      call detrend(obs,npts)

@@ -142,22 +142,30 @@ $dir_win_run_syn  = "${dir_win_run}/SYN";
 $dir_win_run_data = "${dir_win_run}/DATA";
 $dir_win_run_meas = "${dir_win_run}/MEASURE";
 
-# obtain list of events
-#@datadirs = `ls -1 -d ${dir_data}/[1-9]* | sort -g`;
-@datadirs = glob("${dir_data}/[1-9]*");
-$nevent0 = @datadirs;
+# NEW: EVENT LIST
+$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_m07";
+if (not -f $eid_list) {die("check if eid_list ${eid_list} exist or not\n")}
+open(IN,$eid_list); @eids = <IN>; close(IN);
+$nevent0 = @eids;
+
+## obtain list of events
+##@datadirs = `ls -1 -d ${dir_data}/[1-9]* | sort -g`;
+#@datadirs = glob("${dir_data}/[1-9]*");
+#$nevent0 = @datadirs;
 
 # adjust indices for events
 print "\n imin = $imin ; imax = $imax ; nevent = $nevent0";
 if($imin < 1) {$imin = 1}
+if($imin > $nevent0) {$imin = $nevent0}
 if($imax > $nevent0) {$imax = $nevent0}
 $nevent = $imax - $imin + 1;
 print "\n imin = $imin ; imax = $imax ; nevent = $nevent\n";
 print "\n $nevent events to use in the windowing file\n";
 
 for ($ievent = $imin; $ievent <= $imax; $ievent++) {
-  $datadir1 = $datadirs[$ievent-1]; chomp($datadir1);
-  $eid = `basename $datadir1`; chomp($eid);   # event ID
+  #$datadir1 = $datadirs[$ievent-1]; chomp($datadir1);
+  #$eid = `basename $datadir1`; chomp($eid);   # event ID
+  $eid = $eids[$ievent-1]; chomp($eid);
   print "\n Event $ievent : $eid";
 }
 #die("testing");
@@ -172,7 +180,6 @@ $userfun_file = "${dir_win_code}/user_functions.f90";
 # copy PAR_FILE into local directory
 # directories for data and synthetics
 if($idataset == 1) {
-   #$par_file_in = "${dir_user}/socal_3D/PAR_FILE_T06_14095540";
    $par_file_in = "${dir_user}/socal_3D/PAR_FILE_${sTmin}_${smodel}";
    $userfun_file_in = "${dir_user}/socal_3D/user_functions_${smodel}.f90";
 
@@ -187,11 +194,20 @@ if (not -f ${userfun_file_in}) {die("check if PAR_FILE ${userfun_file_in} exist 
 `cp ${par_file_in} ${par_file}`;
 `cp ${userfun_file_in} ${userfun_file}`;
 
+# copy IASP files into run directory
+$iasp_in1 = "${dir_win_code}/ttimes_mod/iasp91.tbl";
+$iasp_in2 = "${dir_win_code}/ttimes_mod/iasp91.hed";
+$iasp_out1 = "${dir_win_run}/iasp91.tbl";
+$iasp_out2 = "${dir_win_run}/iasp91.hed";
+`cp $iasp_in1 $iasp_out1`;
+`cp $iasp_in2 $iasp_out2`;
+
 # name of executable windowing code (in $dir_win_code)
 $win_execute = "flexwin";
 
 # make command for windowing code
-$make = "make -f make_intel_caltech";
+$make = "make -f make_gfortran";   # change as of 9-30-08
+#$make = "make -f make_intel_caltech";
 
 # location of plot_windows_all.pl
 $plot_windows_perl = "${dir_scripts}/plot_windows_all.pl";
@@ -259,8 +275,10 @@ $kk = 0;
 for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
   # directories
-  $datadir1 = $datadirs[$ievent-1]; chomp($datadir1);
-  $eid = `basename $datadir1`; chomp($eid); # event ID
+  $eid = $eids[$ievent-1]; chomp($eid);
+  $datadir1 = "${dir_data}/$eid";
+  #$datadir1 = $datadirs[$ievent-1]; chomp($datadir1);
+  #$eid = `basename $datadir1`; chomp($eid); # event ID
 
   $kk = $kk + 1;
   print "Event ID is $eid -- $kk out of $nevent\n";

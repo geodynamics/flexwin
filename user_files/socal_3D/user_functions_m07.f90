@@ -61,7 +61,7 @@ subroutine set_up_criteria_arrays
   noise_end  = Pnl_start
   if(DEBUG) then
      write(*,*) 'DEBUG : P_pick = ', sngl(P_pick)
-     write(*,*) 'DEBUG : signal_end = ', sngl(sigmal_end)
+     write(*,*) 'DEBUG : signal_end = ', sngl(signal_end)
      write(*,*) 'DEBUG : noise_end = ', sngl(noise_end)
   endif
 

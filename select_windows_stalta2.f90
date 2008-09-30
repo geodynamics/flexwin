@@ -40,7 +40,6 @@
     call check_data_quality(data_ok,signal_int,noise_int,snr_int,time_obs_signal,time_obs_noise,signal_amp,noise_amp,snr_amp)
     ! if data quality is not ok, then return without selecting windows
     if (.not. data_ok) then
-      write(*,*) 'DATA QUALITY NOT OK'
       num_win = 0
       return
     endif
@@ -257,6 +256,7 @@
     snr_amp = 0.0
 
     if(DEBUG) write(*,*) 'DEBUG : noise_end = ', sngl(noise_end)
+    if(DEBUG) write(*,*) 'DEBUG : signal_end = ', sngl(signal_end)
 
     ! Integrating the signal and noise. We will take the RMS of the signal
     ! and noise, and take the ratio. Noise is integrated from start time to 
@@ -290,8 +290,13 @@
     snr_int = signal_int / noise_int
     snr_amp = signal_amp / noise_amp
 
-    ! If snr_int and snr_amp are less than a certain value, data_ok is .false.
+    ! If snr_int or snr_amp is less than a certain value, then data_ok is .false.
     if (snr_int < SNR_INTEGRATE_BASE .or. snr_amp < SNR_MAX_BASE) then
+       write(*,*) 'DATA QUALITY NOT OK'
+       if(DEBUG) write(*,*) 'snr_int < SNR_INTEGRATE_BASE: ', &
+          sngl(snr_int), sngl(SNR_INTEGRATE_BASE), snr_int < SNR_INTEGRATE_BASE
+       if(DEBUG) write(*,*) 'snr_amp < SNR_MAX_BASE: ', &
+          sngl(snr_amp), sngl(SNR_MAX_BASE), snr_amp < SNR_MAX_BASE
        data_ok = .false.
     endif
 

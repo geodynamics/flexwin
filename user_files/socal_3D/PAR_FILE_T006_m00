@@ -26,7 +26,7 @@ WIN_MAX_PERIOD                  = 40.00
 
 # -------------------------------------------------------------
 # E(t) water level  (0.23)
-STALTA_BASE                     = 0.22
+STALTA_BASE                     = 0.18
 
 # -------------------------------------------------------------
 # TSHIFT
@@ -34,7 +34,7 @@ TSHIFT_BASE                     = 10.0
 
 # -------------------------------------------------------------
 # limit on CC for window acceptance
-CC_BASE                         = 0.74
+CC_BASE                         = 0.71
 
 # -------------------------------------------------------------
 # limit on dlnA (dA/A) for window acceptance
@@ -48,7 +48,7 @@ DATA_QUALITY                    = .true.
 # signal-to-noise ratios exceeds these two base levels,
 # then the data time series (and syn) is kept
 SNR_INTEGRATE_BASE              = 3.0  
-SNR_MAX_BASE                    = 3.5
+SNR_MAX_BASE                    = 2.5
 
 # -------------------------------------------------------------
 # limit on signal to noise ratio in a particular window.

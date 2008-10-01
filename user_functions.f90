@@ -41,7 +41,7 @@
     CC_LIMIT(i)=CC_BASE
     TSHIFT_LIMIT(i)=TSHIFT_BASE
     STALTA_W_LEVEL(i)=STALTA_BASE
-    S2N_LIMIT(i)=WINDOW_AMP_BASE
+    S2N_LIMIT(i)=WINDOW_S2N_BASE
   enddo
 
   ! these values will be used for signal2noise calculations
@@ -74,7 +74,7 @@
 ! do i = 1, npts
 !   time=b+(i-1)*dt
 !   if (time.gt.R_time) then
-!     S2N_LIMIT(i)=2*WINDOW_AMP_BASE
+!     S2N_LIMIT(i)=2*WINDOW_S2N_BASE
 !   endif
 ! enddo
 !
@@ -101,7 +101,7 @@
    ! if we are beyond the Rayleigh wave, then make the all criteria stronger
    ! ratio criterion stronger
    if (time.gt.R_time) then
-     S2N_LIMIT(i)=10*WINDOW_AMP_BASE    ! only pick big signals
+     S2N_LIMIT(i)=10*WINDOW_S2N_BASE    ! only pick big signals
      CC_LIMIT(i)= 0.95                  ! only pick very similar signals
      TSHIFT_LIMIT(i)=TSHIFT_BASE/3.0    ! only pick small timeshifts
      DLNA_LIMIT(i)=DLNA_BASE/3.0        ! only pick small amplitude anomalies

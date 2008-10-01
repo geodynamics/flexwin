@@ -538,17 +538,20 @@
   TOL=1e-9
 
 ! set pre-extension for synthetic data and allocate extended_syn
-  n_extend=5*12*WIN_MIN_PERIOD/dt
+!  n_extend=5*12*WIN_MIN_PERIOD/dt
+  n_extend=1000*WIN_MIN_PERIOD/dt
   allocate(extended_syn(npts+n_extend))
 
 ! set noise level
-  n_sample=12*WIN_MIN_PERIOD/dt
-  noise=sum(env_synt_lp(1:n_sample))/n_sample
+!  n_sample=12*WIN_MIN_PERIOD/dt
+!  noise=sum(env_synt_lp(1:n_sample))/n_sample
+  noise=maxval(env_synt_lp)/10**5
 
 ! copy the original synthetic into the extended array, right justified  
-  call random_number(extended_syn)
-  extended_syn=noise*extended_syn
-  extended_syn(n_extend+1:n_extend+npts)=env_synt_lp(1:npts)
+!  call random_number(extended_syn)
+!  extended_syn=noise*extended_syn
+  extended_syn=noise
+  extended_syn(n_extend+1:n_extend+npts)=env_synt_lp(1:npts)+noise
 
   if (DEBUG) write(*,*) 'DEBUG : Cs, Cl = ', Cs, Cl
   if (DEBUG) write(*,*) 'Number of points used to pre-extend synthetics ', n_extend
@@ -795,7 +798,8 @@ end subroutine calc_criteria_original
 
   call prepare_sta_lta
 
-! set up the selection criteria arrays
+! set up the selection criteria arrays (subroutine is in user_functions.f90
+! file)
   call set_up_criteria_arrays
 
   end subroutine

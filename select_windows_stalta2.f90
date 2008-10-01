@@ -153,7 +153,7 @@
 
   write(*,*) "Selected windows, start and end time, CC, Tshift, dlnA  "
   do k = 1,num_win
-    write(*,'(i4,1x,5f8.3)') k, win_start(k), win_end(k), CC_local(k), Tshift_local(k), dlnA_local(k)
+    write(*,'(i4,1x,5f10.3)') k, win_start(k), win_end(k), CC_local(k), Tshift_local(k), dlnA_local(k)
 
     ! sanity check for the end of the record
     if(win_start(k) .lt. b) win_start(k) = b
@@ -184,14 +184,17 @@
     integer, dimension(NWINDOWS) :: iM_new, iL_new, iR_new
     logical :: accept
     double precision :: time, noise_amp, signal_amp, amp_ratio
+    double precision :: noise_pow, signal_pow, pow_ratio
 
-    ! Determine the max abplitude of the noise, as defined by the
+    ! Determine the max amplitude of the noise, as defined by the
     ! global variable noise_end.
     do i = 1, NDIM
        time = b+(i-1)*dt
        if (time > noise_end) exit
     enddo
+    ! i is the index corresponding to noise_end
     noise_amp = maxval( abs(obs_lp(1:i)) )
+    noise_pow = sum( (obs_lp(1:i))**2 )/(i-1)
 
     ! Determine the max amplitude of the windows that have their
     ! left bound time greater than the noise_end time.
@@ -201,16 +204,16 @@
     do iwin = 1, nwin
        accept = .true.
        signal_amp = maxval( abs(obs_lp(iL(iwin):iR(iwin))) )
+       signal_pow = sum( (obs_lp(iL(iwin):iR(iwin)))**2 )/(iR(iwin)-iL(iwin))
        amp_ratio = signal_amp / noise_amp
+       pow_ratio = signal_pow / noise_pow
 
-       if(0==1) then
-          print *, 'iwin : ', iwin
-          print *, 'noise_amp : ', noise_amp
-          print *, 'AMP_RATIO : ', amp_ratio
-          print *, 'S2N_LIMIT(iM(iwin)) : ', S2N_LIMIT(iM(iwin))
+       if(DEBUG) then
+           write (*,*) 'DEBUG : iwin, amp_ratio : ', iwin, amp_ratio
        endif
 
        if (amp_ratio < S2N_LIMIT(iM(iwin))) then
+       !if (pow_ratio < S2N_LIMIT(iM(iwin))) then
           accept = .false.
        endif
 
@@ -274,7 +277,8 @@
        time_obs_noise = b+(i-1)*dt
        if (time_obs_noise > noise_end) exit
     enddo
-    noise_int = sqrt(sum( (obs_lp(1:i))**2 ))
+    ! i is the index corresponding to noise_end
+    noise_int = sum( (obs_lp(1:i))**2 )/(i-1)
     noise_amp = maxval( abs(obs_lp(1:i)) )
 
     ! signal loop
@@ -282,8 +286,9 @@
        time_obs_signal = b+(j-1)*dt
        if (time_obs_signal > signal_end) exit
     enddo
+    ! j is the signal corresponding to signal_end
 
-    signal_int = sqrt(sum( (obs_lp(1:j))**2 ))
+    signal_int = sum( (obs_lp(i:j))**2 )/(j-i)
     signal_amp = maxval( abs(obs_lp(i:j)) )
 
     ! Calculate signal to noise ratio and amplitude ratio.
@@ -1082,7 +1087,7 @@
       do icomb = 1, n_comb
         write(*,'(a,i6,a,1f8.4,a,3f8.4,a)') ' DEBUG : ', icomb, &
         ' (',score(icomb),' = ',space_coverage(icomb),average_CC(icomb),n_window_fraction(icomb),') : '
-        !write(*,*) 'DEBUG : ', comb(icomb,1:comb_size(icomb))
+        write(*,*) 'DEBUG : Combination is :', comb(icomb,1:comb_size(icomb))
       enddo
     endif
 

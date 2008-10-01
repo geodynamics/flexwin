@@ -53,7 +53,7 @@
 
   ! -------------------------------------------------------------
   ! limit on signal to noise ratio in a particular window.
-    double precision :: WINDOW_AMP_BASE 
+    double precision :: WINDOW_S2N_BASE 
 
   ! -------------------------------------------------------------
   ! Fine tuning constants 
@@ -217,7 +217,7 @@
   read(IIN,*)
   read(IIN,*)
   read(IIN,*)
-  read(IIN,2) junk,WINDOW_AMP_BASE
+  read(IIN,2) junk,WINDOW_S2N_BASE
 
   ! Fine tuning constants
   read(IIN,*)

@@ -52,7 +52,7 @@ SNR_MAX_BASE                    = 3.0
 
 # -------------------------------------------------------------
 # limit on signal to noise ratio in a particular window.
-WINDOW_AMP_BASE                 = 1.5
+WINDOW_S2N_BASE                 = 1.5
 
 # -------------------------------------------------------------
 # Fine tuning constants 

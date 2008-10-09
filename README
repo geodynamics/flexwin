@@ -20,40 +20,6 @@ The package contains the flexwin code and documentation, as well as a set of
 test data, examples of user files for different scenarios, and a set of utility
 scripts that may be useful for running flexwin on large datasets.
 
-The contents of the flexwin directory are as follows:
-
-flexwin
-|-- Makefile.in
-|-- PAR_FILE
-|-- README
-|-- TODOs
-|-- configure
-|-- configure.ac
-|-- distaz.f
-|-- flexwin.f90
-|-- io_subs.f90
-|-- latex
-|-- make_gfortran
-|-- make_intel
-|-- make_intel_caltech
-|-- maxima.f90
-|-- measure_windows_xcorr.f90
-|-- measurement_module.f90
-|-- scripts
-|-- seismo_subs.f90
-|-- select_windows_stalta2.f90
-|-- test_data
-|-- travel_times.f90
-|-- ttimes_mod
-|-- user_files
-|-- user_functions.f90
-|-- user_parameters.f90
-`-- xcorr-measure.f90
-
-5 directories, 24 files
-
-
-
 COMPILATION
 -----------
 
@@ -62,7 +28,7 @@ compile and run: libsacio.a and libsac.a. Both libraries
 are distributed by IRIS as part of the SAC package (version 101.2 and above).
 The IRIS download site (as of 30-Sept-2008) is here:
    http://www.iris.edu/software/sac/sac.request.htm
-(To check your version, type XXXXX from within sac.)
+(To check your version, type sac.)
 
 If your compiler of choice is gfortran, then you should be able to use the
 make_gfortran makefiles with only minor modifications (notably you may need to

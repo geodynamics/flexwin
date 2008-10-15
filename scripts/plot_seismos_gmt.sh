@@ -19,9 +19,8 @@ t_end=`grep T_END ${obs} | awk '{print $NF}'`
 t_step=`echo $t_end $t_start | awk '{print int(($1-$2)/10)}'`
 
 # CHT
-t_start=-20
-#t_end=120
-t_end=200
+#t_start=-20
+#t_end=200
 
 # find number of windows
 nwin=`grep NUM_WIN ${win} | awk '{print $NF}'`

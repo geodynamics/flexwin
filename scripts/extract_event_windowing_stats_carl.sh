@@ -193,7 +193,7 @@ END
 proj=X1.75/1.5
 
 ## plot window number statistics
-awk '{print $6}' $t0 | pshistogram  -J$proj -C -B:"CC":/WS -W0.02 -Lthin -G$grey -O -K -X-4.5 -Y-2. >> $out
+awk '{print $6}' $t0 | pshistogram  -J$proj -C -B:"CC":/WS -W0.02 -Lthin -G$grey -O -K -X-4.5 -Y-2.0 >> $out
 awk '{print $5}' $t0 | pshistogram  -J$proj -C -B:"Tshift":/WS -W1 -Lthin -G$grey -O -K -X2.75 >> $out
 awk '{print $7}' $t0 | pshistogram  -J$proj -C -B:"dlnA":/WS -W0.1 -Lthin -G$grey -O -X2.75 -K >> $out
 
@@ -227,6 +227,7 @@ awk '{print $5, $7}' $t0 | psxy -R$region -J$proj -Sl0.1/x -W2/$black -O -K >> $
 psbasemap -R$region -J$proj -B -O -K >> $out
 
 ## plot window number statistics
+## NOTE: IF THERE IS A CONSTANT NUMBER OF WINDOWS FOR A COMPONENT, THEN PSHISTOGRAM CRASHES
 grep Z $t1 | awk '{print $2}' | pshistogram  -J$proj -C -B:"Windows per Z trace":/WS -W1 -Lthin -G$red -O -K -X-5.5 -Y-2.25 >> $out
 grep R $t1 | awk '{print $2}' | pshistogram  -J$proj -C -B:"Windows per R trace":/WS -W1 -Lthin -G$green -O -K -X2.75 >> $out
 grep T $t1 | awk '{print $2}' | pshistogram  -J$proj -C -B:"Windows per T trace":/WS -W1 -Lthin -G$blue -O -X2.75 >> $out   # FINISH (no -K)
@@ -310,3 +311,4 @@ ps2pdf ${out2_ps} ${out2_pdf}
 
 rm $t0 $t1 $t2z $t2r $t2t $t3
 
+#===============================================

@@ -38,12 +38,12 @@
 #     prepare_meas_all.pl
 #
 #  EXAMPLES:
-#    pick_all_windows.pl m07 0 6/40   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-40s
-#    pick_all_windows.pl m07 0 4/40   1/204 1/1/1/1 1 0     # 
-#    pick_all_windows.pl m07 0 2/40   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-40s
+#    pick_all_windows.pl m10 0 6/30   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-40s
+#    pick_all_windows.pl m10 0 3/30   1/204 1/1/1/1 1 0     # 
+#    pick_all_windows.pl m10 0 2/30   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-40s
 #
-#    pick_all_windows.pl m00 0 6/40 179/179 1/1/0/0 1 0     # make plots only, T = 6-40s
-#    pick_all_windows.pl m00 0 6/40 179/179 0/0/1/0 1 0     # make WINDOWS file, T = 6-40s
+#    pick_all_windows.pl m00 0 6/30 179/179 1/1/0/0 1 0     # make plots only, T = 6-40s
+#    pick_all_windows.pl m00 0 6/30 179/179 0/0/1/0 1 0     # make WINDOWS file, T = 6-40s
 #
 #==========================================================
 
@@ -143,7 +143,7 @@ $dir_win_run_data = "${dir_win_run}/DATA";
 $dir_win_run_meas = "${dir_win_run}/MEASURE";
 
 # NEW: EVENT LIST
-$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_m07";
+$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
 if (not -f $eid_list) {die("check if eid_list ${eid_list} exist or not\n")}
 open(IN,$eid_list); @eids = <IN>; close(IN);
 $nevent0 = @eids;
@@ -180,11 +180,11 @@ $userfun_file = "${dir_win_code}/user_functions.f90";
 # copy PAR_FILE into local directory
 # directories for data and synthetics
 if($idataset == 1) {
-   $par_file_in = "${dir_user}/socal_3D/PAR_FILE_${sTmin}_${smodel}";
+   $par_file_in = "${dir_user}/socal_3D/PAR_FILE_${Ttag}_${smodel}";
    $userfun_file_in = "${dir_user}/socal_3D/user_functions_${smodel}.f90";
 
 } elsif ($idataset == 2) {
-   $par_file_in = "${dir_user}/japan_3D/PAR_FILE_${sTmin}";
+   $par_file_in = "${dir_user}/japan_3D/PAR_FILE_${Ttag}";
    $userfun_file_in = "${dir_user}/japan_3D/user_functions.f90";
 }
 if (not -f ${par_file_in}) {die("check if PAR_FILE ${par_file_in} exist or not\n")}
@@ -265,7 +265,7 @@ print CSH "\\cp ${par_file} ${dir_win_run}\n";
 # copy PAR_FILE and user_functions.f90 to output directory
 print CSH "\\cp ${par_file} ${userfun_file} ${dir_prepare}/${pseis} $odir\n";
 
-#die("testing");
+#die("TESTING");
 
 #===========================================================================
 
@@ -305,8 +305,8 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
     print CSH "echo Event ID is $eid -- $kk out of $nevent\n";
 
-    $eout = "${eid}_${sTmin}";	                     # output file tag
-    $measdir = "$rundir/$eid/$smodel/WINDOW_${sTmin}";   # main run directory
+    $eout = "${eid}_${Ttag}_${smodel}";	                # output file tag
+    $measdir = "$rundir/$eid/$smodel/WINDOW_${Ttag}";   # main run directory
 
     # If the windowing code has already been run, then move to the next event.
     # NOTE: to overwrite, just comment out this option
@@ -321,8 +321,10 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
       # remove folders in the windowing directory
       print CSH "\\rm -rf ${dir_win_run_syn} ${dir_win_run_data} ${dir_win_run_meas} \n";
       print CSH "mkdir ${dir_win_run_syn} ${dir_win_run_data} ${dir_win_run_meas} \n";
+      
 
       # copy data and synthetics into windowing directory (BHZ,BHR,BHT)
+      print CSH "echo copying data and syn files to ${dir_win_run}\n";
       for ($j = 1; $j <= $nchan; $j++) {
 	$chan = $chans[$j-1];
 	print CSH "cp $syndir1/*${chan}.${suffix_syn} ${dir_win_run_syn}\n"; # synthetics
@@ -344,7 +346,7 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
       # copy prepared data and synthetic files into a directory for measurement code
       if ($imeas == 1) {
-	#$measdir = "$rundir/$eid/$smodel/WINDOW_${sTmin}";
+	#$measdir = "$rundir/$eid/$smodel/WINDOW_${Ttag}";
 	print CSH "echo copying prepared DATA and SYN to ${measdir}...\n";
 	print CSH "mkdir -p $rundir/$eid\n";
 	print CSH "mkdir -p $rundir/$eid/$smodel/\n";

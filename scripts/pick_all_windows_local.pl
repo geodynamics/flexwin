@@ -4,7 +4,7 @@
 #
 #  pick_all_windows_local.pl
 #  Carl Tape
-#  22-August-2007
+#  02-Oct-2008
 #
 #  This is the "local version" of pick_all_windows_local.pl
 #  This is run from the directory containing MEASURE, DATA, SYN,
@@ -59,8 +59,8 @@ if($imeas==1) {$bmeas = ".true."} else {$bmeas = ".false."}
 if($ibody==1) {$bbody = ".true."} else {$bbody = ".false."}
 
 # string for PDF
-$sTmin = sprintf("%2.2i",$Tmin);
-$sTmax = sprintf("%2.2i",$Tmax);
+$sTmin = sprintf("%3.3i",$Tmin);
+$sTmax = sprintf("%3.3i",$Tmax);
 $sTminD = sprintf("%.2f",$Tmin);
 $sTmaxD = sprintf("%.2f",$Tmax);
 
@@ -71,7 +71,8 @@ $par_file = "${dir_win_code}/PAR_FILE";
 $win_execute = "flexwin";
 
 # make command for windowing code
-$make = "make -f make_intel_caltech";
+$make = "make -f make_gfortran";   # change as of 9-30-08
+#$make = "make -f make_intel_caltech";
 
 # location of plot_windows_all.pl
 $plot_windows_perl = "${dir_scripts}/plot_windows_all.pl";
@@ -146,7 +147,7 @@ if ($imeas == 1) {
 
 #-----------------------------------------
 close(CSH);
-system("csh -f $cshfile");
+#system("csh -f $cshfile");
 
 print "\n";
 

@@ -19,15 +19,28 @@ t_end=`grep T_END ${obs} | awk '{print $NF}'`
 t_step=`echo $t_end $t_start | awk '{print int(($1-$2)/10)}'`
 
 # CHT
-#t_start=-20
+t_start=-20
 #t_end=120
-#t_end=200
+t_end=200
 
 # find number of windows
 nwin=`grep NUM_WIN ${win} | awk '{print $NF}'`
 
-gmtset PAPER_MEDIA a4+ MEASURE_UNIT inch HEADER_FONT_SIZE 14p LABEL_FONT_SIZE 16p
+# default settings
+paper="a4+"
+orient="-P"
 proj=X8/1.5
+origin="-Y6"
+shift="-Y-2.5"
+
+# carl settings
+#paper="letter"
+#orient=" "
+#proj=X10/1.8
+#origin="-X0.5 -Y6"
+#shift="-Y-2.5"
+
+gmtset PAPER_MEDIA $paper MEASURE_UNIT inch HEADER_FONT_SIZE 14p LABEL_FONT_SIZE 16p
 nhead=4
 red=255/0/0
 black=0/0/0
@@ -40,7 +53,8 @@ paleblue=220/220/255
 #################################
 
 # set output filename
-out=${basename}.seis.eps
+out=${basename}.seis.ps
+outpdf=${basename}.seis.pdf
 
 ## for SCSN plots: 
 #dkm=`grep DKM $info | awk '{print $NF}'`
@@ -53,7 +67,8 @@ max=`grep PLOT_MAX ${obs} | awk '{print $NF}'`
 region=$t_start/$t_end/-$max/$max
 
 # do plot
-psbasemap -R$region -J$proj -B${t_step}::.${label}:"Time (s)":/S -K -P -Y8 > $out
+
+psbasemap -R$region -J$proj -B${t_step}::.${label}:"Time (s)":/S -K $orient $origin > $out
 tail -$nwin $win | awk '{printf "%f %f\n%f %f\n%f %f\n%f %f\n>\n", $2,-1*m,$2,m,$3,m,$3,-1*m}' m=$max | psxy -R$region -J$proj -M -W1 -G$paleblue -O -K >> $out
 psxy $obs -R$region -J$proj -H$nhead -W2 -O -K >> $out
 psxy $syn -R$region -J$proj -H$nhead -W2/$red -O -K >> $out
@@ -86,11 +101,10 @@ psbasemap -R$region -J$proj -B${t_step}:"Time (s)":/S -O -K >> $out
 nhead=8
 
 # set region
-proj=X8/1.5
 max=`grep STA_LTA_MAX ${stalta} | awk '{print $NF}'`
 region=$t_start/$t_end/0/$max
 
-psbasemap -R$region -J$proj -B${t_step}:"Time (s)":/S -O -K -Y-2.5 >> $out
+psbasemap -R$region -J$proj -B${t_step}:"Time (s)":/S -O -K $shift >> $out
 tail -$nwin $win | awk '{printf "%f %f\n%f %f\n%f %f\n%f %f\n>\n", $2,-1*m,$2,m,$3,m,$3,-1*m}' m=$max | psxy -R$region -J$proj -M -W1 -G$paleblue -O -K >> $out
 
 awk '{print $1, $2}' $stalta | psxy -R$region -J$proj -H$nhead -W2/$blue -O -K >> $out
@@ -112,10 +126,9 @@ nhead=4
 # set region
 max=`grep PLOT_MAX ${envobs} | awk '{print $NF}'`
 region=$t_start/$t_end/0/$max
-proj=X8/1.5
 
 # do plot
-psbasemap -R$region -J$proj -B${t_step}:"Time (s)":/S -O -K -Y-2.5 >> $out
+psbasemap -R$region -J$proj -B${t_step}:"Time (s)":/S -O -K $shift >> $out
 tail -$nwin $win | awk '{printf "%f %f\n%f %f\n%f %f\n%f %f\n>\n", $2,-1*m,$2,m,$3,m,$3,-1*m}' m=$max | psxy -R$region -J$proj -M -W1 -G$paleblue -O -K >> $out
 psxy $envobs -R$region -J$proj -H$nhead -W2 -O -K >> $out
 psxy $envsyn -R$region -J$proj -H$nhead -W2/$red -O -K >> $out
@@ -130,6 +143,8 @@ psbasemap -R$region -J$proj -B${t_step}:"Time (s)":/S -O -U/0/-0.75/$basename >>
 #epsffit -c -s 10 10 600 780 t1.$$ $out
 #epstopdf $out
 #rm t1.$$
+
+ps2pdf $out $outpdf
 
 #echo $out
 #gv $out

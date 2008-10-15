@@ -3,7 +3,7 @@
 #==========================================================
 #
 #  Carl Tape
-#  24-July-2007
+#  01-Oct-2008
 #  process_data_and_syn.pl
 #
 #  This script processes data and 3D-Socal-SEM synthetics for Southern California.
@@ -20,36 +20,29 @@
 #    Trange    band-pass filter
 #
 #  ORDER OF OPERATIONS:
-#    ~/UTILS/process_data_and_syn.pl 1 m07 1 0 d d 20 6/40 PROCESSED    # data, initial pre-processing
-#    ~/UTILS/process_data_and_syn.pl 1 m07 0 1 d d 20 6/40 PROCESSED    # syn, initial pre-processing
-#    ~/UTILS/process_data_and_syn.pl 2 m07 1 1 d d 20 6/40 PROCESSED    # both, create cut files
-#    ~/UTILS/process_data_and_syn.pl 3 m07 1 0 d d 20 6/40 PROCESSED    # data, execute cut file
-#    ~/UTILS/process_data_and_syn.pl 3 m07 0 1 d d 20 6/40 PROCESSED    # syn, execute cut file
+#    ~/UTILS/process_data_and_syn.pl 1 m10 1 0 d d 20 6/30 PROCESSED    # data, initial pre-processing
+#    ~/UTILS/process_data_and_syn.pl 1 m10 0 1 d d 20 6/30 PROCESSED    # syn, initial pre-processing
+#    ~/UTILS/process_data_and_syn.pl 2 m10 1 1 d d 20 6/30 PROCESSED    # both, create cut files
+#    ~/UTILS/process_data_and_syn.pl 3 m10 1 0 d d 20 6/30 PROCESSED    # data, execute cut file
+#    ~/UTILS/process_data_and_syn.pl 3 m10 0 1 d d 20 6/30 PROCESSED    # syn, execute cut file
 #
-#    ~/UTILS/process_data_and_syn.pl 4 m07 1 0 d d 20 6/40 PROCESSED    # data, bandpass T=6-40
-#    ~/UTILS/process_data_and_syn.pl 4 m07 0 1 d d 20 6/40 PROCESSED    # syn, bandpass T=6-40
+#    ~/UTILS/process_data_and_syn.pl 4 m10 1 0 d d 20 6/30 PROCESSED    # data, bandpass T=6-30
+#    ~/UTILS/process_data_and_syn.pl 4 m10 0 1 d d 20 6/30 PROCESSED    # syn, bandpass T=6-30
 #
-#    ~/UTILS/process_data_and_syn.pl 4 m07 1 0 d d 20 2/40 PROCESSED    # data, bandpass T=2-40
-#    ~/UTILS/process_data_and_syn.pl 4 m07 0 1 d d 20 2/40 PROCESSED    # syn, bandpass T=2-40
+#    ~/UTILS/process_data_and_syn.pl 4 m10 1 0 d d 20 2/30 PROCESSED    # data, bandpass T=2-30
+#    ~/UTILS/process_data_and_syn.pl 4 m10 0 1 d d 20 2/30 PROCESSED    # syn, bandpass T=2-30
+#
+#  Chino Hills synthetics for Hiroo:
+#    ~/UTILS/process_data_and_syn.pl 4 m10 0 1 d d 20 50/150 PROCESSED
 #
 #==========================================================
 
 if (@ARGV < 9) {die("Usage: process_data_and_syn.pl iprocess smodel idata isyn syn_ext dat_ext sps Tmin/Tmax pdir\n")}
 ($iprocess,$smodel,$idata,$isyn,$syn_ext,$dat_ext,$sps,$Trange,$pdir) = @ARGV;
 
-#$smodel = "m05";   # KEY: model iteration index
 $iexecute = 0;
 $ilist = 1;
-
 $iprocess0 = 0;
-
-# THESE MUST BE DONE IN SEQUENTIAL ORDER
-#$iprocess1 = 0;    # only done ONCE, no matter how many band-pass filters you use
-#$iprocess2 = 1;    # cut records and pad zeros (and bandpass, if iprocess3=1)
-#$iprocess3 = 0;    # bandpass filter (iprocess2=1 also)
-
-#$Lrange = "-l -40/220";
-#$Lrange = " ";
 
 # USER PARAMETERS
 $tfac = 1.0;      # factor to extend lengths of records (should be > 1.0)
@@ -62,18 +55,22 @@ $dat_suffix = "${dat_suffix0}.${dat_ext}";
 
 # directories
 #$CMT_list = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_${smodel}";
-$dir_source = "/net/sierra/raid1/carltape/results/SOURCES/socal_9";
-$dirCMT    = "${dir_source}/v9_files";
-$CMT_list  = "${dir_source}/EIDs_only_eid";
+$dir_source = "/net/sierra/raid1/carltape/results/SOURCES/socal_10";
+$dirCMT    = "${dir_source}/v10_files";
+#$CMT_list  = "${dir_source}/EIDs_only_eid";
+$CMT_list  = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
 $dirdat0    = "/net/sierra/raid1/carltape/socal/socal_3D/DATA/FINAL";
 $dirsyn0    = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_${smodel}";
 #$dirsyn0 = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_pre_${smodel}";
 
-# check if the STATIONS file exists
-#$stafile = "/net/denali/home2/carltape/gmt/stations/seismic/Matlab_output/STATIONS";
-$stafile = "/net/denali/home2/carltape/gmt/stations/seismic/Matlab_output/STATIONS_CALIFORNIA_TOMO_INNER_specfem";
-#$stafile = "/net/denali/home2/carltape/gmt/stations/seismic/Matlab_output/STATIONS_CALIFORNIA_TOMO_OUTER_specfem";
-if (not -f $stafile) {print "\n check if $stafile exists -- we will use the default"; $stafile = "none";}
+# STATIONS file
+#$stafile = "/net/denali/home1/carltape/gmt/stations/seismic/Matlab_output/STATIONS";
+$stafile = "/net/denali/home1/carltape/gmt/stations/seismic/Matlab_output/STATIONS_CALIFORNIA_TOMO_INNER_specfem";
+#$stafile = "/net/denali/home1/carltape/gmt/stations/seismic/Matlab_output/STATIONS_CALIFORNIA_TOMO_OUTER_specfem";
+
+# check if the files exist
+if (not -f $stafile) {print "\n check if $stafile exists";}
+if (not -f ${CMT_list}) {print "\n check if CMT_list ${CMT_list} exists";}
 
 # period range
 ($Tmin,$Tmax) = split("/",$Trange);
@@ -107,11 +104,11 @@ if($ilist == 1) {
 
 # write the C-shell script to file
 if($idata==1 && $isyn==1) {
-   $cshfile = "process_data_and_syn.csh";
+   $cshfile = "process_data_and_syn_${Ttag}.csh";
 } elsif($idata==1 && $isyn==0) {
-   $cshfile = "process_data.csh";
+   $cshfile = "process_data_${Ttag}.csh";
 } elsif($idata==0 && $isyn==1) {
-   $cshfile = "process_syn.csh";
+   $cshfile = "process_syn_${Ttag}.csh";
 } else {
    die("check idata and isyn\n");
 }
@@ -124,8 +121,8 @@ if($iprocess==0) {
 }
 
 $imin = 1; $imax = $ncmt;  # default
-#$imin = 101; $imax = $ncmt;
-#$imin = 204; $imax = $imin;
+#$imin = 1; $imax = 10;
+#$imin = 95; $imax = $imin;
 
 #----------------------------------------------------------------------
 
@@ -281,28 +278,11 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	    $dt = $deltad;
 	  }
 
-	  # determine the cut for the records
-	  # b = earliest start time
-	  # e = earliest end time, multiplied by some factor
-	  if ($bd < $bs) {
-	    $b0 = $bd;
-	  } else {
-	    $b0 = $bs;
-	  }
-	  if ($b0 < $bmin) {
-	    $b0 = $bmin;
-	  }
-	  if ($ed < $es) {
-	    $e0 = $ed;
-	  } else {
-	    $e0 = $es;
-	  }
-
-          # avoid events 14263716 and 14179292
-          # --> adjust the simulation times, rather than the cut times
-          #if($eid == 14179288 || $eid == 14263712) {
-          #   $e0 = 120;
-          #}
+	  # determine the cut times for the records
+          $b0 = $bd;
+	  #if ($bd < $bs) {$b0 = $bd} else {$b0 = $bs}
+	  if ($b0 < $bmin) {$b0 = $bmin}
+	  if ($ed < $es) {$e0 = $ed} else {$e0 = $es}
 
 	  $b = $b0;
 	  $tlen0 = $e0 - $b;
@@ -310,9 +290,12 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	  $e = $b0 + $tlen;
 	  $npt = int( ($e-$b)/$dt );
 
-	  #print CUT "$datfile $synfile $b $e $npt $dt\n";
-	  print CUTDAT "$datfile $b $e $npt $dt\n";
-	  print CUTSYN "$synfile_base $b $e $npt $dt\n";
+          # print the cut times if the begin time is before the end time
+          if ($b < $e) {
+	    #print CUT "$datfile $synfile $b $e $npt $dt\n";
+	    print CUTDAT "$datfile $b $e $npt $dt\n";
+	    print CUTSYN "$synfile_base $b $e $npt $dt\n";
+	  }
 
 	  if (0==1) {
 	    print "\n Data : $bd $ed $deltad $nptd -- $tlend";
@@ -424,18 +407,22 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
               # KEY: indicate the base directory
               $synfile = "${dirsyn_pro_1}/${synfile_base}";
-              if (not -f $synfile) {die("synfile $synfile does not exist");}
+              if (not -f $synfile) {
+                 print "synfile $synfile does not exist\n";
+                 #die("synfile $synfile does not exist");
 
-	      print "$j out of $nlines -- $synfile\n";
-	      #print "-- $datfile -- $synfile -- $b -- $e -- $npt -- $dt -- \n";
+              } else {
+		print "$j out of $nlines -- $synfile\n";
+		#print "-- $datfile -- $synfile -- $b -- $e -- $npt -- $dt -- \n";
 
-	      # cut records and fill zeros
-	      `echo r $synfile >> $sacfile`;
-	      `echo cuterr fillz >> $sacfile`;
-	      `echo "cut $b n $npt" >> $sacfile`;
-	      `echo r $synfile >> $sacfile`;
-	      `echo cut off >> $sacfile`;
-	      `echo w over >> $sacfile`;
+		# cut records and fill zeros
+		`echo r $synfile >> $sacfile`;
+		`echo cuterr fillz >> $sacfile`;
+		`echo "cut $b n $npt" >> $sacfile`;
+		`echo r $synfile >> $sacfile`;
+		`echo cut off >> $sacfile`;
+		`echo w over >> $sacfile`;
+              }
 	    } 
 	    `echo quit >> $sacfile`;
 

@@ -67,10 +67,11 @@ for ($irec = 1; $irec <= $nrec; $irec++) {
       $filename = "$namerec.$namenet.$comps[$icomp-1]";
       $obsfile = "${dir_win_run_meas}/${filename}.obs";
 
-      # generate output PDF files -- make sure that plot_seismos_gmt.sh is doing this
+      # generate output PDF files -- make sure that plot_seismos_gmt.sh is working
       if (-f $obsfile)  {
          print "$obsfile\n";
          $ftag = "${dir_win_run_meas}/${filename}";
+         print "${dir_scripts}/plot_seismos_gmt.sh $ftag\n";
          `${dir_scripts}/plot_seismos_gmt.sh $ftag`;
       }
    }

@@ -16,12 +16,13 @@
 DEBUG                           = .true.
 MAKE_SEISMO_PLOTS               = .true.
 MAKE_WINDOW_FILES               = .true.
-BODY_WAVE_ONLY                  = .false.
+BODY_WAVE_ONLY                  = .true.
 
 # -------------------------------------------------------------
 # period min/max for filtering
-WIN_MIN_PERIOD                  = 6.00
-WIN_MAX_PERIOD                  = 40.00
+RUN_BANDPASS                    = .false.
+WIN_MIN_PERIOD                  = 2.00
+WIN_MAX_PERIOD                  = 30.00
 
 # -------------------------------------------------------------
 # E(t) water level
@@ -29,7 +30,7 @@ STALTA_BASE                     = 0.07
 
 # -------------------------------------------------------------
 # TSHIFT
-TSHIFT_BASE                     = 5.0
+TSHIFT_BASE                     = 2.0
 
 # -------------------------------------------------------------
 # limit on CC for window acceptance
@@ -56,7 +57,7 @@ WINDOW_AMP_BASE                 = 4.0
 # -------------------------------------------------------------
 # Fine tuning constants 
 C_0  (internal minima)          = 1.0
-C_1  (small windows)            = 4.0
+C_1  (small windows)            = 5.0
 C_2  (prominence)               = 0.0
 C_3a (separation height)        = 4.0 
 C_3b (separation time)          = 2.5 

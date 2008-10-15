@@ -22,7 +22,7 @@ subroutine set_up_criteria_arrays
      CC_LIMIT(i) = CC_BASE
      TSHIFT_LIMIT(i) = TSHIFT_BASE       ! WIN_MIN_PERIOD/2.0
      STALTA_W_LEVEL(i) = STALTA_BASE
-     S2N_LIMIT(i) = WINDOW_AMP_BASE
+     S2N_LIMIT(i) = WINDOW_S2N_BASE
    enddo
 
 !!$  if (.not. BODY_WAVE_ONLY) then
@@ -124,7 +124,7 @@ subroutine set_up_criteria_arrays
 ! do i = 1, npts
 !   time=b+(i-1)*dt
 !   if (time.gt.R_time) then
-!     S2N_LIMIT(i)=2*WINDOW_AMP_BASE
+!     S2N_LIMIT(i)=2*WINDOW_S2N_BASE
 !   endif
 ! enddo
 !

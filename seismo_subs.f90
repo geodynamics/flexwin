@@ -721,7 +721,7 @@ subroutine calc_criteria(d,s,npts,i1,i2,dt,tshift,cc_max,dlnA)
   double precision, dimension(*), intent(in) :: d, s
   integer, intent(in) :: npts,i1,i2
   double precision, intent(in) :: dt
-  double precision, intent(out) ::  tshift,cc_max,dlnA
+  double precision, intent(out) :: tshift,cc_max,dlnA
 
   double precision, dimension(NDIM) :: d_win, s_win
   integer :: ishift
@@ -738,7 +738,13 @@ subroutine calc_criteria(d,s,npts,i1,i2,dt,tshift,cc_max,dlnA)
   ! calculate dlnA : definition of Dahlen and Baig (2002), Eq. 3,17,18 : dlnA = Aobs/Asyn - 1
   ! NOTE 1: these records are unshifted
   ! NOTE 2: this measurement will reflect any noise in the data, too
-  dlnA = sqrt( ( sum( d_win(i1:i2)*d_win(i1:i2) )) / (sum( s_win(i1:i2)*s_win(i1:i2) )) ) - 1.0
+  !dlnA = sqrt( ( sum( d_win(i1:i2)*d_win(i1:i2) )) / (sum( s_win(i1:i2)*s_win(i1:i2) )) ) - 1.0
+
+  ! CHT revision 15-oct-2008
+  ! The previously used expression for dlnA is a first-order perturbation of ln(A1/A2) = (A1-A2)/A2
+  ! The new expression is better suited to getting values between -1 and 1,
+  ! with dlnA = 0 indicating perfect fit, as before.
+  dlnA = 0.5 * log( sum(d_win(i1:i2)*d_win(i1:i2)) / sum(s_win(i1:i2)*s_win(i1:i2)) )
 
 end subroutine calc_criteria
 

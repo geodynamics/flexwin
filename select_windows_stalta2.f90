@@ -805,6 +805,7 @@
   integer :: nwin_new
   integer, dimension(NWINDOWS) :: iM_new, iL_new, iR_new
   double precision :: CC_temp, Tshift_temp, dlnA_temp
+  double precision :: tshift_min, tshift_max, dlnA_min, dlnA_max
   logical :: accept
   
 
@@ -817,19 +818,28 @@
     ! check the conditions, and set accept to false if rejection
     call calc_criteria(obs_lp,synt_lp,npts,iL(iwin),iR(iwin),dt,Tshift_temp,CC_temp,dlnA_temp)
 
-    if ( abs(Tshift_temp) .gt. TSHIFT_LIMIT(iM(iwin)) &
-        .or. CC_temp .lt. CC_LIMIT(iM(iwin)) &
-        .or. abs(dlnA_temp) .gt. DLNA_LIMIT(iM(iwin))   ) then
-      if (1==1) then
-          write(*,*) iwin, ' : rejection based on LEFT > RIGHT'
-          if(abs(Tshift_temp) .gt. TSHIFT_LIMIT(iM(iwin))) &
-              write(*,*) 'Tshift : ', abs(Tshift_temp), TSHIFT_LIMIT(iM(iwin))
-          if(CC_LIMIT(iM(iwin)) .gt. CC_temp) &
-              write(*,*) 'CC : ', CC_LIMIT(iM(iwin)), CC_temp
-          if(abs(dlnA_temp) .gt. DLNA_LIMIT(iM(iwin))) &
-              write(*,*) 'dlnA : ', abs(dlnA_temp), DLNA_LIMIT(iM(iwin))
-      endif
-      accept = .false.
+    ! here we allow for a systematic shift in the time shift and amplitude measurements
+    tshift_min = TSHIFT_REFERENCE - TSHIFT_LIMIT(iM(iwin))
+    tshift_max = TSHIFT_REFERENCE + TSHIFT_LIMIT(iM(iwin))
+    dlnA_min   = DLNA_REFERENCE - DLNA_LIMIT(iM(iwin))
+    dlnA_max   = DLNA_REFERENCE + DLNA_LIMIT(iM(iwin))
+
+    if ( (Tshift_temp .lt. tshift_min) .or. (Tshift_temp .gt.tshift_max ) ) then
+       write(*,*) iwin, ' : rejection based on not satisfying TSHIFT_MIN < TSHIFT < TSHIFT_MAX'
+       write(*,*) 'Tshift : ',tshift_min , Tshift_temp, tshift_max
+       accept = .false.
+    endif
+
+    if ( accept .and. ( (dlnA_temp .lt. dlnA_min) .or. (dlnA_temp .gt. dlnA_max ) )) then
+       write(*,*) iwin, ' : rejection based on not satisfying DLNA_MIN < DLNA < DLNA_MAX'
+       write(*,*) 'dlnA : ', dlnA_min , dlnA_temp, dlnA_max
+       accept = .false.
+    endif
+
+    if( accept .and. (CC_temp .lt. CC_LIMIT(iM(iwin))) ) then
+       write(*,*) iwin, ' : rejection based on CC < CC_MIN'
+       write(*,*) 'CC : ', CC_temp, CC_LIMIT(iM(iwin))
+       accept = .false.
     endif
 
     ! if the proto-window is acceptable, then accept it

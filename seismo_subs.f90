@@ -29,15 +29,15 @@
 
   ! -------------------------------------------------------------
   ! TSHIFT
-    double precision :: TSHIFT_BASE 
+    double precision :: TSHIFT_BASE, TSHIFT_REFERENCE
+
+  ! -------------------------------------------------------------
+  ! limit on dlnA (dA/A) for window acceptance
+    double precision :: DLNA_BASE, DLNA_REFERENCE
 
   ! -------------------------------------------------------------
   ! limit on CC for window acceptance
     double precision :: CC_BASE 
-
-  ! -------------------------------------------------------------
-  ! limit on dlnA (dA/A) for window acceptance
-    double precision :: DLNA_BASE 
 
   ! -------------------------------------------------------------
   ! limit on signal-to-noise on the observed data
@@ -181,7 +181,18 @@
   read(IIN,*)
   read(IIN,*)
   read(IIN,2) junk,TSHIFT_BASE
+  read(IIN,2) junk,TSHIFT_REFERENCE
   if (DEBUG) write(*,*) '       TSHIFT_BASE',TSHIFT_BASE
+  if (DEBUG) write(*,*) '       TSHIFT_REFERENCE',TSHIFT_REFERENCE
+
+  ! limit on dlnA for window acceptance
+  read(IIN,*)
+  read(IIN,*)
+  read(IIN,*)
+  read(IIN,2) junk,DLNA_BASE
+  read(IIN,2) junk,DLNA_REFERENCE
+  if (DEBUG) write(*,*) '       DLNA_BASE',DLNA_BASE
+  if (DEBUG) write(*,*) '       DLNA_REFERENCE',DLNA_REFERENCE
 
   ! limit on CC 
   read(IIN,*)
@@ -189,13 +200,6 @@
   read(IIN,*)
   read(IIN,2) junk,CC_BASE
   if (DEBUG) write(*,*) '       CC_BASE',CC_BASE
-
-  ! limit on dlnA (dA/A) for window acceptance
-  read(IIN,*)
-  read(IIN,*)
-  read(IIN,*)
-  read(IIN,2) junk,DLNA_BASE
-  if (DEBUG) write(*,*) '       DLNA_BASE',DLNA_BASE
 
   ! boolean switch for check_data_quality
   read(IIN,*)

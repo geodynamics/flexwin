@@ -15,22 +15,22 @@
 # boolean parameters
 DEBUG                           = .true.
 MAKE_SEISMO_PLOTS               = .true.
-MAKE_WINDOW_FILES               = .false.
-BODY_WAVE_ONLY                  = .false.
+MAKE_WINDOW_FILES               = .true.
+BODY_WAVE_ONLY                  = .true.
 
 # -------------------------------------------------------------
 # period min/max for filtering
-RUN_BANDPASS                    = .true.
-WIN_MIN_PERIOD                  = 50.0
-WIN_MAX_PERIOD                  = 150.0
+RUN_BANDPASS                    = .false.
+WIN_MIN_PERIOD                  = 2.00
+WIN_MAX_PERIOD                  = 30.00
 
 # -------------------------------------------------------------
 # E(t) water level
-STALTA_BASE                     = 0.08
+STALTA_BASE                     = 0.07
 
 # -------------------------------------------------------------
 # maximum allowable time shift from reference TSHIFT
-TSHIFT_BASE                     = 15.0
+TSHIFT_BASE                     = 2.0
 TSHIFT_REFERENCE                = 0.0
 
 # -------------------------------------------------------------
@@ -49,24 +49,23 @@ DATA_QUALITY                    = .true.
 # if DATA_QUALITY = .true. and if two different measurements of
 # signal-to-noise ratios exceeds these two base levels,
 # then the data time series (and syn) is kept
-SNR_INTEGRATE_BASE              = 3.5  
-SNR_MAX_BASE                    = 3.0
+SNR_INTEGRATE_BASE              = 2.5  
+SNR_MAX_BASE                    = 3.5
 
 # -------------------------------------------------------------
 # limit on signal to noise ratio in a particular window.
-WINDOW_S2N_BASE                 = 1.5
+WINDOW_SNR_BASE                 = 4.0
 
 # -------------------------------------------------------------
 # Fine tuning constants 
-C_0  (internal minima)          = 0.7
-C_1  (small windows)            = 4.0
+C_0  (internal minima)          = 1.0
+C_1  (small windows)            = 5.0
 C_2  (prominence)               = 0.0
-C_3a (separation height)        = 1.0 
-C_3b (separation time)          = 2.0 
-C_4a (curtail on left)          = 3.0 
-C_4b (curtail on right)         = 10.0 
+C_3a (separation height)        = 4.0 
+C_3b (separation time)          = 2.5 
+C_4a (curtail on left)          = 2.0 
+C_4b (curtail on right)         = 6.0 
 
 WEIGHT_SPACE_COVERAGE           = 1.0
-WEIGHT_AVERAGE_CC               = 1.0
-WEIGHT_N_WINDOWS                = 1.0
-
+WEIGHT_AVERAGE_CC               = 0.0
+WEIGHT_N_WINDOWS                = 5.0

@@ -38,9 +38,9 @@
 #     prepare_meas_all.pl
 #
 #  EXAMPLES:
-#    pick_all_windows.pl m10 0 6/30   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-40s
-#    pick_all_windows.pl m10 0 3/30   1/204 1/1/1/1 1 0     # 
-#    pick_all_windows.pl m10 0 2/30   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-40s
+#    pick_all_windows.pl m11 0 6/30   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-40s
+#    pick_all_windows.pl m11 0 3/30   1/204 1/1/1/1 1 0     # 
+#    pick_all_windows.pl m11 0 2/30   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-40s
 #
 #    pick_all_windows.pl m00 0 6/30 179/179 1/1/0/0 1 0     # make plots only, T = 6-40s
 #    pick_all_windows.pl m00 0 6/30 179/179 0/0/1/0 1 0     # make WINDOWS file, T = 6-40s

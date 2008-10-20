@@ -339,8 +339,8 @@
      call getfhv('t2', S_pick, nerr)
   endif
 
-  ! CHT: why does this output as:  FMP     BHR     CI      
-  if (DEBUG) write(*,*) kstnm, kcmpnm, knetwk 
+  ! CHT: why does this output as:  BZN    ^@BHR    ^@AZ     ^@
+  if (DEBUG) write(*,*) kstnm, kcmpnm, knetwk
 
   ! calculate distances and azimuths
   call distaz(evla,evlo,stla,stlo,azimuth,backazimuth,dist_deg,dist_km)

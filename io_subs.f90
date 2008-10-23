@@ -287,7 +287,7 @@
   character*120 :: basename
 
   ! write the seismograms in sac
-  call write_lp_sac(basename)
+  if (RUN_BANDPASS)  call write_lp_sac(basename)
 
   ! write the seismograms for gmt
   call write_seis_gmt(basename)

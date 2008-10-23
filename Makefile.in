@@ -7,7 +7,7 @@ LIBS = @LIBS@
 
 PROGS = flexwin
 
-flexwin_LIBS = -lSacLib -lsac -ltau
+flexwin_LIBS = -lsacio -lsac -ltau
 flexwin_OBJS = \
 	distaz.o \
 	io_subs.o \

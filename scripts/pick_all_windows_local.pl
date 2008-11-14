@@ -26,12 +26,13 @@
 #  EXAMPLES:
 #     /net/denali/scratch1/carltape/svn/cig/seismo/3D/ADJOINT_TOMO/flexwin_work/scripts/pick_all_windows_local.pl
 #
-#     pick_all_windows_local.pl 2/40 1/1/1/1 input MEASURE
-#     pick_all_windows_local.pl 6/40 1/1/1/0 input MEASURE
+#     pick_all_windows_local.pl 2/30 1/1/1/1 input MEASURE
+#     pick_all_windows_local.pl 6/30 1/1/1/0 input MEASURE
 #
-#     pick_all_windows_local.pl 6/40 1/1/1/0 input_test MEASURE_TEST    # plots AND window file
-#     pick_all_windows_local.pl 6/40 0/0/1/0 input_test MEASURE_TEST    # window file only
-#     pick_all_windows_local.pl 6/40 1/1/0/0 input_test MEASURE_TEST   # plots only
+#     pick_all_windows_local.pl 6/30 1/1/1/0 input_test MEASURE_TEST    # plots AND window file
+#     pick_all_windows_local.pl 6/30 0/0/1/0 input_test MEASURE_TEST    # window file only
+#     pick_all_windows_local.pl 6/30 1/1/0/0 input_test MEASURE_TEST    # plots only
+#     pick_all_windows_local.pl 2/30 1/1/0/1 input_test MEASURE_TEST    # plots only
 #
 #==========================================================
 

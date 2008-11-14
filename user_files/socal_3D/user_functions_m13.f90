@@ -97,8 +97,8 @@ subroutine set_up_criteria_arrays
 
      ! raises STA/LTA water level after surface wave arrives
      if (BODY_WAVE_ONLY) then
-        if(time.gt.S_end) then
-        !if(time.gt.Sw_end) then
+        !if(time.gt.S_end) then
+        if(time.gt.Sw_end) then
            STALTA_W_LEVEL(i) = 10.*STALTA_BASE
         endif
         

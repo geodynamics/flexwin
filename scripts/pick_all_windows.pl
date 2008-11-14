@@ -4,7 +4,7 @@
 #
 #  pick_all_windows.pl
 #  Carl Tape
-#  09-June-2008
+#  09-Oct-2008
 #
 #  The script reads in a set of data directories, each labeled as an event ID,
 #  and it copies the data and synthetics into the windowing code, runs the code,
@@ -38,12 +38,12 @@
 #     prepare_meas_all.pl
 #
 #  EXAMPLES:
-#    pick_all_windows.pl m11 0 6/30   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-40s
-#    pick_all_windows.pl m11 0 3/30   1/204 1/1/1/1 1 0     # 
-#    pick_all_windows.pl m11 0 2/30   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-40s
+#    pick_all_windows.pl m13 0 6/30   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-30s
+#    pick_all_windows.pl m13 0 3/30   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 3-30s
+#    pick_all_windows.pl m13 0 2/30   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-30s
 #
-#    pick_all_windows.pl m00 0 6/30 179/179 1/1/0/0 1 0     # make plots only, T = 6-40s
-#    pick_all_windows.pl m00 0 6/30 179/179 0/0/1/0 1 0     # make WINDOWS file, T = 6-40s
+#    pick_all_windows.pl m00 0 6/30 179/179 1/1/0/0 1 0     # make plots only, T = 6-30s
+#    pick_all_windows.pl m00 0 6/30 179/179 0/0/1/0 1 0     # make WINDOWS file, T = 6-30s
 #
 #==========================================================
 
@@ -306,12 +306,12 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
     print CSH "echo Event ID is $eid -- $kk out of $nevent\n";
 
     $eout = "${eid}_${Ttag}_${smodel}";	                # output file tag
-    $measdir = "$rundir/$eid/$smodel/WINDOW_${Ttag}";   # main run directory
+    $savedir = "$rundir/$eid/$smodel/WINDOW_${Ttag}";   # main run directory
 
     # If the windowing code has already been run, then move to the next event.
     # NOTE: to overwrite, just comment out this option
-    if (-f "$measdir/${eout}_runfile") {
-      print "--> $measdir/${eout}_runfile exists -- on to next event\n";
+    if (-f "$savedir/${eout}_runfile") {
+      print "--> $savedir/${eout}_runfile exists -- on to next event\n";
 
     } else {
       print "--> do this event\n";
@@ -346,13 +346,13 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
       # copy prepared data and synthetic files into a directory for measurement code
       if ($imeas == 1) {
-	#$measdir = "$rundir/$eid/$smodel/WINDOW_${Ttag}";
-	print CSH "echo copying prepared DATA and SYN to ${measdir}...\n";
+	#$savedir = "$rundir/$eid/$smodel/WINDOW_${Ttag}";
+	print CSH "echo copying prepared DATA and SYN to ${savedir}...\n";
 	print CSH "mkdir -p $rundir/$eid\n";
 	print CSH "mkdir -p $rundir/$eid/$smodel/\n";
-	print CSH "mkdir -p $measdir\n";
-	print CSH "\\rm -rf $measdir/SYN ; cp -r ${dir_win_run_syn} $measdir\n";
-	print CSH "\\rm -rf $measdir/DATA ; cp -r ${dir_win_run_data} $measdir\n";
+	print CSH "mkdir -p $savedir\n";
+	print CSH "\\rm -rf $savedir/SYN ; cp -r ${dir_win_run_syn} $savedir\n";
+	print CSH "\\rm -rf $savedir/DATA ; cp -r ${dir_win_run_data} $savedir\n";
       }
  
       # copy input file into output directory
@@ -410,12 +410,13 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	# copy window file to another location
 	print CSH "\\cp ${dir_win_run_meas}/${ofile} ${odir}/${ofile}\n";
 
-	# leave copy in MEASURE directory (generic name called my mt_measure_adj.f90)
+	# leave copy in MEASURE directory (use the generic name called by mt_measure_adj.f90)
 	print CSH "\\cp ${dir_win_run_meas}/${ofile} ${dir_win_run_meas}/MEASUREMENT_WINDOWS\n";
 
 	# copy all window output files, including figures, into RUN directory
-	print CSH "\\cp ${odir}/*${eout}* $measdir\n";
-	print CSH "\\cp ${par_file} ${userfun_file} ${dir_prepare}/${pseis} $measdir\n";
+	print CSH "\\cp ${odir}/*${eout}* $savedir\n";
+	print CSH "\\cp ${savedir}/${ofile} ${savedir}/${ofile}_orig\n";    # extra copy
+	print CSH "\\cp ${par_file} ${userfun_file} ${dir_prepare}/${pseis} $savedir\n";
       }
 
     }

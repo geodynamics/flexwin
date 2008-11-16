@@ -115,14 +115,14 @@ subroutine set_up_criteria_arrays
 !!$        endif
 
         ! double the STA/LTA water level after the surface waves
-        !if(time.gt.Sw_end) then
-        !   STALTA_W_LEVEL(i) = 2.0*STALTA_BASE
-        !endif
-
-        ! allow 100 seconds to possibly capture additional phases
-        if(time.gt. (Sw_end+100.0) ) then
-           STALTA_W_LEVEL(i) = 10.*STALTA_BASE
+        if(time.gt.Sw_end) then
+           STALTA_W_LEVEL(i) = 10.0*STALTA_BASE
         endif
+
+!!$        ! allow 100 seconds to possibly capture additional phases
+!!$        if(time.gt. (Sw_end+100.0) ) then
+!!$           STALTA_W_LEVEL(i) = 10.*STALTA_BASE
+!!$        endif
 
      endif
 

@@ -39,7 +39,7 @@
 #
 #  EXAMPLES:
 #    pick_all_windows.pl m13 0 6/30   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-30s
-#    pick_all_windows.pl m13 0 3/30   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 3-30s
+#    pick_all_windows.pl m13 0 3/30   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 3-30s
 #    pick_all_windows.pl m13 0 2/30   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-30s
 #
 #    pick_all_windows.pl m00 0 6/30 179/179 1/1/0/0 1 0     # make plots only, T = 6-30s
@@ -144,6 +144,7 @@ $dir_win_run_meas = "${dir_win_run}/MEASURE";
 
 # NEW: EVENT LIST
 $eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
+$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_m12";
 if (not -f $eid_list) {die("check if eid_list ${eid_list} exist or not\n")}
 open(IN,$eid_list); @eids = <IN>; close(IN);
 $nevent0 = @eids;

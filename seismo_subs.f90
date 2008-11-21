@@ -675,7 +675,7 @@
   ! local variables
   integer :: nlen
   integer :: i_left, i_right, i, j, id_left, id_right
-  double precision :: cc, norm, norm_s
+  double precision :: cc, norm, norm_s, fout
 
   ! initialise shift and cross correlation to zero
   ishift = 0
@@ -694,11 +694,14 @@
 
   ! left and right limits of index (time) shift search
   ! NOTE: This looks OUTSIDE the time window of interest to compute TSHIFT and CC.
-  !       How far to look outside, in theory, should be another parameter.
+  !       If fout=0.5, then it looks outside by a time of 0.5*(window width).
+  !       Perhaps fout should be a parameter, or it should be tied to the max
+  !          allowable time-shift specified by the user.
   !       However, it does not matter as much if the data and synthetics are
   !          zeroed outside the windows, as currently done in calc_criteria.
-  i_left = -1*int(nlen/2.0)
-  i_right = int(nlen/2.0)
+  fout = 0.5
+  i_left = -1*int(fout*nlen)
+  i_right = int(fout*nlen)
 
   ! i is the index to shift to be applied to DATA (d)
   do i = i_left, i_right
@@ -728,7 +731,7 @@
   !    i   i1+i   i2+i  id_left  id_right
   !  -11     9     30      9        30
   !   -5    15     36     15        36
-  !    0    20     41     20        41
+  !    0    20     41     20        41    <== ORIGINAL WINDOW
   !    5    25     46     25        46
   !   10    31     52     31        52
 

@@ -675,7 +675,7 @@
   ! local variables
   integer :: nlen
   integer :: i_left, i_right, i, j, id_left, id_right
-  double precision :: cc, norm
+  double precision :: cc, norm, norm_s
 
   ! initialise shift and cross correlation to zero
   ishift = 0
@@ -689,27 +689,48 @@
   ! length of window (number of points, including ends)
   nlen = i2 - i1 + 1
 
+  ! power of synthetic signal in window
+  norm_s = sqrt(sum(s(i1:i2)*s(i1:i2)))
+
   ! left and right limits of index (time) shift search
   ! NOTE: This looks OUTSIDE the time window of interest to compute TSHIFT and CC.
-  !       THIS IS A VERY IMPORTANT DECISION!
+  !       How far to look outside, in theory, should be another parameter.
+  !       However, it does not matter as much if the data and synthetics are
+  !          zeroed outside the windows, as currently done in calc_criteria.
   i_left = -1*int(nlen/2.0)
   i_right = int(nlen/2.0)
 
-  ! i -> shift (to be applied to DATA (d) in cc search) 
+  ! i is the index to shift to be applied to DATA (d)
   do i = i_left, i_right
+
+    ! normalization factor varies as you take different windows of d
+    id_left = max(1,i1+i)      ! left index for data window
+    id_right = min(npts,i2+i)  ! right index for data window
+    norm = norm_s * sqrt(sum(d(id_left:id_right)*(d(id_left:id_right))))
+
+    ! cc as a function of i
     cc = 0.
-    id_left = max(1,i1+i)     ! left-most point on the data that will be treated
-    id_right = min(npts,i2+i) ! right-most point on the data that will be treated
-    norm = sqrt(sum(s(i1:i2)*s(i1:i2)) * sum(d(id_left:id_right)*(d(id_left:id_right))))
-    do j = i1, i2 
-      if((j+i).ge.1 .and. (j+i).le.npts) cc = cc + s(j)*d(j+i)
+    do j = i1, i2   ! loop over full window length
+      if((j+i).ge.1 .and. (j+i).le.npts) cc = cc + s(j)*d(j+i)  ! d is shifted by i
     enddo
     cc = cc/norm
+
+    ! keeping cc-max only
     if (cc .gt. cc_max) then
       cc_max = cc
       ishift = i
     endif
   enddo
+
+  ! EXAMPLE: consider the following indexing:
+  ! Two records are from 1 to 100, window is i1=20 to i2=41.
+  !    --> nlen = 22, i_left = -11, i_right = 11
+  !    i   i1+i   i2+i  id_left  id_right
+  !  -11     9     30      9        30
+  !   -5    15     36     15        36
+  !    0    20     41     20        41
+  !    5    25     46     25        46
+  !   10    31     52     31        52
 
 end subroutine xcorr_calc
 

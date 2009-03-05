@@ -30,7 +30,7 @@ STALTA_BASE                     = 0.07
 
 # -------------------------------------------------------------
 # maximum allowable time shift from reference TSHIFT
-TSHIFT_BASE                     = 2.0
+TSHIFT_BASE                     = 3.0
 TSHIFT_REFERENCE                = 0.0
 
 # -------------------------------------------------------------
@@ -67,5 +67,5 @@ C_4a (curtail on left)          = 2.0
 C_4b (curtail on right)         = 6.0 
 
 WEIGHT_SPACE_COVERAGE           = 1.0
-WEIGHT_AVERAGE_CC               = 0.0
-WEIGHT_N_WINDOWS                = 5.0
+WEIGHT_AVERAGE_CC               = 1.0
+WEIGHT_N_WINDOWS                = 1.0

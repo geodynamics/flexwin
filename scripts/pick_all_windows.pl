@@ -4,7 +4,7 @@
 #
 #  pick_all_windows.pl
 #  Carl Tape
-#  09-Oct-2008
+#  01-Feb-2009
 #
 #  The script reads in a set of data directories, each labeled as an event ID,
 #  and it copies the data and synthetics into the windowing code, runs the code,
@@ -38,9 +38,9 @@
 #     prepare_meas_all.pl
 #
 #  EXAMPLES:
-#    pick_all_windows.pl m13 0 6/30   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-30s
-#    pick_all_windows.pl m13 0 3/30   1/204 1/1/1/0 1 0     # make plots and WINDOWS file, T = 3-30s
-#    pick_all_windows.pl m13 0 2/30   1/204 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-30s
+#    pick_all_windows.pl m16 0 6/30   1/300 1/1/1/0 1 0     # make plots and WINDOWS file, T = 6-30s
+#    pick_all_windows.pl m16 0 3/30   1/300 1/1/1/0 1 0     # make plots and WINDOWS file, T = 3-30s
+#    pick_all_windows.pl m16 0 2/30   1/300 1/1/1/1 1 0     # make plots and WINDOWS file, T = 2-30s
 #
 #    pick_all_windows.pl m00 0 6/30 179/179 1/1/0/0 1 0     # make plots only, T = 6-30s
 #    pick_all_windows.pl m00 0 6/30 179/179 0/0/1/0 1 0     # make WINDOWS file, T = 6-30s
@@ -125,7 +125,8 @@ if (not -e ${rundir}) {die("check if ${rundir} exist or not\n")}
 
 # data and synthetic files (MUST BE MODIFIED FOR EACH USER)
 if ($idataset == 1) {
-   $suffix_syn = "semd.sac.d.${Ttag}";
+   #$suffix_syn = "semd.sac.d.${Ttag}";
+   $suffix_syn = "semd.sac.${smodel}.${Ttag}";
    $suffix_dat = "sac.d.${Ttag}";
 
 } elsif ($idataset == 2) {
@@ -143,8 +144,8 @@ $dir_win_run_data = "${dir_win_run}/DATA";
 $dir_win_run_meas = "${dir_win_run}/MEASURE";
 
 # NEW: EVENT LIST
-$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
-$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_m12";
+#$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
+$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_iterate";
 if (not -f $eid_list) {die("check if eid_list ${eid_list} exist or not\n")}
 open(IN,$eid_list); @eids = <IN>; close(IN);
 $nevent0 = @eids;
@@ -428,7 +429,6 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 #-----------------------------------------
 close(CSH);
 if($iexecute==1) {system("csh -f $cshfile");}
-
-print "\n ";
+print "csh -f pick_all_windows.csh\n\n";
 
 #=================================================================

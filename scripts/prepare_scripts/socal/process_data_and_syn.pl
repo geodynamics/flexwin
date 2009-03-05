@@ -3,7 +3,7 @@
 #==========================================================
 #
 #  Carl Tape
-#  01-Oct-2008
+#  22-Nov-2008
 #  process_data_and_syn.pl
 #
 #  This script processes data and 3D-Socal-SEM synthetics for Southern California.
@@ -20,53 +20,65 @@
 #    Trange    band-pass filter
 #
 #  ORDER OF OPERATIONS:
-#    ~/UTILS/process_data_and_syn.pl 1 m10 1 0 d d 20 6/30 PROCESSED    # data, initial pre-processing
-#    ~/UTILS/process_data_and_syn.pl 1 m10 0 1 d d 20 6/30 PROCESSED    # syn, initial pre-processing
-#    ~/UTILS/process_data_and_syn.pl 2 m10 1 1 d d 20 6/30 PROCESSED    # both, create cut files
-#    ~/UTILS/process_data_and_syn.pl 3 m10 1 0 d d 20 6/30 PROCESSED    # data, execute cut file
-#    ~/UTILS/process_data_and_syn.pl 3 m10 0 1 d d 20 6/30 PROCESSED    # syn, execute cut file
+#    ~/UTILS/process_data_and_syn.pl 1 m16 1 0 d 6/30    # data, initial pre-processing
+#    ~/UTILS/process_data_and_syn.pl 1 m16 0 1 d 6/30    # syn, initial pre-processing
+#    ~/UTILS/process_data_and_syn.pl 2 m16 1 1 d 6/30    # both, create cut files
+#    ~/UTILS/process_data_and_syn.pl 3 m16 1 0 d 6/30    # data, execute cut file
+#    ~/UTILS/process_data_and_syn.pl 3 m16 0 1 d 6/30    # syn, execute cut file
 #
-#    ~/UTILS/process_data_and_syn.pl 4 m10 1 0 d d 20 6/30 PROCESSED    # data, bandpass T=6-30
-#    ~/UTILS/process_data_and_syn.pl 4 m10 0 1 d d 20 6/30 PROCESSED    # syn, bandpass T=6-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 6/30    # data, bandpass T=6-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 6/30    # syn, bandpass T=6-30
 #
-#    ~/UTILS/process_data_and_syn.pl 4 m10 1 0 d d 20 2/30 PROCESSED    # data, bandpass T=2-30
-#    ~/UTILS/process_data_and_syn.pl 4 m10 0 1 d d 20 2/30 PROCESSED    # syn, bandpass T=2-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 3/30    # data, bandpass T=3-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 3/30    # syn, bandpass T=3-30
+#
+#    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 2/30    # data, bandpass T=2-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 2/30    # syn, bandpass T=2-30
 #
 #  Chino Hills synthetics for Hiroo:
-#    ~/UTILS/process_data_and_syn.pl 4 m10 0 1 d d 20 50/150 PROCESSED
+#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 50/150
 #
 #==========================================================
 
-if (@ARGV < 9) {die("Usage: process_data_and_syn.pl iprocess smodel idata isyn syn_ext dat_ext sps Tmin/Tmax pdir\n")}
-($iprocess,$smodel,$idata,$isyn,$syn_ext,$dat_ext,$sps,$Trange,$pdir) = @ARGV;
+if (@ARGV < 6) {die("Usage: process_data_and_syn.pl iprocess smodel idata isyn dat_ext Tmin/Tmax\n")}
+($iprocess,$smodel,$idata,$isyn,$dat_ext,$Trange) = @ARGV;
 
-$iexecute = 0;
-$ilist = 1;
-$iprocess0 = 0;
+#-------------------------------------
+# USER INPUT
 
 # USER PARAMETERS
-$tfac = 1.0;      # factor to extend lengths of records (should be > 1.0)
-$itest = 0;       # test directories or not
-$bmin = -40;      # minimum time before origin time
+$sps = 20;               # samples per second for interpolation/sub-sampling
+$tfac = 1.0;             # factor to extend lengths of records (should be > 1.0)
+$bmin = -40;             # minimum allowable time before origin time for cut records
+
+$pdir = "PROCESSED";     # tag for processed directories
+$syn_ext = $smodel;      # KEY: include model index for comparison among synthetics from different models
 $syn_suffix0 = "semd.sac";                  # suffix for synthetic files
 $syn_suffix = "${syn_suffix0}.${syn_ext}";
 $dat_suffix0 = "sac";                       # suffix for data files
 $dat_suffix = "${dat_suffix0}.${dat_ext}"; 
 
+$iexecute = 0;           # execute CSH file immediately
+$ilist = 1;              # read EIDs from a list (=1) or grab all CMTSOLUTION files (=0)
+
+# EID list
+$CMT_list = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_${smodel}";
+$dir_source = "/net/sierra/raid1/carltape/results/SOURCES/socal_16";
+$dirCMT    = "${dir_source}/v16_files";
+$CMT_list  = "${dir_source}/EIDs_only_loc";
+#$CMT_list  = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
+#$CMT_list  = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_m12";
+
 # directories
-#$CMT_list = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_${smodel}";
-$dir_source = "/net/sierra/raid1/carltape/results/SOURCES/socal_10";
-$dirCMT    = "${dir_source}/v10_files";
-#$CMT_list  = "${dir_source}/EIDs_only_eid";
-$CMT_list  = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
 $dirdat0    = "/net/sierra/raid1/carltape/socal/socal_3D/DATA/FINAL";
 $dirsyn0    = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_${smodel}";
 #$dirsyn0 = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_pre_${smodel}";
-
 # STATIONS file
 #$stafile = "/net/denali/home1/carltape/gmt/stations/seismic/Matlab_output/STATIONS";
 $stafile = "/net/denali/home1/carltape/gmt/stations/seismic/Matlab_output/STATIONS_CALIFORNIA_TOMO_INNER_specfem";
 #$stafile = "/net/denali/home1/carltape/gmt/stations/seismic/Matlab_output/STATIONS_CALIFORNIA_TOMO_OUTER_specfem";
+
+#-------------------------------------
 
 # check if the files exist
 if (not -f $stafile) {print "\n check if $stafile exists";}
@@ -78,6 +90,7 @@ $sTmin = sprintf("T%3.3i",$Tmin);
 $sTmax = sprintf("T%3.3i",$Tmax);
 $Ttag = "${sTmin}_${sTmax}";
 $pdirbpass = "${pdir}_${Ttag}";
+$ftag = "${Ttag}_${smodel}";
 
 # grab all the CMT solution files or read in the list of event IDs
 if($ilist == 1) {
@@ -104,11 +117,11 @@ if($ilist == 1) {
 
 # write the C-shell script to file
 if($idata==1 && $isyn==1) {
-   $cshfile = "process_data_and_syn_${Ttag}.csh";
+   $cshfile = "process_data_and_syn_${ftag}.csh";
 } elsif($idata==1 && $isyn==0) {
-   $cshfile = "process_data_${Ttag}.csh";
+   $cshfile = "process_data_${ftag}.csh";
 } elsif($idata==0 && $isyn==1) {
-   $cshfile = "process_syn_${Ttag}.csh";
+   $cshfile = "process_syn_${ftag}.csh";
 } else {
    die("check idata and isyn\n");
 }
@@ -122,7 +135,7 @@ if($iprocess==0) {
 
 $imin = 1; $imax = $ncmt;  # default
 #$imin = 1; $imax = 10;
-#$imin = 95; $imax = $imin;
+#$imin = 213; $imax = $imin;
 
 #----------------------------------------------------------------------
 
@@ -177,12 +190,31 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
     # synthetics -- this will convolve with the source half-duration (prior to interpolating)
     if ($isyn == 1) {
+
       if (-e $dirsyn) {
+
+        # this block is required if you are also converting ASCII files to SAC
+ 	($nsemd,undef,undef) = split(" ",`ls -1 $dirsyn/*semd | wc`); # number of ascii files
+ 	($nsacd,undef,undef) = split(" ",`ls -1 $dirsyn/*sac | wc`); # number of sac files
+ 	print "nsemd = $nsemd, nsacd = $nsacd\n";
+ 	if ($nsemd*$nsacd > 0) {
+ 	  if ($nsemd == $nsacd) {
+ 	    print CSH "rm $dirsyn/*semd\n";
+ 	    print CSH "sleep 5s\n";
+ 	  } else {
+ 	    die("error in converting to SAC files\n");
+ 	  }
+ 	}
+
 	if (not -e ${dirsyn_pro_1}) {
 	  print CSH "cd $dirsyn\n";
-          #print CSH "mv $pdir ${pdir}_OLD\n";
-	  #print CSH "\\rm -rf $pdir\n";
-	  print CSH "process_trinet_syn_new.pl -S -m $cmtfile -h -a $stafile -s $sps -p -d $pdir -x ${syn_ext} *.${syn_suffix0} \n";
+          # converting to SAC is so slow on the cluster -- even in parallel -- that we must do it here
+          if($nsemd > 0 && $nsacd==0) {
+	     print CSH "process_trinet_syn_new.pl -m $cmtfile -a $stafile *semd\n";
+	     print CSH "sleep 5s\n";
+	  } else {
+             print CSH "process_trinet_syn_new.pl -S -m $cmtfile -h -a $stafile -s $sps -p -d $pdir -x ${syn_ext} *.${syn_suffix0}\n";
+          }
 	} else {
 	  print "dir ${dirsyn_pro_1} already exists\n";
 	}
@@ -238,11 +270,22 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
     } else {
 
+       # check that the number of unprocessed files matches the number of processed files
+       $ns1 = `ls -1 ${dirsyn}/*.sac | wc | awk '{print \$1}'`; chomp($ns1);
+       $nd1 = `ls -1 ${dirdat}/*.sac | wc | awk '{print \$1}'`; chomp($nd1);
+       $ns2 = `ls -1 ${dirsyn_pro_1}/*.sac.${smodel} | wc | awk '{print \$1}'`; chomp($ns2);
+       $nd2 = `ls -1 ${dirdat_pro_1}/*.sac.d | wc | awk '{print \$1}'`; chomp($nd2);
+       print "-- ndata1 $nd1 -- ndata2 $nd2 -- nsyn1 $ns1 -- nsyn2 $ns2 --\n";
+       if( ($nd1 != $nd2) || ($ns1 != $ns2)) {
+          print "mismatch of expected records\n";
+          die("RESOLVE MISMATCH\n");
+       }
+
       print "\nWriting to cutfiles ...\n";
       open(CUTDAT,">${cutfile_dat}");
       open(CUTSYN,">${cutfile_syn}");
 
-      # grab all DATA files
+      # grab all the initially processed DATA files
       @files = glob("${dirdat_pro_1}/*");
       $nfile = @files;
       print "\n $nfile data files to line up with synthetics\n";
@@ -269,8 +312,17 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	  $tlend = $ed - $bd;
 	  $tlens = $es - $bs;
     
+          # if the end time of the data is less than the origin time, STOP and move the record to REJECTED
+          if ($ed < 0) {
+             close(CUTDAT); close(CUTSYN); `rm ${cutfile_dat} ${cutfile_syn}`;
+             print "move unprocessed data file to REJECTED\n";
+             print "end time is $ed\n";
+             die("data record ends before 0 -- REJECTED\n")
+          }
+
 	  # dt should be the same for both records ALREADY
 	  if (log($deltad/$deltas) > 0.01) {
+            close(CUTDAT); close(CUTSYN); `rm ${cutfile_dat} ${cutfile_syn}`;
 	    print "$datfile $synfile\n";
 	    print "DT values are not close enough: $deltad, $deltas\n";
 	    die("fix the DT values\n");
@@ -292,7 +344,6 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
           # print the cut times if the begin time is before the end time
           if ($b < $e) {
-	    #print CUT "$datfile $synfile $b $e $npt $dt\n";
 	    print CUTDAT "$datfile $b $e $npt $dt\n";
 	    print CUTSYN "$synfile_base $b $e $npt $dt\n";
 	  }
@@ -340,7 +391,7 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	    # read cut file
 	    open(IN,"${cutfile_dat}"); @lines = <IN>; close(IN); $nlines = @lines;
 
-	    $sacfile = "sacdat.mac";
+	    $sacfile = "sacdat_${ftag}.mac";
 	    `echo echo on > $sacfile`;
 	    `echo readerr badfile fatal >> $sacfile`;
 
@@ -396,7 +447,7 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	    # read cut file
 	    open(IN,"${cutfile_syn}"); @lines = <IN>; close(IN); $nlines = @lines;
 
-	    $sacfile = "sacsyn.mac";
+	    $sacfile = "sacsyn_${ftag}.mac";
 	    `echo echo on > $sacfile`;
 	    `echo readerr badfile fatal >> $sacfile`;
 
@@ -405,8 +456,15 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	      $line = $lines[$j-1]; chomp($line);
 	      ($synfile_base,$b,$e,$npt,$dt) = split(" ",$line);
 
+              # KEY: use the suffix of the present model -- the cut file may have been
+              #      generated using a different set of synthetics
+              #      THIS FILE FORMAT MIGHT DIFFER FOR DIFFERENT USERS
+              #      HERE: PHOB.NC.BHE.semd.sac.m12
+              ($tag1,$tag2,$tag3,$tag4,$tag5,$tag6) = split("\\.",$synfile_base);
+              $synfile_base_new = "${tag1}.${tag2}.${tag3}.${tag4}.${tag5}.${smodel}";
+
               # KEY: indicate the base directory
-              $synfile = "${dirsyn_pro_1}/${synfile_base}";
+              $synfile = "${dirsyn_pro_1}/${synfile_base_new}";
               if (not -f $synfile) {
                  print "synfile $synfile does not exist\n";
                  #die("synfile $synfile does not exist");
@@ -511,8 +569,10 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 if($iprocess==0) {close(SYN);}
 
 #======================
+print CSH "echo done with $cshfile\n";
 close(CSH);
 print "closing $cshfile\n";
+if(($iprocess==1) || ($iprocess==4)) {print "csh -f $cshfile\n";}
 if($iexecute==1) {system("csh -f $cshfile");}
 
 print "\n ";

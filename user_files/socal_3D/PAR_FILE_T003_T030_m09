@@ -29,16 +29,18 @@ WIN_MAX_PERIOD                  = 30.00
 STALTA_BASE                     = 0.11
 
 # -------------------------------------------------------------
-# TSHIFT
-TSHIFT_BASE                     = 4.0
+# maximum allowable time shift from reference TSHIFT
+TSHIFT_BASE                     = 3.0
+TSHIFT_REFERENCE                = 0.0
+
+# -------------------------------------------------------------
+# maximum allowable amplitude measurement relative to reference DLNA
+DLNA_BASE                       = 1.0
+DLNA_REFERENCE                  = 0.0
 
 # -------------------------------------------------------------
 # limit on CC for window acceptance
 CC_BASE                         = 0.80
-
-# -------------------------------------------------------------
-# limit on dlnA (dA/A) for window acceptance
-DLNA_BASE                       = 1.0
 
 # -------------------------------------------------------------
 # boolean switch for check_data_quality

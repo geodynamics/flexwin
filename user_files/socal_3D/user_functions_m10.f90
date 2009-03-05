@@ -25,8 +25,8 @@ subroutine set_up_criteria_arrays
   integer :: i
   double precision :: time
 
-  ! for qinya's scsn picking
   double precision :: Pnl_start, S_end, Sw_start, Sw_end
+  double precision :: Nlam, dtresh, vref
  
 !===========================
 
@@ -96,6 +96,8 @@ subroutine set_up_criteria_arrays
      endif
 
      ! raises STA/LTA water level after surface wave arrives
+     ! NOTE: CHT is effectively no longer using BODY_WAVE mode at all,
+     !       but for the 2s data, we do not look AFTER the surface waves for exotic phases.
      if (BODY_WAVE_ONLY) then
         !if(time.gt.S_end) then
         if(time.gt.Sw_end) then
@@ -119,7 +121,7 @@ subroutine set_up_criteria_arrays
         !   STALTA_W_LEVEL(i) = 2.0*STALTA_BASE
         !endif
 
-        ! allow for 100s to possibly capture additional phases
+        ! allow 100 seconds to possibly capture additional phases
         if(time.gt. (Sw_end+100.0) ) then
            STALTA_W_LEVEL(i) = 10.*STALTA_BASE
         endif
@@ -127,6 +129,24 @@ subroutine set_up_criteria_arrays
      endif
 
   enddo
+
+ ! --------------------------------
+ ! if the distance to the station is less than N wavelengths, then reject records
+ ! by reasing the entire water level
+
+  Nlam = 1.7    ! number of wavelengths
+  vref = 2.0    ! reference velocity, km/s
+  dtresh = Nlam*WIN_MIN_PERIOD*vref
+  if (dist_km .le. dtresh ) then
+     if(DEBUG) then
+         write(*,*) 'REJECT by raising water level: station is too close for this period range'
+         write(*,*) 'dist_km, dtresh = Nlam*WIN_MIN_PERIOD, Nlam, WIN_MIN_PERIOD :'
+         write(*,'(4f12.4)') dist_km, dtresh, Nlam, WIN_MIN_PERIOD
+     endif
+     do i = 1,npts
+        STALTA_W_LEVEL(i) = 10.*STALTA_BASE
+     enddo
+  endif
 
 ! The following is for check_window quality_s2n
 

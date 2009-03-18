@@ -1,15 +1,16 @@
 ################################################################
-   FLEXWIN - AUTOMATED WINDOW SELECTION - BETA TEST VERSION
+      FLEXWIN - AUTOMATED TIME-WINDOW SELECTION ALGORITHM
 ################################################################
 
 Alessia Maggi
 alessia@sismo.u-strasbg.fr
 
+
 Welcome to the flexwin package.  The purpose of this package is to
 select windows on pairs of observed and synthetic seismograms on which
 measurements can subsequently be made.
 
-This is a bare-bones instruction set.  For more details read the flexwin manual (latex/flexwin_manual.pdf) and the flexwin article (latex/flexwin_paper.pdf).
+This is a bare-bones instruction set.  For more details read the flexwin manual (flexwin_manual.pdf) and the flexwin article (Maggi et al, GJI, 2009).
 
 
 
@@ -141,6 +142,6 @@ extraction needs.
 CONFIGURING FLEXWIN FOR YOUR SCENARIO
 -------------------------------------
 
-After having read the flexwin article (latex/flexwin_paper.pdf) to learn how
+After having read the flexwin article to learn how
 flexwin works, you should refer to the flexwin manual
-(latex/flexwin_manual.pdf) for basic configuration instructions.
+(flexwin_manual.pdf) for basic configuration instructions.

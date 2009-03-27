@@ -92,7 +92,7 @@ if($idataset == 1) {
 #-------------------------------------
 
 # specify various directories (MUST BE MODIFIED FOR EACH USER)
-$dir0 = "/net/denali/scratch1/carltape/svn/cig/seismo/3D";
+$dir0 = "/net/denali/raid1/carltape/svn/cig/seismo/3D";
 $dir_win_code = "$dir0/ADJOINT_TOMO/flexwin_work";
 $dir_win_run  = "$dir0/flexwin_run";
 #$dir_win_code = "$dir0/ADJOINT_TOMO/flexwin_work_copy2";
@@ -143,9 +143,9 @@ $dir_win_run_syn  = "${dir_win_run}/SYN";
 $dir_win_run_data = "${dir_win_run}/DATA";
 $dir_win_run_meas = "${dir_win_run}/MEASURE";
 
-# NEW: EVENT LIST
-#$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
-$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_iterate";
+# EVENT LIST
+$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
+#$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_iterate";
 if (not -f $eid_list) {die("check if eid_list ${eid_list} exist or not\n")}
 open(IN,$eid_list); @eids = <IN>; close(IN);
 $nevent0 = @eids;
@@ -312,7 +312,8 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 
     # If the windowing code has already been run, then move to the next event.
     # NOTE: to overwrite, just comment out this option
-    if (-f "$savedir/${eout}_runfile") {
+    if (-e $savedir) {
+    #if (-f "$savedir/${eout}_runfile") {
       print "--> $savedir/${eout}_runfile exists -- on to next event\n";
 
     } else {

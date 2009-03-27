@@ -3,10 +3,15 @@
 #==========================================================
 #
 #  Carl Tape
-#  22-Nov-2008
+#  27-March-2009
 #  process_data_and_syn.pl
 #
 #  This script processes data and 3D-Socal-SEM synthetics for Southern California.
+#  It calls two in-house processing scripts
+#       process_cal_data.pl 
+#       process_trinet_syn_new.pl
+#  The general procedure is advised for pre-processing data and synthetics for
+#  seismic tomography applications.
 #
 #  INPUT:
 #    CMT_list  list of event ID labels in a file
@@ -34,9 +39,6 @@
 #
 #    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 2/30    # data, bandpass T=2-30
 #    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 2/30    # syn, bandpass T=2-30
-#
-#  Chino Hills synthetics for Hiroo:
-#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 50/150
 #
 #==========================================================
 
@@ -135,7 +137,7 @@ if($iprocess==0) {
 
 $imin = 1; $imax = $ncmt;  # default
 #$imin = 1; $imax = 10;
-#$imin = 213; $imax = $imin;
+#$imin = 228; $imax = $imin;
 
 #----------------------------------------------------------------------
 

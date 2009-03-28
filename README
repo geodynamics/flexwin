@@ -37,6 +37,7 @@ change the search path for the libsacio.a library).  If you prefer another
 compiler, you should modify the OPT and FC lines in the makefiles accordingly. 
 We tested using gfortran version 4.1.2
 (To check your version, type "gfortran --version".)
+The makefile requires GNU make.
 
 IMPORTANT NOTE: All the code is compiled with the -m32 option, which makes
 32bit binaries.  This option is currently required to enable compatibility with

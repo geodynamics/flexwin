@@ -534,7 +534,7 @@
   use seismo_variables
 
   double precision :: TOL, Cs, Cl, sta, lta, noise
-  integer :: i, n_extend, n_sample
+  integer :: i, n_extend 
   double precision, dimension(:), allocatable :: extended_syn
 
 ! set the Cs Cl for STA/LTA ratio using the Bai & Kennett (2001) expressions

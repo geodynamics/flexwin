@@ -27,7 +27,7 @@ COMPILATION
 FLEXWIN requires the following libraries external to the package in order to
 compile and run: libsacio.a and libsac.a. Both libraries
 are distributed by IRIS as part of the SAC package (version 101.2 and above).
-The IRIS download site (as of 30-Sept-2008) is here:
+The IRIS download site (as of 30-Marci-2009) is here:
    http://www.iris.edu/software/sac/sac.request.htm
 (To check your version, type sac.)
 

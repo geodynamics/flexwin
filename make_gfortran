@@ -1,4 +1,4 @@
-OPT= -m32 -ffixed-line-length-132 -Wall
+OPT= -m32 -Wall
 FC = gfortran
 CFLAGS= ${OPT}
 

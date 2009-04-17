@@ -38,11 +38,11 @@ c----------------------------------------------------------------------
       e=acosf((cos(c)-cos(a)*cos(del))/(sin(a)*sin(del)))
       s=acosf((cos(a)-cos(c)*cos(del))/(sin(c)*sin(del)))
       if (delo .lt. 0.) then
-	azm=360.-c1*e
-	bzm=c1*s
+        azm=360.-c1*e
+        bzm=c1*s
       else
-	azm=c1*e
-	bzm=360.-c1*s
+        azm=c1*e
+        bzm=360.-c1*s
       endif
       return
       end

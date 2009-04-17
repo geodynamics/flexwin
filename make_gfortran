@@ -30,8 +30,8 @@ SUFFIXES = .f .o .f90 .F .mod
 	$(FC) ${CFLAGS} -c -o $@ $< 
 
 
-flexwin:flexwin.f90 ${LIB2} 
-	$(FC) ${CFLAGS} flexwin.f90 -o flexwin ${LIB2} -L${TAULIBDIR} -L${SACLIBDIR} ${LIBS} 
+flexwin:flexwin.f90 copy_float.o ${LIB2} 
+	$(FC) ${CFLAGS} flexwin.f90 -o flexwin copy_float.o ${LIB2} -L${TAULIBDIR} -L${SACLIBDIR} ${LIBS} 
 
 clean:
 	rm -f  ${LIB2} ${PROGS} *.o *.mod

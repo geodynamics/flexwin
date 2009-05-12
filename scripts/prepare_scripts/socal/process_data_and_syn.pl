@@ -7,7 +7,7 @@
 #  process_data_and_syn.pl
 #
 #  This script processes data and 3D-Socal-SEM synthetics for Southern California.
-#  It calls two in-house processing scripts
+#  It calls two Caltech in-house SAC-based Perl processing scripts
 #       process_cal_data.pl 
 #       process_trinet_syn_new.pl
 #  The general procedure is advised for pre-processing data and synthetics for
@@ -39,6 +39,27 @@
 #
 #    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 2/30    # data, bandpass T=2-30
 #    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 2/30    # syn, bandpass T=2-30
+#
+#  FILE-NAMING CONVENTIONS (example for event 9818433):
+#    DATA                                 -- main data directory
+#       9818433                           -- event directory
+#          9818433.CI.PAS.BHZ.sac         -- raw record
+#          9818433_dat_cut_done           -- list of data files to cut
+#          9818433_syn_cut                -- list of syn files to cut
+#          PROCESSED                      -- initial processing directory
+#             9818433.CI.PAS.BHZ.sac.d    -- sac headers, interpolated, cut
+#             PROCESSED_T006_T030         -- bandpass directory
+#                 9818433.CI.PAS.BHZ.sac.d.T006_T030  -- bandpass (and rotated)
+#
+#    SYN                                  -- main synthetics directory
+#       model_m00                         -- model iteration
+#          9818433                        -- event directory
+#             PAS.CI.BHZ.semd.sac         -- "raw" synthetic record
+#             9818433_syn_cut_done        -- list of synthetics that were cut
+#             PROCESSED                   -- initial processing directory
+#                PAS.CI.BHZ.semd.sac.m00  -- sac headers, hdur convolution, interpolated, cut
+#                PROCESSED_T006_T030      -- bandpass directory
+#                    PAS.CI.BHZ.semd.sac.m00.T006_T030 -- bandpass (and rotated)
 #
 #==========================================================
 

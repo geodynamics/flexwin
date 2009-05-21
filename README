@@ -44,6 +44,8 @@ IMPORTANT NOTE: All the code is compiled with the -m32 option, which makes
 SAC.  Future versions of the SAC distribution may no longer require this
 compatibility flag.
 
+21-MAY-2009: CHT successfully compiled and ran FLEXWIN WITHOUT the -m32 option using a beta version of 64-bit SAC (101.3) with gfortran 4.3.3 on Ubuntu Linux.
+
 Steps to compile the flexwin package:
 
 (1) Compile libtau.a and create iasp91.hed and iasp91.tbl.  In the

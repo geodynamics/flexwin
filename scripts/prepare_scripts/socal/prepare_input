@@ -15,14 +15,14 @@ for file in DATA/*.?H[RTZ].* ; do
   comp=`echo $chan | awk '{print substr($1,3,1)}'`
   #echo $net $sta $chan $comp
 
-  # synthetics are always BH_
+  # synthetics are always BH_ (for socal problem)
   #synt=SYN/${sta}.${net}.BH${comp}.semd.sac.d
   #synt=`ls SYN/${sta}.${net}.BH${comp}*`
   nsynt=`ls -1 SYN/${sta}.${net}.BH${comp}* | wc | awk '{print $1}'`
 
   out=MEASURE/${sta}.${net}.${chan}
 
-  if [ $nsynt == 1 ] ; then # data with unique syn match
+  if [ $nsynt -eq 1 ] ; then # data with unique syn match
 
     synt=`ls SYN/${sta}.${net}.BH${comp}*`
     b1=`saclst b f $file | awk '{print $2}'`

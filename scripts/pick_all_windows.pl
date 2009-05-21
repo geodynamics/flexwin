@@ -75,9 +75,9 @@ if($ibp==1) {$bbp = ".true."} else {$bbp = ".false."}
 # directories for data and synthetics
 if($idataset == 1) {
   
-  $dir_data  = "/net/sierra/raid1/carltape/socal/socal_3D/DATA/FINAL";   # Socal data (Carl)
-  $dir_syn  = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_${smodel}";   # Socal syn
-  #$dir_syn  = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_pre_${smodel}";   # Socal syn
+  $dir_data  = "/home/carltape/SOCAL_ADJOINT/DATA/FINAL";   # Socal data (Carl)
+  $dir_syn  = "/home/carltape/SOCAL_ADJOINT/SYN/model_${smodel}";   # Socal syn
+  #$dir_syn  = "/home/carltape/SOCAL_ADJOINT/SYN/model_pre_${smodel}";   # Socal syn
   $sdataset = "socal";
 
 } elsif ($idataset == 2) {
@@ -92,7 +92,7 @@ if($idataset == 1) {
 #-------------------------------------
 
 # specify various directories (MUST BE MODIFIED FOR EACH USER)
-$dir0 = "/net/denali/raid1/carltape/svn/cig/seismo/3D";
+$dir0 = "/data1/cig/seismo/3D";    # SVN path
 $dir_win_code = "$dir0/ADJOINT_TOMO/flexwin_work";
 $dir_win_run  = "$dir0/flexwin_run";
 #$dir_win_code = "$dir0/ADJOINT_TOMO/flexwin_work_copy2";
@@ -106,10 +106,10 @@ $dir_prepare = "${dir_scripts}/prepare_scripts/${sdataset}";
 $dir_user = "${dir_win_code}/user_files";
 
 # directory to collect COPIES of various output files
-$odir         = "/net/sierra/raid1/carltape/results/WINDOWS/model_${smodel}";
+$odir = "/home/carltape/results/WINDOWS/model_${smodel}";
 
 # run directory for windows, measurements, adjoint sources, and kernels
-$rundir = "/net/sierra/raid1/carltape/socal/socal_3D/RUNS";
+$rundir = "/home/carltape/SOCAL_ADJOINT/RUNS";
 
 #-------------------------------------
 
@@ -144,8 +144,8 @@ $dir_win_run_data = "${dir_win_run}/DATA";
 $dir_win_run_meas = "${dir_win_run}/MEASURE";
 
 # EVENT LIST
-$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
-#$eid_list = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_iterate";
+$eid_list = "/home/carltape/results/EID_LISTS/syn_run_${smodel}";
+#$eid_list = "/home/carltape/results/EID_LISTS/syn_run_iterate";
 if (not -f $eid_list) {die("check if eid_list ${eid_list} exist or not\n")}
 open(IN,$eid_list); @eids = <IN>; close(IN);
 $nevent0 = @eids;

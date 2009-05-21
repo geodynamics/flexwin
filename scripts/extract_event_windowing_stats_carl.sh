@@ -28,7 +28,7 @@ min_ddg=0
 #CHT
 rectxt=rectext
 
-gmtset PAPER_MEDIA letter MEASURE_UNIT inch
+gmtset PAPER_MEDIA letter MEASURE_UNIT inch BASEMAP_TYPE plain PLOT_DEGREE_FORMAT D LABEL_FONT_SIZE 12 ANOT_FONT_SIZE 10 HEADER_FONT_SIZE 12
 red=255/0/0
 black=0/0/0
 grey=220/220/220
@@ -193,9 +193,9 @@ END
 proj=X1.75/1.5
 
 ## plot window number statistics
-awk '{print $6}' $t0 | pshistogram  -J$proj -C -B:"CC":/WS -W0.02 -Lthin -G$grey -O -K -X-4.5 -Y-2.0 >> $out
-awk '{print $5}' $t0 | pshistogram  -J$proj -C -B:"Tshift":/WS -W1 -Lthin -G$grey -O -K -X2.75 >> $out
-awk '{print $7}' $t0 | pshistogram  -J$proj -C -B:"dlnA":/WS -W0.1 -Lthin -G$grey -O -X2.75 -K >> $out
+awk '{print $6}' $t0 | pshistogram  -J$proj -F -B:"CC":/WS -W0.02 -Lthin -G$grey -O -K -X-4.5 -Y-2.0 >> $out
+awk '{print $5}' $t0 | pshistogram  -J$proj -F -B:"Tshift":/WS -W1 -Lthin -G$grey -O -K -X2.75 >> $out
+awk '{print $7}' $t0 | pshistogram  -J$proj -F -B:"dlnA":/WS -W0.1 -Lthin -G$grey -O -X2.75 -K >> $out
 
 # set projection for stats plotting
 # plot Tshift vs CC 
@@ -228,9 +228,9 @@ psbasemap -R$region -J$proj -B -O -K >> $out
 
 ## plot window number statistics
 ## NOTE: IF THERE IS A CONSTANT NUMBER OF WINDOWS FOR A COMPONENT, THEN PSHISTOGRAM CRASHES
-grep Z $t1 | awk '{print $2}' | pshistogram  -J$proj -C -B:"Windows per Z trace":/WS -W1 -Lthin -G$red -O -K -X-5.5 -Y-2.25 >> $out
-grep R $t1 | awk '{print $2}' | pshistogram  -J$proj -C -B:"Windows per R trace":/WS -W1 -Lthin -G$green -O -K -X2.75 >> $out
-grep T $t1 | awk '{print $2}' | pshistogram  -J$proj -C -B:"Windows per T trace":/WS -W1 -Lthin -G$blue -O -X2.75 >> $out   # FINISH (no -K)
+grep Z $t1 | awk '{print $2}' | pshistogram  -J$proj -F -B:"Windows per Z trace":/WS -W1 -Lthin -G$red -O -K -X-5.5 -Y-2.25 >> $out
+grep R $t1 | awk '{print $2}' | pshistogram  -J$proj -F -B:"Windows per R trace":/WS -W1 -Lthin -G$green -O -K -X2.75 >> $out
+grep T $t1 | awk '{print $2}' | pshistogram  -J$proj -F -B:"Windows per T trace":/WS -W1 -Lthin -G$blue -O -X2.75 >> $out   # FINISH (no -K)
 
 # CHT comment out
 #echo "%!PS-Adobe-3.0" >t1
@@ -240,7 +240,7 @@ grep T $t1 | awk '{print $2}' | pshistogram  -J$proj -C -B:"Windows per T trace"
 
 echo $out
 
-#ggv $out
+#gv $out
 
 #-------------------------------
 
@@ -249,7 +249,7 @@ echo $out
 out2=${basename}/event_recordsection.eps
 out2_ps=${basename}/event_recordsection.ps
 out2_pdf=${basename}/event_recordsection.pdf
-gmtset PAPER_MEDIA letter MEASURE_UNIT inch
+#gmtset PAPER_MEDIA letter MEASURE_UNIT inch
 
 region=$min_time/$max_time/$min_ddg/$max_ddg
 proj=X3.0/-6.8

@@ -4,7 +4,7 @@
 #
 #  pick_all_windows_local.pl
 #  Carl Tape
-#  02-Oct-2008
+#  20-Ocit-2009
 #
 #  This is the "local version" of pick_all_windows_local.pl
 #  This is run from the directory containing MEASURE, DATA, SYN,
@@ -24,7 +24,7 @@
 #     prepare_meas_all.pl
 #
 #  EXAMPLES:
-#     /net/denali/raid1/carltape/svn/cig/seismo/3D/ADJOINT_TOMO/flexwin_work/scripts/pick_all_windows_local.pl
+#     /data1/cig/seismo/3D/ADJOINT_TOMO/flexwin_work/scripts/pick_all_windows_local.pl
 #
 #     pick_all_windows_local.pl 2/30 1/1/1/1 input MEASURE
 #     pick_all_windows_local.pl 6/30 1/1/1/0 input MEASURE
@@ -34,19 +34,26 @@
 #     pick_all_windows_local.pl 6/30 1/1/0/0 input_test MEASURE_TEST    # plots only
 #     pick_all_windows_local.pl 2/30 1/1/0/1 input_test MEASURE_TEST    # plots only
 #
+#     pick_all_windows_local.pl 3/10 1/1/1/0 input_test MEASURE_TEST    # plots AND window file
+#
 #==========================================================
 
 if (@ARGV < 4) {die("Usage: pick_all_windows_local.pl  Tmin/Tmax idebug/iplot/imeas/ibody input_file MEASURE_dir\n");}
 ($Ts,$ibools,$input,$dir) = @ARGV;
 
-# specify source code directory (MUST BE MODIFIED FOR EACH USER)
-$dir_win_code = "/net/denali/raid1/carltape/svn/cig/seismo/3D/ADJOINT_TOMO/flexwin_work";
+$pwd = $ENV{PWD};
+
+#-------------------------------------
+# USER INPUT
+
+# source code directory
+$dir_win_code = "/home/carltape/ADJOINT_TOMO/flexwin_work";
+
+#-------------------------------------
 
 $dir_scripts = "${dir_win_code}/scripts";
 if (not -e ${dir_win_code}) {die("check if ${dir_win_code} exist or not\n")}
 if (not -e ${dir_scripts}) {die("check if ${dir_scripts} exist or not\n")}
-
-#-------------------------------------
 
 # split input entries
 ($Tmin,$Tmax)  = split("/",$Ts);
@@ -72,8 +79,7 @@ $par_file = "${dir_win_code}/PAR_FILE";
 $win_execute = "flexwin";
 
 # make command for windowing code
-$make = "make -f make_gfortran";   # change as of 9-30-08
-#$make = "make -f make_intel_caltech";
+$make = "make -f make_gfortran";
 
 # location of plot_windows_all.pl
 $plot_windows_perl = "${dir_scripts}/plot_windows_all.pl";
@@ -118,7 +124,7 @@ print CSH "$make clean\n $make ${win_execute}\n";
 
 # remove contents in target directory
 # NOTE: This copies in the PAR_FILE from the main directory -- it is not the local version!
-print CSH "cd -\n";
+print CSH "cd $pwd\n";
 print CSH "\\cp ${par_file} .\n";
 print CSH "\\rm -rf ${dir}\n mkdir ${dir}\n";
 
@@ -136,6 +142,7 @@ if ($iplot == 1) {
   print CSH "sort -g -k 2 $reclist0 > ${reclist_dist}\n";
 
   # generate composite PDF file using plot_windows_all.pl
+  # make sure Carl's settings are on in plot_seismos_gmt.sh
   $pdffile = "$dir/${eout}_all.pdf";
   print CSH "${plot_windows_perl} ${dir_win_code} ${dir} ${reclist_dist} $pdffile\n";
 }

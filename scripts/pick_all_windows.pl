@@ -45,6 +45,8 @@
 #    pick_all_windows.pl m00 0 6/30 179/179 1/1/0/0 1 0     # make plots only, T = 6-30s
 #    pick_all_windows.pl m00 0 6/30 179/179 0/0/1/0 1 0     # make WINDOWS file, T = 6-30s
 #
+#    pick_all_windows.pl m16 0 3/10 198/198 1/1/1/0 1 0     # socal 14236768
+#
 #==========================================================
 
 if (@ARGV < 7) {die("Usage: pick_all_windows.pl model Tmin/Tmax imin/imax idebug/iplot/imeas/ibody idataset iexecute\n");}
@@ -73,18 +75,15 @@ if($ibody==1) {$bbody = ".true."} else {$bbody = ".false."}
 if($ibp==1) {$bbp = ".true."} else {$bbp = ".false."}
 
 # directories for data and synthetics
+# 1=socal; 2=Japan
 if($idataset == 1) {
-  
-  $dir_data  = "/home/carltape/SOCAL_ADJOINT/DATA/FINAL";   # Socal data (Carl)
-  $dir_syn  = "/home/carltape/SOCAL_ADJOINT/SYN/model_${smodel}";   # Socal syn
-  #$dir_syn  = "/home/carltape/SOCAL_ADJOINT/SYN/model_pre_${smodel}";   # Socal syn
+  $dir_data  = "/home/carltape/SOCAL_ADJOINT/DATA/FINAL";
+  $dir_syn  = "/home/carltape/SOCAL_ADJOINT/SYN/model_${smodel}";
   $sdataset = "socal";
-
 } elsif ($idataset == 2) {
-  $dir_data  = "/net/sierra/raid1/mchen/DATA/TEST";     # Japan data (Min)
-  $dir_syn  = "/net/sierra/raid1/mchen/SEM/TEST";      # Japan syn (Min)
+  $dir_data  = "/home/mchen/DATA/TEST";
+  $dir_syn  = "/home/mchen/SEM/TEST";
   $sdataset = "japan";
-
 } else {
   die("\n idataset must be 1 (socal) or 2 (japan)\n");
 }

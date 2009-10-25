@@ -48,7 +48,7 @@ The main user parameters in the {\tt PAR\_FILE} are:
 \item[{\tt TSHIFT\_BASE}]Corresponds to $\Delta\tau_0$ in Table~\ref{tb:params}, and is the maximum cross-correlation lag (in seconds) between synthetic and observed seismogram for a window to be acceptable.
 \item[{\tt DLNA\_BASE}]Corresponds to $\Delta\ln{A}_0$ in Table~\ref{tb:params}, and is the maximum amplitude ratio ($\Delta\ln{A}$ or $\Delta A/A$) between synthetic and observed seismogram for a window to be acceptable.
 \item[{\tt TSHIFT\_REFERENCE}]Corresponds to $\Delta\tau_{\rm ref}$ in Table~\ref{tb:params}, and allows for a systematic traveltime bias in the synthetics.
-\item[{\tt TSHIFT\_REFERENCE}]Corresponds to $\Delta\ln{A}_{\rm ref}$ in Table~\ref{tb:params}, and allows for a systematic amplitude bias in the synthetics.
+\item[{\tt DLNA\_REFERENCE}]Corresponds to $\Delta\ln{A}_{\rm ref}$ in Table~\ref{tb:params}, and allows for a systematic amplitude bias in the synthetics.
 \item[{\tt C\_0}]Corresponds to $C_0$ in Table~\ref{tb:params}, and is expressed as a multiple of $w_E$.  No window may contain a local minimum in its STA:LTA waveform that falls below the local value of $C_0 w_E$.  See Figure~\ref{fg:win_composite}b.
 \item[{\tt C\_1}]Corresponds to $C_1$ in Table~\ref{tb:params}, and is expressed as a multiple of $T_0$.  No window may be shorter than $C_1 T_0$.
 \item[{\tt C\_2}]Corresponds to $C_2$ in Table~\ref{tb:params}, and is expressed as a multiple of $w_E$.  A window whose seed maximum on the STA:LTA waveform rises less than $C_2 w_E$ above either of its adjacent minima is rejected.  See Figure~\ref{fg:win_composite}c.
@@ -352,6 +352,23 @@ w_E(t) & =
 %\Delta\tau_0(t) & = \Delta\tau_0.
 \end{align}
 
+%-----------------------
+
+\subsection{Time intervals for signal-to-noise calculations}
+
+If the parameter {\tt DATA$\_$QUALITY = .true.} in the {\tt PAR$\_$FILE}, then the {\tt user\_functions.f90} file requires the specification of four times that define the ``noise'' and ``signal'' time intervals.  For example, the default {\tt user\_functions.f90} file contains these lines:
+%
+\begin{verbatim}
+  ! these values will be used for signal2noise calculations
+  if (DATA_QUALITY) then
+    noise_start=b
+    noise_end=ph_times(1)-WIN_MAX_PERIOD
+    signal_start=noise_end
+    signal_end=b+(npts-1)*dt
+  endif
+\end{verbatim}
+%
+The use of all four variables allows provides the flexibility of choosing these time intervals.  (For example, the start of the noise does not need to be the beginning of the seismogram. Or the start of the signal does not have to coincide with the end of the noise.)
 
 %-----------------------
 

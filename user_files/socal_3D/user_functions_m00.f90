@@ -74,8 +74,11 @@ subroutine set_up_criteria_arrays
   endif
 
   ! variables for signal to noise ratio criteria.
-  signal_end = Sw_end
-  noise_end  = Pnl_start
+  noise_start  = b
+  noise_end    = Pnl_start
+  signal_start = noise_end
+  signal_end   = Sw_end
+
   if(DEBUG) then
      if (BODY_WAVE_ONLY) then
          write(*,*) 'DEBUG : P_pick = ', P_pick

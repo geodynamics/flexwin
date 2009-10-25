@@ -15,7 +15,7 @@
   double precision :: w_level_local
 
   logical :: data_ok
-  double precision :: time_obs_noise, time_obs_signal, noise_int, signal_int, snr_int, signal_amp, noise_amp, snr_amp
+  double precision :: noise_int, signal_int, snr_int, signal_amp, noise_amp, snr_amp
 
 ! initialise global arrays
   num_win = 0
@@ -37,7 +37,7 @@
   if(DATA_QUALITY) then
     if(DEBUG) print *, "Checking data quality"
     ! returns data_ok = .true. if two signal-to-noise criteria are met
-    call check_data_quality(data_ok,signal_int,noise_int,snr_int,time_obs_signal,time_obs_noise,signal_amp,noise_amp,snr_amp)
+    call check_data_quality(data_ok,signal_int,noise_int,snr_int,signal_amp,noise_amp,snr_amp)
     ! if data quality is not ok, then return without selecting windows
     if (.not. data_ok) then
       num_win = 0
@@ -45,104 +45,124 @@
     endif
   endif
 
-  ! find list of maxima and minima, ignoring water level
-  w_level_local = 0.0
-  if(DEBUG) print *, "Finding max min "
-  call find_maxima(STA_LTA,npts,maxima_lp,nmax,w_level_local)
-  call find_minima(STA_LTA,npts,minima_lp,nmin,w_level_local)
+!!$  if (1==1) then
+!!$     ! keep the manually selected window that has met the signal-to-noise criteria;
+!!$     ! this option is used for time-reversing coda surface waves
+!!$     nwin = 1
+!!$     iL(1) = is1
+!!$     iM(1) = int((is1+is2)/2)
+!!$     iR(1) = is2
+!!$
+!!$     ! reject window if it does not satisfy F2, tshift and dlnA criteria;
+!!$     ! here we are only interested in using the dlnA criterion
+!!$     call reject_on_fit_criteria(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
+!!$     if (nwin.eq.0) then
+!!$        write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
+!!$        num_win = 0
+!!$        return
+!!$     endif
+!!$     if(DEBUG) call display_windows_full(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
+!!$
+!!$  else
 
-  ! find all possible windows within seismogram, with central maxima above the water level
-  if(DEBUG) print *, "Making all windows "
-  call setup_M_L_R(nmax,maxima_lp,nmin,minima_lp,nwin,iM,iL,iR)
-  if (nwin.eq.0) then
-    write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
-    num_win = 0
-    return
-  endif
+     ! find list of maxima and minima, ignoring water level
+     w_level_local = 0.0
+     if(DEBUG) print *, "Finding max min "
+     call find_maxima(STA_LTA,npts,maxima_lp,nmax,w_level_local)
+     call find_minima(STA_LTA,npts,minima_lp,nmin,w_level_local)
 
-  ! remove windows with internal minima below the water level
-  if(DEBUG) print *, "Rejecting on water level "
-  call reject_on_water_level(nwin,iM,iL,iR,nmin,minima_lp,C_0)
-  if (nwin.eq.0) then
-    write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
-    num_win = 0
-    return
-  endif
-  ! sort windows
-  call sort_on_start_time(nwin,iM,iL,iR)
-  !if(DEBUG) call display_windows(nwin,iM,iL,iR)
+     ! find all possible windows within seismogram, with central maxima above the water level
+     if(DEBUG) print *, "Making all windows "
+     call setup_M_L_R(nmax,maxima_lp,nmin,minima_lp,nwin,iM,iL,iR)
+     if (nwin.eq.0) then
+        write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
+        num_win = 0
+        return
+     endif
 
-  ! remove small windows
-  if(DEBUG) print *, "Rejecting on size "
-  call reject_on_window_width(nwin,iM,iL,iR,C_1)
-  if (nwin.eq.0) then
-    write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
-    num_win = 0
-    return
-  endif
-  !if(DEBUG) call display_windows(nwin,iM,iL,iR)
+     ! remove windows with internal minima below the water level
+     if(DEBUG) print *, "Rejecting on water level "
+     call reject_on_water_level(nwin,iM,iL,iR,nmin,minima_lp,C_0)
+     if (nwin.eq.0) then
+        write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
+        num_win = 0
+        return
+     endif
+     ! sort windows
+     call sort_on_start_time(nwin,iM,iL,iR)
+     !if(DEBUG) call display_windows(nwin,iM,iL,iR)
 
-  ! reject on prominence of central maximum
-  if(DEBUG) print *, "Rejecting on prominence "
-  call reject_on_prominence(nwin,iM,iL,iR,nmin,minima_lp,C_2)
-  if (nwin.eq.0) then
-    write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
-    num_win = 0
-    return
-  endif
-  !if(DEBUG) call display_windows(nwin,iM,iL,iR)
+     ! remove small windows
+     if(DEBUG) print *, "Rejecting on size "
+     call reject_on_window_width(nwin,iM,iL,iR,C_1)
+     if (nwin.eq.0) then
+        write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
+        num_win = 0
+        return
+     endif
+     !if(DEBUG) call display_windows(nwin,iM,iL,iR)
 
-  ! reject windows containing more than one distinct phase
-  call reject_on_phase_separation(nwin,iM,iL,iR,nmin,minima_lp,nmax,maxima_lp,C_3a, C_3b)
-  if (nwin.eq.0) then
-    write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
-    num_win = 0
-    return
-  endif
-  !if(DEBUG) call display_windows(nwin,iM,iL,iR)
+     ! reject on prominence of central maximum
+     if(DEBUG) print *, "Rejecting on prominence "
+     call reject_on_prominence(nwin,iM,iL,iR,nmin,minima_lp,C_2)
+     if (nwin.eq.0) then
+        write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
+        num_win = 0
+        return
+     endif
+     !if(DEBUG) call display_windows(nwin,iM,iL,iR)
 
-  ! curtail window ends by time decay
-  call curtail_window_length(nwin,iL,iR,nmax,maxima_lp,C_4a,C_4b)
-  !if(DEBUG) call display_windows(nwin,iM,iL,iR)
+     ! reject windows containing more than one distinct phase
+     call reject_on_phase_separation(nwin,iM,iL,iR,nmin,minima_lp,nmax,maxima_lp,C_3a, C_3b)
+     if (nwin.eq.0) then
+        write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
+        num_win = 0
+        return
+     endif
+     !if(DEBUG) call display_windows(nwin,iM,iL,iR)
 
-  ! REPEAT: remove small windows, since curtailing my have shrunk them
-  ! ALESSIA: Perhaps this only needs to be done once (here)?
-  if(DEBUG) print *, "Rejecting on size (REPEAT)"
-  call reject_on_window_width(nwin,iM,iL,iR,C_1)
-  if (nwin.eq.0) then
-    write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
-    num_win = 0
-    return
-  endif
-  if(DEBUG) call display_windows(nwin,iM,iL,iR)
+     ! curtail window ends by time decay
+     call curtail_window_length(nwin,iL,iR,nmax,maxima_lp,C_4a,C_4b)
+     !if(DEBUG) call display_windows(nwin,iM,iL,iR)
 
-  ! check window quality
-  if(DATA_QUALITY) call check_window_s2n(nwin,iM,iL,iR)
-  if (nwin.eq.0) then
-    write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
-    num_win = 0
-    return
-  endif
-  if(DEBUG) call display_windows(nwin,iM,iL,iR)
+     ! REPEAT: remove small windows, since curtailing may have shrunk them
+     ! NOTE: perhaps this only needs to be done once (here)
+     if(DEBUG) print *, "Rejecting on size (REPEAT)"
+     call reject_on_window_width(nwin,iM,iL,iR,C_1)
+     if (nwin.eq.0) then
+        write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
+        num_win = 0
+        return
+     endif
+     if(DEBUG) call display_windows(nwin,iM,iL,iR)
 
-  ! reject windows that do not satisfy F2, tshift and dlnA criteria
-  call reject_on_fit_criteria(nwin,iM,iL,iR,CC_local,Tshift_local, dlnA_local)
-  if (nwin.eq.0) then
-    write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
-    num_win = 0
-    return
-  endif
-  if(DEBUG) call display_windows_full(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
+     ! check window quality
+     if(DATA_QUALITY) call check_window_s2n(nwin,iM,iL,iR)
+     if (nwin.eq.0) then
+        write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
+        num_win = 0
+        return
+     endif
+     if(DEBUG) call display_windows(nwin,iM,iL,iR)
 
-  ! now that all criteria are satisfied, reject any duplicate windows
-  call reject_on_duplicate(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
-  if(DEBUG) call display_windows_full(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
+     ! reject windows that do not satisfy F2, tshift and dlnA criteria
+     call reject_on_fit_criteria(nwin,iM,iL,iR,CC_local,Tshift_local, dlnA_local)
+     if (nwin.eq.0) then
+        write(*,*) 'NO WINDOWS SELECTED FOR THIS TRACE'
+        num_win = 0
+        return
+     endif
+     if(DEBUG) call display_windows_full(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
 
-  ! resolve the overlaps
-  call resolve_overlaps(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
-  if(DEBUG) call display_windows_full(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local) 
+     ! now that all criteria are satisfied, reject any duplicate windows
+     call reject_on_duplicate(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
+     if(DEBUG) call display_windows_full(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
 
-  ! for each window
+     ! resolve the overlaps
+     call resolve_overlaps(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
+     if(DEBUG) call display_windows_full(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local) 
+
+!!$  endif
 
   ! set global number of windows
   num_win = nwin
@@ -209,7 +229,9 @@
        pow_ratio = signal_pow / noise_pow
 
        if(DEBUG) then
-           write (*,*) 'DEBUG : iwin, amp_ratio : ', iwin, amp_ratio
+           write (*,*) 'DEBUG : amp_ratio,signal_amp,noise_amp : ',amp_ratio,signal_amp,noise_amp
+           write (*,*) 'DEBUG : pow_ratio,signal_pow,noise_pow : ',pow_ratio,signal_pow,noise_pow
+           write (*,*) 'DEBUG : iwin, amp_ratio : ', iwin, amp_ratio, S2N_LIMIT(iM(iwin))
        endif
 
        if (amp_ratio < S2N_LIMIT(iM(iwin))) then
@@ -236,7 +258,7 @@
   end subroutine check_window_s2n
 
 
-  subroutine check_data_quality(data_ok,signal_int,noise_int,snr_int,time_obs_signal,time_obs_noise,signal_amp,noise_amp,snr_amp)
+  subroutine check_data_quality(data_ok,signal_int,noise_int,snr_int,signal_amp,noise_amp,snr_amp)
     use seismo_variables
 
     ! data_ok is a logical value to indicate whether or not 
@@ -245,9 +267,10 @@
     ! and that particular station will be rejected.
 
     logical, intent(out) :: data_ok
-    double precision :: time_obs_noise, time_obs_signal, noise_int, signal_int, snr_int, signal_amp, noise_amp, snr_amp
+    double precision, intent(out) :: signal_int,noise_int,snr_int,signal_amp,noise_amp,snr_amp
 
-    integer :: i, j
+    double precision :: time_obs_noise, time_obs_signal
+    integer :: i, j, k
 
     ! initialize values
     data_ok = .true.
@@ -258,38 +281,42 @@
     noise_amp = 0.0
     snr_amp = 0.0
 
-    if(DEBUG) write(*,*) 'DEBUG : noise_end = ', sngl(noise_end)
-    if(DEBUG) write(*,*) 'DEBUG : signal_end = ', sngl(signal_end)
+    if(DEBUG) then
+       write(*,*) 'DEBUG : noise_start = ', sngl(noise_start)
+       write(*,*) 'DEBUG : noise_end = ', sngl(noise_end)
+       write(*,*) 'DEBUG : signal_start = ', sngl(signal_start)
+       write(*,*) 'DEBUG : signal_end = ', sngl(signal_end)
+    endif
 
-    ! Integrating the signal and noise. We will take the RMS of the signal
-    ! and noise, and take the ratio. Noise is integrated from start time to 
-    ! time noise_end, and signal is integrated from start time
-    ! to time signal_end. We also reject based on the amplitude
-    ! ratio of the largest data point before noise_end and the 
-    ! largest data point between noise_end and signal_end. 
-
-    ! These two loops prepare noise, noise_amp, signal, signal_amp.
-    ! noise_end and signal_end are defined in user_functions.f90
-    ! (set_up_criteria_arrays).
-
-    ! noise loop
-    do i = 1, NDIM
-       time_obs_noise = b+(i-1)*dt
-       if (time_obs_noise > noise_end) exit
+    ! compute noise
+    ! see user_functions.f90 (default: noise_start = b)
+    do m = 1, npts
+       time_obs_noise = b+(m-1)*dt
+       if (time_obs_noise > noise_start) exit
     enddo
-    ! i is the index corresponding to noise_end
-    noise_int = sum( (obs_lp(1:i))**2 )/(i-1)
-    noise_amp = maxval( abs(obs_lp(1:i)) )
+    in1 = m-1       ! index corresponding to noise_start
+    do i = 1, npts
+       time_obs_noise = b+(i-1)*dt
+       if (time_obs_noise > noise_end ) exit
+    enddo
+    in2 = i-1       ! index corresponding to noise_end
+    noise_int = sum( (obs_lp(in1:in2))**2 )/(in2-in1)
+    noise_amp = maxval( abs(obs_lp(in1:in2)) )
 
-    ! signal loop
-    do j = 1, NDIM
+    ! compute signal
+    ! see user_functions.f90 (default: signal_start = noise_end)
+    do j = 1, npts
        time_obs_signal = b+(j-1)*dt
+       if (time_obs_signal > signal_start) exit
+    enddo
+    is1 = j-1     ! index corresponding to signal_start
+    do k = 1, npts
+       time_obs_signal = b+(k-1)*dt
        if (time_obs_signal > signal_end) exit
     enddo
-    ! j is the signal corresponding to signal_end
-
-    signal_int = sum( (obs_lp(i:j))**2 )/(j-i)
-    signal_amp = maxval( abs(obs_lp(i:j)) )
+    is2 = k-1     ! index corresponding to signal_end
+    signal_int = sum( (obs_lp(is1:is2))**2 )/(is2-is1)
+    signal_amp = maxval( abs(obs_lp(is1:is2)) )
 
     ! Calculate signal to noise ratio and amplitude ratio.
     snr_int = signal_int / noise_int
@@ -306,15 +333,16 @@
     endif
 
     if (DEBUG) then
+       print *, 'DEBUG : in1,in2,is1,is2,npts :', in1,in2,is1,is2,npts
        print *, 'DEBUG : data_ok :', data_ok
-       print *, 'DEBUG : signal_int : ', signal_int
-       print *, 'DEBUG : noise_int :',  noise_int
-       print *, 'DEBUG : snr_int :', snr_int
-       print *, 'DEBUG : signal_amp : ', signal_amp
-       print *, 'DEBUG : noise_amp :',  noise_amp
-       print *, 'DEBUG : snr_amp :', snr_amp
-       print *, 'DEBUG : SNR_INTEGRATE_BASE :', SNR_INTEGRATE_BASE
-       print *, 'DEBUG : SNR_MAX_BASE :', SNR_MAX_BASE
+       print *, 'DEBUG : signal_int : ', sngl(signal_int)
+       print *, 'DEBUG : noise_int :',  sngl(noise_int)
+       print *, 'DEBUG : snr_int :', sngl(snr_int)
+       print *, 'DEBUG : signal_amp : ', sngl(signal_amp)
+       print *, 'DEBUG : noise_amp :',  sngl(noise_amp)
+       print *, 'DEBUG : snr_amp :', sngl(snr_amp)
+       print *, 'DEBUG : SNR_INTEGRATE_BASE :', sngl(SNR_INTEGRATE_BASE)
+       print *, 'DEBUG : SNR_MAX_BASE :', sngl(SNR_MAX_BASE)
     endif
 
   end subroutine check_data_quality
@@ -801,13 +829,11 @@
   integer, dimension(*), intent(inout) :: iM, iL, iR
   double precision, dimension(*), intent(out) :: CC_local, Tshift_local, dlnA_local
 
-  integer :: iwin
-  integer :: nwin_new
+  integer :: iwin, nwin_new
   integer, dimension(NWINDOWS) :: iM_new, iL_new, iR_new
   double precision :: CC_temp, Tshift_temp, dlnA_temp
   double precision :: tshift_min, tshift_max, dlnA_min, dlnA_max
   logical :: accept
-  
 
   nwin_new = 0
   ! for each proto-window, check that all included maxima are part of the

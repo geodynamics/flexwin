@@ -59,33 +59,36 @@ subroutine set_up_criteria_arrays
   ! that are listed in the publication should not be there
   ! THESE ARE PROBABLY NOT ACCURATE ENOUGH FOR LONGER PATHS.
 
-  Sw_start  = -15.0 + dist_km/3.5
+  !Sw_start  = -15.0 + dist_km/3.5
+  !Sw_end    =  35.0 + dist_km/3.1
   Sw_end    =  35.0 + dist_km/3.1
 
   if (BODY_WAVE_ONLY) then
-     !Pnl_start =  P_pick - 5.0
-     !S_end     =  S_pick + 5.0
      Pnl_start =  P_pick - 2.5*WIN_MIN_PERIOD
-     S_end     =  S_pick + 2.5*WIN_MIN_PERIOD
-
   else
-     Pnl_start =  -5.0 + dist_km/7.8
-     S_end     =  Sw_start
+     !Pnl_start =  -5.0 + dist_km/7.8
+     Pnl_start =  -10.0 + dist_km/7.8
   endif
 
   ! variables for signal to noise ratio criteria.
+  !noise_start  = b
+  !noise_end    = Pnl_start
+  !signal_start = noise_end
+  !signal_end   = Sw_end
   noise_start  = b
   noise_end    = Pnl_start
-  signal_start = noise_end
-  signal_end   = Sw_end
+  signal_start = Sw_end + 50.0
+  signal_end   = signal_start + 1000.0     ! (end of record)
 
   if(DEBUG) then
      if (BODY_WAVE_ONLY) then
          write(*,*) 'DEBUG : P_pick = ', P_pick
          write(*,*) 'DEBUG : S_pick = ', S_pick
      endif
-     write(*,*) 'DEBUG : signal_end = ', sngl(signal_end)
-     write(*,*) 'DEBUG : noise_end = ', sngl(noise_end)
+     !write(*,*) 'DEBUG : noise_start  = ', sngl(noise_start)
+     !write(*,*) 'DEBUG : noise_end    = ', sngl(noise_end)
+     !write(*,*) 'DEBUG : signal_start = ', sngl(signal_start)
+     !write(*,*) 'DEBUG : signal_end   = ', sngl(signal_end)
   endif
 
  ! --------------------------------
@@ -94,41 +97,13 @@ subroutine set_up_criteria_arrays
      time = b+(i-1)*dt     ! time
 
      ! raises STA/LTA water level before P wave arrival.
-     if(time.lt.Pnl_start) then
+     if(time.lt. signal_start ) then
         STALTA_W_LEVEL(i) = 10.*STALTA_BASE
      endif
 
-     ! raises STA/LTA water level after surface wave arrives
-     ! NOTE: CHT is effectively no longer using BODY_WAVE mode at all,
-     !       but for the 2s data, we do not look AFTER the surface waves for exotic phases.
-     if (BODY_WAVE_ONLY) then
-        !if(time.gt.S_end) then
-        if(time.gt.Sw_end) then
-           STALTA_W_LEVEL(i) = 10.*STALTA_BASE
-        endif
-        
-     else
-!!$        ! set time- and distance-specific Tshift and DlnA to mimic Qinya's criteria
-!!$        ! (see Liu et al., 2004, p. 1755; note comment above)
-!!$        if(time.ge.Pnl_start .and. time.lt.Sw_start) then
-!!$           !DLNA_LIMIT(i) = 1.5  ! ratio is 2.5, and dlna is ratio-1
-!!$           TSHIFT_LIMIT(i) = 3.0 + dist_km/80.0
-!!$        endif
-!!$        if(time.ge.Sw_start .and. time.le.Sw_end) then
-!!$           !DLNA_LIMIT(i) = 1.5  ! ratio is 2.5, and dlna is ratio-1
-!!$           TSHIFT_LIMIT(i) = 3.0 + dist_km/50.0
-!!$        endif
-
-        ! double the STA/LTA water level after the surface waves
-        !if(time.gt.Sw_end) then
-        !   STALTA_W_LEVEL(i) = 2.0*STALTA_BASE
-        !endif
-
-        ! allow 100 seconds to possibly capture additional phases
-        if(time.gt. (Sw_end+100.0) ) then
-           STALTA_W_LEVEL(i) = 10.*STALTA_BASE
-        endif
-
+     ! raises STA/LTA water level before P wave arrival.
+     if(time.gt. signal_end ) then
+        STALTA_W_LEVEL(i) = 10.*STALTA_BASE
      endif
 
   enddo
@@ -137,7 +112,7 @@ subroutine set_up_criteria_arrays
  ! if the distance to the station is less than N wavelengths, then reject records
  ! by reasing the entire water level
 
-  Nlam = 1.7    ! number of wavelengths
+  Nlam = 0.0    ! number of wavelengths
   vref = 2.0    ! reference velocity, km/s
   dtresh = Nlam*WIN_MIN_PERIOD*vref
   if (dist_km .le. dtresh ) then

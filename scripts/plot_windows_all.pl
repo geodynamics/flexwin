@@ -68,6 +68,7 @@ for ($irec = 1; $irec <= $nrec; $irec++) {
       $obsfile = "${dir_win_run_meas}/${filename}.obs";
 
       # generate output PDF files -- make sure that plot_seismos_gmt.sh is working
+      # NOTE: turn Carl's settings on in plot_seismos_gmt.sh
       if (-f $obsfile)  {
          print "$obsfile\n";
          $ftag = "${dir_win_run_meas}/${filename}";

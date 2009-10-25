@@ -47,7 +47,9 @@
   ! these values will be used for signal2noise calculations
   ! if DATA_QUALITY=.true.
   if (DATA_QUALITY) then
+    noise_start=b
     noise_end=ph_times(1)-WIN_MAX_PERIOD
+    signal_start=noise_end
     signal_end=b+(npts-1)*dt
   endif
 

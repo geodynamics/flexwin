@@ -111,8 +111,11 @@
   character*8, dimension(MAX_PHASES) :: ph_names
   double precision, dimension(MAX_PHASES) :: ph_times
   
-  ! end times for signal and noise
-  double precision :: signal_end, noise_end
+  ! start/end times for signal and noise
+  double precision :: noise_start, noise_end, signal_start, signal_end
+
+  ! indices of start/end times for signal and noise
+  integer :: in1, in2, is1, is2
 
   end module seismo_variables
 

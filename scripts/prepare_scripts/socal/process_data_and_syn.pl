@@ -3,7 +3,7 @@
 #==========================================================
 #
 #  Carl Tape
-#  27-March-2009
+#  19-Oct-2009
 #  process_data_and_syn.pl
 #
 #  This script processes data and 3D-Socal-SEM synthetics for Southern California.
@@ -25,20 +25,20 @@
 #    Trange    band-pass filter
 #
 #  ORDER OF OPERATIONS:
-#    ~/UTILS/process_data_and_syn.pl 1 m16 1 0 d 6/30    # data, initial pre-processing
-#    ~/UTILS/process_data_and_syn.pl 1 m16 0 1 d 6/30    # syn, initial pre-processing
-#    ~/UTILS/process_data_and_syn.pl 2 m16 1 1 d 6/30    # both, create cut files
-#    ~/UTILS/process_data_and_syn.pl 3 m16 1 0 d 6/30    # data, execute cut file
-#    ~/UTILS/process_data_and_syn.pl 3 m16 0 1 d 6/30    # syn, execute cut file
+#    ~/UTILS/process_data_and_syn.pl 1 m16 1 0 d 6/30 # data, initial pre-processing
+#    ~/UTILS/process_data_and_syn.pl 1 m16 0 1 d 6/30 # syn, initial pre-processing (REPEAT)
+#    ~/UTILS/process_data_and_syn.pl 2 m16 1 1 d 6/30 # both, create cut files
+#    ~/UTILS/process_data_and_syn.pl 3 m16 1 0 d 6/30 # data, execute cut file
+#    ~/UTILS/process_data_and_syn.pl 3 m16 0 1 d 6/30 # syn, execute cut file
 #
-#    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 6/30    # data, bandpass T=6-30
-#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 6/30    # syn, bandpass T=6-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 6/30 # data, bandpass T=6-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 6/30 # syn, bandpass T=6-30
 #
-#    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 3/30    # data, bandpass T=3-30
-#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 3/30    # syn, bandpass T=3-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 3/30 # data, bandpass T=3-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 3/30 # syn, bandpass T=3-30
 #
-#    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 2/30    # data, bandpass T=2-30
-#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 2/30    # syn, bandpass T=2-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 1 0 d 2/30 # data, bandpass T=2-30
+#    ~/UTILS/process_data_and_syn.pl 4 m16 0 1 d 2/30 # syn, bandpass T=2-30
 #
 #  FILE-NAMING CONVENTIONS (example for event 9818433):
 #    DATA                                 -- main data directory
@@ -73,6 +73,7 @@ if (@ARGV < 6) {die("Usage: process_data_and_syn.pl iprocess smodel idata isyn d
 $sps = 20;               # samples per second for interpolation/sub-sampling
 $tfac = 1.0;             # factor to extend lengths of records (should be > 1.0)
 $bmin = -40;             # minimum allowable time before origin time for cut records
+$chdur = 0;              # convolve synthetics with Gaussian half duration (default = 1)
 
 $pdir = "PROCESSED";     # tag for processed directories
 $syn_ext = $smodel;      # KEY: include model index for comparison among synthetics from different models
@@ -85,21 +86,21 @@ $iexecute = 0;           # execute CSH file immediately
 $ilist = 1;              # read EIDs from a list (=1) or grab all CMTSOLUTION files (=0)
 
 # EID list
-$CMT_list = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_${smodel}";
-$dir_source = "/net/sierra/raid1/carltape/results/SOURCES/socal_16";
+$CMT_list = "/home/carltape/SOCAL_ADJOINT/SYN/model_${smodel}";
+$dir_source = "/home/carltape/results/SOURCES/socal_16";
 $dirCMT    = "${dir_source}/v16_files";
 $CMT_list  = "${dir_source}/EIDs_only_loc";
-#$CMT_list  = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_${smodel}";
-#$CMT_list  = "/net/sierra/raid1/carltape/results/EID_LISTS/syn_run_m12";
+#$CMT_list  = "/home/carltape/results/EID_LISTS/syn_run_${smodel}";
+#$CMT_list  = "/home/carltape/results/EID_LISTS/syn_run_m12";
 
 # directories
-$dirdat0    = "/net/sierra/raid1/carltape/socal/socal_3D/DATA/FINAL";
-$dirsyn0    = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_${smodel}";
-#$dirsyn0 = "/net/sierra/raid1/carltape/socal/socal_3D/SYN/model_pre_${smodel}";
+$dirdat0    = "/home/carltape/SOCAL_ADJOINT/DATA/FINAL";
+$dirsyn0    = "/home/carltape/SOCAL_ADJOINT/SYN/model_${smodel}";
+#$dirsyn0 = "/home/carltape/SOCAL_ADJOINT/SYN/model_pre_${smodel}";
 # STATIONS file
-#$stafile = "/net/denali/home1/carltape/gmt/stations/seismic/Matlab_output/STATIONS";
-$stafile = "/net/denali/home1/carltape/gmt/stations/seismic/Matlab_output/STATIONS_CALIFORNIA_TOMO_INNER_specfem";
-#$stafile = "/net/denali/home1/carltape/gmt/stations/seismic/Matlab_output/STATIONS_CALIFORNIA_TOMO_OUTER_specfem";
+#$stafile = "/home/carltape/gmt/stations/seismic/Matlab_output/STATIONS";
+$stafile = "/home/carltape/gmt/stations/seismic/Matlab_output/STATIONS_CALIFORNIA_TOMO_INNER_specfem";
+#$stafile = "/home/carltape/gmt/stations/seismic/Matlab_output/STATIONS_CALIFORNIA_TOMO_OUTER_specfem";
 
 #-------------------------------------
 
@@ -158,7 +159,7 @@ if($iprocess==0) {
 
 $imin = 1; $imax = $ncmt;  # default
 #$imin = 1; $imax = 10;
-#$imin = 228; $imax = $imin;
+$imin = 76; $imax = $imin;
 
 #----------------------------------------------------------------------
 
@@ -236,7 +237,11 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
 	     print CSH "process_trinet_syn_new.pl -m $cmtfile -a $stafile *semd\n";
 	     print CSH "sleep 5s\n";
 	  } else {
-             print CSH "process_trinet_syn_new.pl -S -m $cmtfile -h -a $stafile -s $sps -p -d $pdir -x ${syn_ext} *.${syn_suffix0}\n";
+	    if ($chdur == 1) {
+	      print CSH "process_trinet_syn_new.pl -S -m $cmtfile -h -a $stafile -s $sps -p -d $pdir -x ${syn_ext} *.${syn_suffix0}\n";
+	    } else {
+	      print CSH "process_trinet_syn_new.pl -S -m $cmtfile -a $stafile -s $sps -p -d $pdir -x ${syn_ext} *.${syn_suffix0}\n";
+	    }
           }
 	} else {
 	  print "dir ${dirsyn_pro_1} already exists\n";

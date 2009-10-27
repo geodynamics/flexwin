@@ -1,4 +1,4 @@
-OPT=-m32
+OPT=
 FC=gfortran
 FFLAGS=$(OPT)
 

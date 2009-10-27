@@ -27,7 +27,7 @@ COMPILATION
 FLEXWIN requires the following libraries external to the package in order to
 compile and run: libsacio.a and libsac.a. Both libraries
 are distributed by IRIS as part of the SAC package (version 101.2 and above).
-The IRIS download site (as of 18-May-2009) is here:
+The IRIS download site (as of 27-Oct-2009) is here:
    http://www.iris.edu/software/sac/sac.request.htm
 (To check your version, type sac.)
 
@@ -35,16 +35,16 @@ If your compiler of choice is gfortran, then you should be able to use the
 make_gfortran makefiles with only minor modifications (notably you may need to
 change the search path for the libsacio.a library).  If you prefer another
 compiler, you should modify the OPT and FC lines in the makefiles accordingly. 
-We tested using gfortran version 4.1.2
+We tested using gfortran version 4.3.3
 (To check your version, type "gfortran --version".)
 The makefile requires GNU make.
 
-IMPORTANT NOTE: All the code is compiled with the -m32 option, which makes
-32bit binaries.  This option is currently required to enable compatibility with
-SAC.  Future versions of the SAC distribution may no longer require this
-compatibility flag.
-
-21-MAY-2009: CHT successfully compiled and ran FLEXWIN WITHOUT the -m32 option using a beta version of 64-bit SAC (101.3) with gfortran 4.3.3 on Ubuntu Linux.
+IMPORTANT NOTE: The default setting assume a 64-bit operating system,
+compatible with SAC 101.3b (August 2009) and higher.
+For older SAC versions, you must have the -m32 option, which makes
+32bit binaries.  In particular
+  OPT=-m32 -Wall         -- make_gfortran
+  OPT=-m32               -- ttimes_mod/make_gfortran
 
 Steps to compile the flexwin package:
 

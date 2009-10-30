@@ -327,7 +327,8 @@
 !  write(*,*)'number of points =',npts
 
 ! DEBUG
-  if (DEBUG) write(*,*) 'DEBUG : b, dt, npts ', b, dt, npts
+  if (DEBUG) write(*,'(a,f10.1,f10.4,i10)') ' DEBUG : b, dt, npts ', b, dt, npts
+
 
 ! read event and station header parameters from observation file
   call getfhv('evla', evla, nerr)
@@ -344,8 +345,8 @@
      call getfhv('t2', S_pick, nerr)
   endif
 
-  ! CHT: why does this output as:  BZN    ^@BHR    ^@AZ     ^@
-  if (DEBUG) write(*,*) kstnm, kcmpnm, knetwk
+  ! LQY fixed -- CHT: why does this output as:  BZN    ^@BHR    ^@AZ     ^@
+  if (DEBUG) write(*,*) 'DEBUG : sta,net,comp = ', kstnm(1:7), kcmpnm(1:7), knetwk(1:7)
 
   ! calculate distances and azimuths
   call distaz(evla,evlo,stla,stlo,azimuth,backazimuth,dist_deg,dist_km)

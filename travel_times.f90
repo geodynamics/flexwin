@@ -7,6 +7,7 @@
 
   subroutine ttimes(dist_deg,depth,nphases,names,times)
 
+  implicit none
   integer, parameter :: MAX_PHASES=60
 
   real, intent(in) :: dist_deg, depth
@@ -21,7 +22,8 @@
   real usrc(2)
   real, dimension(MAX_PHASES) :: dtdd,dtdh,dddp
   real, dimension(MAX_PHASES) :: times_sngl
-  character*20 modnam
+  character*262 modnam
+  character*256 iaspmod
 
 
   ! ask for all phases
@@ -29,7 +31,12 @@
   prnt(1)=.false.
   prnt(2)=.false.
   prnt(3)=.false.
-  modnam='iasp91'
+  call getenv('IASPMODEL', iaspmod)
+  if (trim(iaspmod) == '') then
+    modnam='iasp91'
+  else
+    modnam=iaspmod
+  endif
   call tabin(1,modnam)
   call brnset(1,phlst,prnt)
   call depset(depth,usrc)

@@ -13,7 +13,6 @@ c
       save
       logical log
       character*(*) ia,ib
-      character*25 ic
 c
 c     if(iargc(i).lt.n) go to 1
       if(iargc().lt.n) go to 1
@@ -27,9 +26,7 @@ c
 c
  2    nb=index(ib,' ')-1
       if(nb.le.0) nb=len(ib)
-      ic=ib(1:nb)//'.hed'
-c	ic=ic//'.hed'
-      call assign(lu,mode,ic)
+      call assign(lu,mode,ib(1:nb)//'.hed')
       return
       end
       subroutine assign(lu,mode,ia)
@@ -1485,7 +1482,7 @@ c     if(prnt(1)) write(10,100,iostat=ios)'   ',j,pt(j)
       character*(*) modnam
 c     logical log
       character*8 phcd,phdif(6)
-      character*25 modnam2
+c      character*25 modnam2
       double precision pm,zm,us,pt,tau,xlim,xbrn,dbrn,zs,pk,pu,pux,tauu,
      1 xu,px,xt,taut,coef,tauc,xc,tcoef,tp
 c
@@ -1522,10 +1519,7 @@ c++
 c
       nb=index(modnam,' ')-1
       if(nb.le.0) nb=len(modnam)
-      modnam2=modnam(1:nb)//'.tbl'
-c     modnam2=modnam2//'.tbl'
-c     call dasign(nin,-1,modnam(1:nb)//'.tbl',nasgr)
-      call dasign(nin,-1,modnam2,nasgr)
+      call dasign(nin,-1,modnam(1:nb)//'.tbl',nasgr)
 c
       do 11 nph=1,2
  11   pu(ku(nph)+1,nph)=pm(1,nph)

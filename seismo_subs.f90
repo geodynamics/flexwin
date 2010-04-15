@@ -452,23 +452,31 @@
 !----------------------------------------------------------------------
 ! calls sac function envelope (single precision version)
   subroutine sac_envelope(n, seis, env)
+
+  ! AM : added this to fix memory bug
+  use user_parameters
+
   integer, intent(in) :: n
   double precision, intent(in), dimension(*) :: seis
   double precision, intent(out), dimension(*) :: env
 
-  real, dimension(:), allocatable :: dummy_seis1, dummy_seis2
+  ! AM : removed allocation here to fix a memory bug
+  !real, dimension(:), allocatable :: dummy_seis1, dummy_seis2
+  real, dimension(NDIM) :: dummy_seis1, dummy_seis2
   external :: envelope
 
-  allocate(dummy_seis1(n))
-  allocate(dummy_seis2(n))
+  ! AM : removed allocation here to fix memory bug
+  !allocate(dummy_seis1(n))
+  !allocate(dummy_seis2(n))
   
   dummy_seis1(:)=0 ; dummy_seis2(:)=0
   dummy_seis1(1:n)=sngl(seis(1:n))
   call envelope(n,dummy_seis1,dummy_seis2)
   env(1:n)=dble(dummy_seis2(1:))
 
-  deallocate(dummy_seis1)
-  deallocate(dummy_seis2)
+  ! AM : removed deallocation here to fix memory bug
+  !deallocate(dummy_seis1)
+  !deallocate(dummy_seis2)
 
   end subroutine sac_envelope
 
@@ -528,8 +536,11 @@
   ! make filtered envelopes 
   env_obs_lp(:) = 0.
   env_synt_lp(:) = 0.
+  if (DEBUG) write(*,*) 'DEBUG first point of obs/synt envelope before ',env_obs_lp(1), env_synt_lp(1)
   call sac_envelope(npts,synt_lp,env_synt_lp)
+  if (DEBUG) write(*,*) 'DEBUG first point of obs/synt envelope middle ',env_obs_lp(1), env_synt_lp(1)
   call sac_envelope(npts,obs_lp,env_obs_lp)
+  if (DEBUG) write(*,*) 'DEBUG first point of obs/synt envelope after ',env_obs_lp(1), env_synt_lp(1)
 
   end subroutine prepare_lp_env
 

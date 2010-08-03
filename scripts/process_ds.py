@@ -8,6 +8,8 @@
 # remaining question: do we need -h for process_syn?
 # back up your raw data and synthetics before processing
 # channels may become a command-line option in the future
+# when number of matching files is large, we may face issues of
+# 'argument list too long' (especially when derivatives are includede)
 #
 # need process_data_new.pl, process_syn_new.pl, pad_zeros.pl and rotate.pl as well as sac_merge
 
@@ -191,8 +193,10 @@ if bandpass:
         if der_syn:
           rsyn_list=rsyn_list+' '+new_syndir+'/'+os.path.basename(syn)+'.???.c'+hole_list[i]+' '
   sac_input=sac_input+'quit\n'
-  if (os.system('sac <<EOF > /dev/null\n'+sac_input+'EOF\n') != 0):
-    print 'error cutting data and synthetics'; exit()
+  f = open('sac.cmd', "w"); f.write('#!/bin/bash\nsac<<EOF\n')
+  f.write(''.join(sac_input)); f.write('EOF\n'); f.close()
+  if (os.system('chmod a+rx sac.cmd; sac.cmd') != 0):
+    print 'error cutting data and synthetics '+str(nerror); exit()
 
   # further band-pass filtering data and all syn
   print '**** band-passing data and synthetics ****'
@@ -265,7 +269,7 @@ if windowing:
   if (not os.path.isdir('MEASURE')):
     os.mkdir('MEASURE')
 
-os.system('rm -f data.tmp '+datadir+'/*.c '+syndir+'/*.c '+syndir+'/*.c??')
+os.system('rm -f data.tmp sac.cmd '+datadir+'/*.c '+syndir+'/*.c '+syndir+'/*.c??')
 print '**** Done ****'
 
 

@@ -380,7 +380,7 @@
   use seismo_variables
 
   do i = 1, num_win
-    call calc_criteria(obs_lp,synt_lp,npts,i_start(iwin),i_end(iwin),dt,Tshift(i),CC(i),dlnA(i))
+    call calc_criteria(obs_lp,synt_lp,npts,i_start(i),i_end(i),dt,Tshift(i),CC(i),dlnA(i))
   enddo
   end subroutine
 
@@ -390,7 +390,7 @@
   use seismo_variables
 
   do i = 1, num_win
-    call calc_criteria(obs_lp,synt_lp,npts,i_start(iwin),i_end(iwin),dt,Tshift_aux(i),CC_aux(i),dlnA_aux(i))
+    call calc_criteria(obs_lp,synt_lp,npts,i_start(i),i_end(i),dt,Tshift_aux(i),CC_aux(i),dlnA_aux(i))
 
   enddo
   end subroutine

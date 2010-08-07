@@ -1,4 +1,4 @@
-OPT= -Wall
+OPT= -Wall -fbounds-check
 FC = gfortran
 CFLAGS= ${OPT}
 

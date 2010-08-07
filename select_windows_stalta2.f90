@@ -950,7 +950,7 @@
 
   subroutine resolve_overlaps(nwin, iM, iL, iR, CC_local, Tshift_local, dlnA_local)
   use seismo_variables
-
+  implicit none
   integer, intent(inout) :: nwin
   integer, dimension(*), intent(inout) :: iM, iL, iR
   double precision, dimension(*), intent(inout) :: CC_local, Tshift_local, dlnA_local
@@ -966,6 +966,7 @@
 
   ! for combinations of overlapping windows
   logical :: iterate
+  integer :: ii, igroup, igroup_window
   integer :: n_comb, icomb, win_length, group_length 
   integer :: prev_comb_start, prev_comb_end
   integer, dimension(NWINDOWS) :: iL_comb, iR_comb
@@ -989,6 +990,11 @@
       ! start a group with this window
       assigned(iwin) = .true.
       n_groups = n_groups+1
+      !checks bounds
+      if( n_groups > NWINDOWS ) then
+        write(*,*) '  too many groups: set NWINDOWS higher!'
+        stop 'error too many groups (n_groups)'
+      endif 		
       group_size(n_groups) = 1
       ! initialise group listing
       groups(n_groups,group_size(n_groups)) = iwin 
@@ -1032,7 +1038,7 @@
       iwin = groups(igroup,igroup_window)
       ! increment the number of combinations
       n_comb = n_comb+1
-
+      ! checks bounds
       if (n_comb .gt. NWINDOWS) stop 'Too many window combinations'
 
       comb_size(n_comb) = 1
@@ -1059,6 +1065,12 @@
             if(iL(iwin).ge.iR_comb(icomb)) then
               ! make a new combination with this window added
               n_comb = n_comb+1
+	      ! checks bounds	
+              if( n_comb > NWINDOWS ) then
+                write(*,*) '  too many combinations: set NWINDOWS higher!'
+                stop 'error too many combinations (n_comb)'
+              endif
+
               ! copy the old combination to the new combination
               comb(n_comb,1:comb_size(icomb)) = comb(icomb,1:comb_size(icomb))
               ! extend it by one window

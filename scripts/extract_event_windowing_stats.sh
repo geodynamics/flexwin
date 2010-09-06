@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ $# != 1 ]; then
+  echo "extract_event_windowing_stats.sh basename(MEASURE)"; exit
+fi
+
 basename=$1
 figname=window_stats.fig
 
@@ -165,5 +169,5 @@ mv t1 $out2
 
 echo $out2
 
-rm $t0 $t1 $t2z $t2r $t2t $t3
+rm -f $t0 $t1 $t2z $t2r $t2t $t3
 

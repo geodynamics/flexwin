@@ -12,24 +12,26 @@
 import os,sys,glob
 
 if (len(sys.argv) != 3 and len(sys.argv) != 4):
-  print "write_flexwin_out.py measure_dir out_filename [manual-pick-file]"; exit()
+  sys.exit("write_flexwin_out.py measure_dir out_filename [manual-pick-file]")
 
 dir=sys.argv[1]; outfile=sys.argv[2]
 if (not os.path.isdir(dir)):
-  print 'check if '+dir+' exists or not'; exit()
+  sys.exit('check if '+dir+' exists or not')
 
 manual_pick=False
 if (len(sys.argv) == 4):
   manual_pick=True
   manual_file=sys.argv[3]
   if (not os.path.isfile(manual_file)):
-    print 'Check if '+manual_file+' exists or not'; exit()
+    sys.exit('Check if '+manual_file+' exists or not')
   manual_lines=open(manual_file,'r').readlines()
   flexwin_input = manual_lines[0].rstrip('\n');
   print '*** Adding manual pick info from '+ manual_file+ ' ***'
   
 output=''
-files=glob.glob(dir+'/*mt*');
+files=glob.glob(dir+'/*mt*')
+if len(files) <= 0:
+  sys.exit('No such file as '+dir+'/*mt*')
 nfiles=0
 
 for file in files:

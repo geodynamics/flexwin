@@ -6,28 +6,28 @@
 import sys,os
 
 if (len(sys.argv) != 2):
-  print "plot_flexwin.py measure_dir(MEASURE)"; exit()
+  sys.exit('plot_flexwin.py measure_dir(MEASURE)')
 
 dir=sys.argv[1]
 if not os.path.isdir(dir):
-  print "no such dir "+dir; exit()
+  sys.exit("no such dir "+dir)
 script1='scripts/plot_seismos_gmt.sh'
 script2='scripts/extract_event_windowing_stats.sh'
 if not os.path.isfile(script1) or not os.path.isfile(script2):
-  print 'no '+script1+' or '+script2; exit()
+  sys.exit('no '+script1+' or '+script2)
 
 if (os.system(script2+' '+dir+' > /dev/null') != 0):
-  print 'Error executing '+ script2; exit()
+  sys.exit('Error executing '+ script2)
 
 ps=dir+'/event_winstats.pdf'+' '+dir+'/event_recordsection.pdf'
 
 for basename in os.popen('grep DDG '+dir+"/*.info | awk '{print $1,$4}'| sort -k 2 -g | awk '{print $1}' | sed 's/\.info:#//g'").readlines():
   input = basename.rstrip()  
   if (os.system(script1+' '+input) != 0):
-    print "Error plotting individual seismograms"; exit()
+    sys.exit("Error plotting individual seismograms")
   ps = ps + ' '+input+'.seis.pdf'
 
 if (os.system('pdcat -r '+ps+' flexwin_seis.pdf') != 0):
-  print "Error concatenate all seismogram plots"; exit()
+  sys.exit("Error concatenate all seismogram plots")
 
 

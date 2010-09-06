@@ -1,11 +1,9 @@
 #!/usr/bin/perl -w
 
-# this program plots data and syn waveforms according to either
+# this program plots sophisticated data and syn waveforms according to either
 # given data and syn dir
 # or flexwin output file 
 # sort by distance and then by azimuth, a regional SC map is also supplied
-# scaled by magnitude 5 earthquake
-# Qinya Liu, Oct 2009
 
 use lib '/home/liuqy/local/perl-lib';
 use GMT_PLOT;
@@ -16,7 +14,7 @@ use Getopt::Std;
 use List::Util qw[min max];
 
 
-if (@ARGV == 0) {die("Usage: plot_socal_ds.pl -d data_dir,data_ext -s syn_dir,syn_ext -Snew_syn_dir,new_syn_ext -M flexwin_file -m CMTSOLUTION -A Z/R/T(0.03/0.03/0.04)\n");}
+if (@ARGV == 0) {die("Usage: plot_data_and_syn.pl -d data_dir,data_ext -s syn_dir,syn_ext -Snew_syn_dir,new_syn_ext -M flexwin_file -m CMTSOLUTION -A Z/R/T(0.03/0.03/0.01)\n");}
 
 if (!getopts('d:s:S:m:M:A:')) {die("Check input options\n");}
 

@@ -468,11 +468,13 @@
   ! AM : removed allocation here to fix memory bug
   !allocate(dummy_seis1(n))
   !allocate(dummy_seis2(n))
-  
+
+  if( NDIM < n ) stop 'error envelope size'
+
   dummy_seis1(:)=0 ; dummy_seis2(:)=0
   dummy_seis1(1:n)=sngl(seis(1:n))
-  call envelope(n,dummy_seis1,dummy_seis2)
-  env(1:n)=dble(dummy_seis2(1:))
+  call envelope(n,dummy_seis1(1:n),dummy_seis2(1:n))
+  env(1:n)=dble(dummy_seis2(1:n))
 
   ! AM : removed deallocation here to fix memory bug
   !deallocate(dummy_seis1)

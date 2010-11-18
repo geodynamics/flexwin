@@ -994,7 +994,7 @@
       if( n_groups > NWINDOWS ) then
         write(*,*) '  too many groups: set NWINDOWS higher!'
         stop 'error too many groups (n_groups)'
-      endif 		
+      endif
       group_size(n_groups) = 1
       ! initialise group listing
       groups(n_groups,group_size(n_groups)) = iwin 

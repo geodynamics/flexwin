@@ -10,9 +10,11 @@ Welcome to the flexwin package.  The purpose of this package is to
 select windows on pairs of observed and synthetic seismograms on which
 measurements can subsequently be made.
 
-This is a bare-bones instruction set.  For more details read the flexwin manual (flexwin_manual.pdf) and the flexwin article (Maggi et al, GJI, 2009).
+This is a bare-bones instruction set.  For more details read the flexwin manual
+(flexwin_manual.pdf) and the flexwin article (Maggi et al, GJI, 2009).
 
-If you have suggestions for fixes or future updates, please send me an email.  I will post them in the file FUTURE_UPDATES.
+If you have suggestions for fixes or future updates, please send me an email.
+I will post them in the file FUTURE_UPDATES.
 
 THE PACKAGE
 -----------
@@ -21,22 +23,48 @@ The package contains the flexwin code and documentation, as well as a set of
 test data, examples of user files for different scenarios, and a set of utility
 scripts that may be useful for running flexwin on large datasets.
 
+QUICK TEST
+-------------
+
+For quick start-to-finish testing with the sample data set provided,
+execute these commands within the base directory:
+
+cd flexwin
+cd ttimes_mod
+make -f make_gfortran
+make -f make_gfortran install
+cd ..
+make -f make_gfortran
+cd test_data
+./flexwin < input.test
+./plot_seismos_gmt.sh MEASURE/ABKT.II.LHZ
+
+If all goes well, you should see the file flexwin/test_data/MEASURE/ABKT.II.LHZ.seis.ps
+Note that the plotting script requires GMT (http://gmt.soest.hawaii.edu/).
+
+Last tested 19-Nov-2010 with the following:
+  linux: 64-bit, opensuse 11.1
+  sac 101.3b
+  gfortran 4.3.2
+  GMT 4.5.3 (for plotting)
+
+NOTE: The current version of sac (101.4) requires a patch;
+      thus, we recommend using 101.3b for now.
+
 COMPILATION
 -----------
 
 FLEXWIN requires the following libraries external to the package in order to
 compile and run: libsacio.a and libsac.a. Both libraries
 are distributed by IRIS as part of the SAC package (version 101.2 and above).
-The IRIS download site (as of 27-Oct-2009) is here:
-   http://www.iris.edu/software/sac/sac.request.htm
+The IRIS download site (as of 10-Nov-2010) is here:
+   http://www.iris.edu/forms/sac_request.htm
 (To check your version, type sac.)
 
 If your compiler of choice is gfortran, then you should be able to use the
 make_gfortran makefiles with only minor modifications (notably you may need to
 change the search path for the libsacio.a library).  If you prefer another
-compiler, you should modify the OPT and FC lines in the makefiles accordingly. 
-We tested using gfortran version 4.3.3
-(To check your version, type "gfortran --version".)
+compiler, you should modify the OPT and FC lines in the makefiles accordingly.
 The makefile requires GNU make.
 
 IMPORTANT NOTE: The default setting assume a 64-bit operating system,
@@ -64,15 +92,14 @@ launched.
 TEST DATA SET
 -------------
 
-You should test your compiled code on the test_data dataset provided.  In the flexwin/test_data directory, type "./flexwin < input.test".  The results of your
-run will be found in the MEASURE subdirectory, and
-should match those found in the MEASURE.orig
-subdirectory.
+You should test your compiled code on the test_data dataset provided.
+In the flexwin/test_data directory, type "./flexwin < input.test".
+The results of your run will be found in the MEASURE subdirectory,
+and should match those found in the MEASURE.orig subdirectory.
 
 You can also test the basic plotting script by running "./plot_seismos_gmt.sh
-MEASURE/ABKT.II.LHZ", whose output will be MEASURE/ABKT.II.LHZ.seis.eps.   Note
-that plotting scripts require GMT.
-
+MEASURE/ABKT.II.LHZ", whose output will be MEASURE/ABKT.II.LHZ.seis.eps.
+Note that plotting scripts require GMT.
 
 
 RUNNING FLEXWIN

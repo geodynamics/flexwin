@@ -8,7 +8,7 @@
   character*240 :: file_obs, file_syn
   double precision :: max_value_obs, max_value_syn, max_value
 
-  integer :: i 
+  integer :: i,ier
 
   ! create the filenames
   file_obs=trim(basename)//'.obs'
@@ -22,8 +22,16 @@
   max_value = max(max_value_obs, max_value_syn)
 
   ! open the files for writing
-  open(unit=11, file=file_obs)
-  open(unit=12, file=file_syn)
+  open(unit=11, file=file_obs,iostat=ier)
+  if( ier /= 0 ) then
+    print*,'Error opening: ',trim(file_obs)
+    stop
+  endif
+  open(unit=12, file=file_syn,iostat=ier)
+  if( ier /= 0 ) then
+    print*,'Error opening: ',trim(file_syn)
+    stop
+  endif
 
   ! write the header - observed
   write(11,'("# NPTS = ",i10)') npts
@@ -59,7 +67,7 @@
   character*240 :: file_obs_env, file_syn_env
   double precision :: max_value_obs, max_value_syn, max_value
 
-  integer :: i 
+  integer :: i
 
   ! create the filenames
   file_obs_env=trim(basename)//'.env.obs'
@@ -103,13 +111,13 @@
   subroutine write_win_gmt(basename)
   use seismo_variables
   implicit none
-  
+
   character*120 :: basename
   character*240 :: file_win
   integer, dimension(MAX_PHASES) :: phase_indexes
   integer :: i, k, n_phases
 
-  ! set filename	
+  ! set filename
   file_win=trim(basename)//'.win'
 
   open(unit=11, file=file_win)
@@ -119,8 +127,8 @@
     write(11,'(i4,1x,2f10.2,1x,i4,60(1x,a8))') i, win_start(i), win_end(i), n_phases, (ph_names(phase_indexes(k)), k=1,n_phases)
   end do
   close(11)
-  
-  end subroutine 
+
+  end subroutine
 
 !----------------------------------------------------------------------
 
@@ -132,7 +140,7 @@
   character*240 :: file_win
   integer :: i
 
-  ! set filename	
+  ! set filename
   file_win=trim(basename)//'.win.qual'
 
   open(unit=11, file=file_win)
@@ -144,7 +152,7 @@
   end do
   close(11)
 
-  end subroutine 
+  end subroutine
 
 !----------------------------------------------------------------------
 
@@ -157,7 +165,7 @@
   integer :: i, i_dummy
   character*120 :: c_dummy
 
-  ! set filename	
+  ! set filename
   file_win=trim(basename)//'.win.qual'
 
   open(unit=11, file=file_win, status='old')
@@ -168,13 +176,13 @@
   ! read file, ignoring input "quality" values
     read(11,'(i4,5(1x,f10.5))') i_dummy, win_start(i), win_end(i), &
                                  Tshift(i),CC(i),dlnA(i)
-    ! calculate indexes for start and and of windows 
+    ! calculate indexes for start and and of windows
     i_start(i)=1+int((win_start(i)-b)/dt)
     i_end(i)  =1+int((win_end(i)  -b)/dt)
   end do
   close(11)
 
-  end subroutine 
+  end subroutine
 
 !----------------------------------------------------------------------
 
@@ -186,7 +194,7 @@
   character*240 :: file_phases
   integer :: i
 
-  ! set filename	
+  ! set filename
   file_phases=trim(basename)//'.phases'
 
   open(unit=11, file=file_phases)
@@ -198,7 +206,7 @@
 
   close(11)
 
-  end subroutine 
+  end subroutine
 
 !----------------------------------------------------------------------
 
@@ -211,7 +219,7 @@
   double precision :: max_qual, max_tshift, max_dlna, max_sta_lta, max_s2n
   integer :: i
 
-  ! set filename	
+  ! set filename
   file_stalta=trim(basename)//'.stalta'
 
   ! get the max amplitude of envelopes
@@ -237,10 +245,10 @@
     write(15,'(f10.2,6(2x,e12.6))') b+(i-1)*dt, STA_LTA(i), STALTA_W_LEVEL(i), &
     CC_LIMIT(i), TSHIFT_LIMIT(i), DLNA_LIMIT(i), S2N_LIMIT(i)
   end do
-  
+
   close(15)
 
-  end subroutine 
+  end subroutine
 
 !----------------------------------------------------------------------
 
@@ -251,7 +259,7 @@
   character*120 :: basename
   character*240 :: file_info
 
-  ! set filename	
+  ! set filename
   file_info=trim(basename)//'.info'
 
   ! set filenames for output (use full path)
@@ -274,10 +282,10 @@
   write(16,'("# DDG = ",f10.4)') dist_deg
   write(16,'("# DKM = ",f12.4)') dist_km
   write(16,'("# NUM_WIN = ",i10)') num_win
- 
+
   close(16)
 
-  end subroutine 
+  end subroutine
 
 !----------------------------------------------------------------------
 
@@ -340,10 +348,10 @@
   call setihv('iftype','ITIME',nerr)
   call setihv('iztype','IB',nerr)
   call setlhv('leven',1,nerr)
-  
+
   call wsac0(file_obs,time(1:npts),obs_filt(1:npts),io_error)
   call wsac0(file_syn,time(1:npts),syn_filt(1:npts),io_error)
-  
+
   end subroutine
 
 !----------------------------------------------------------------------
@@ -357,7 +365,7 @@
   spos=0
   k=0
   pos=index(filename,'/')
-  if (pos.eq.0) then 
+  if (pos.eq.0) then
     spos = 0
   else
    do while (pos .ne. 0)
@@ -367,7 +375,7 @@
    enddo
    spos = prev_pos
   endif
-  
+
   end subroutine slash_index
 
 ! -----------------------------------------------------------------------
@@ -394,7 +402,7 @@
     do i = 1, num_win
        write(11,'(2(f10.4,1x))') win_start(i), win_end(i)
     end do
-    close(11) 
+    close(11)
 
   end subroutine write_mt_input
   ! -----------------------------------------------------------------------
@@ -419,7 +427,7 @@
        do i = 1, num_win
           write(11,'(2(f10.4,1x))') win_start(i), win_end(i)
        enddo
-       close(11) 
+       close(11)
 
     endif
 

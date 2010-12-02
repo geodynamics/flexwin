@@ -11,21 +11,21 @@
   ! -------------------------------------------------------------
   ! boolean parameters
   logical :: DEBUG
-  logical :: MAKE_SEISMO_PLOTS 
-  logical :: MAKE_WINDOW_FILES 
-  logical :: BODY_WAVE_ONLY 
+  logical :: MAKE_SEISMO_PLOTS
+  logical :: MAKE_WINDOW_FILES
+  logical :: BODY_WAVE_ONLY
 
   ! -------------------------------------------------------------
   ! period min/max for filtering
   logical :: RUN_BANDPASS
-  double precision :: WIN_MIN_PERIOD 
-  double precision :: WIN_MAX_PERIOD 
-  double precision :: FSTART 
-  double precision :: FEND 
+  double precision :: WIN_MIN_PERIOD
+  double precision :: WIN_MAX_PERIOD
+  double precision :: FSTART
+  double precision :: FEND
 
   ! -------------------------------------------------------------
   ! E(t) water level
-    double precision :: STALTA_BASE 
+    double precision :: STALTA_BASE
 
   ! -------------------------------------------------------------
   ! TSHIFT
@@ -37,61 +37,61 @@
 
   ! -------------------------------------------------------------
   ! limit on CC for window acceptance
-    double precision :: CC_BASE 
+    double precision :: CC_BASE
 
   ! -------------------------------------------------------------
   ! limit on signal-to-noise on the observed data
 
   ! boolean switch for check_data_quality
-    logical :: DATA_QUALITY 
+    logical :: DATA_QUALITY
 
   ! if DATA_QUALITY = .true. and if two different measurements of
   ! signal-to-noise ratios exceeds these two base levels,
   ! then the data time series (and syn) is kept
-    double precision :: SNR_INTEGRATE_BASE 
-    double precision :: SNR_MAX_BASE 
+    double precision :: SNR_INTEGRATE_BASE
+    double precision :: SNR_MAX_BASE
 
   ! -------------------------------------------------------------
   ! limit on signal to noise ratio in a particular window.
-    double precision :: WINDOW_S2N_BASE 
+    double precision :: WINDOW_S2N_BASE
 
   ! -------------------------------------------------------------
-  ! Fine tuning constants 
-    double precision :: C_0  
-    double precision :: C_1  
-    double precision :: C_2  
-    double precision :: C_3a 
-    double precision :: C_3b 
-    double precision :: C_4a 
+  ! Fine tuning constants
+    double precision :: C_0
+    double precision :: C_1
+    double precision :: C_2
+    double precision :: C_3a
+    double precision :: C_3b
+    double precision :: C_4a
     double precision :: C_4b
 
-    double precision :: WEIGHT_SPACE_COVERAGE 
-    double precision :: WEIGHT_AVERAGE_CC 
-    double precision :: WEIGHT_N_WINDOWS 
+    double precision :: WEIGHT_SPACE_COVERAGE
+    double precision :: WEIGHT_AVERAGE_CC
+    double precision :: WEIGHT_N_WINDOWS
 
   !=========================================
   ! Global variables and arrays
   !=========================================
 
   ! un-windowed synthetic and observed seismograms
-  double precision, dimension (NDIM) :: synt, obs 
+  double precision, dimension (NDIM) :: synt, obs
 
   ! un-windowed synthetic and observed seismograms filtered
-  double precision, dimension (NDIM) :: synt_lp, obs_lp 
+  double precision, dimension (NDIM) :: synt_lp, obs_lp
 
-  ! envelopes of un-windowed, filtered, synthetic and observed seismograms 
-  double precision, dimension (NDIM) :: env_synt_lp, env_obs_lp 
+  ! envelopes of un-windowed, filtered, synthetic and observed seismograms
+  double precision, dimension (NDIM) :: env_synt_lp, env_obs_lp
 
   ! STA/LTA array
-  double precision, dimension (NDIM) :: STA_LTA 
+  double precision, dimension (NDIM) :: STA_LTA
 
   ! time-dependent criteria arrays for selection parameters
   double precision, dimension (NDIM) :: STALTA_W_LEVEL, TSHIFT_LIMIT, CC_LIMIT, DLNA_LIMIT, S2N_LIMIT
 
-  ! seismogram parameters 
-  double precision :: dt, b        
+  ! seismogram parameters
+  double precision :: dt, b
   character*8 :: kstnm,knetwk,kcmpnm
-  integer :: npts     
+  integer :: npts
   real :: evla, evlo, stla, stlo, evdp
   real :: azimuth, backazimuth, dist_deg, dist_km
   real :: P_pick, S_pick
@@ -110,7 +110,7 @@
   integer :: num_phases
   character*8, dimension(MAX_PHASES) :: ph_names
   double precision, dimension(MAX_PHASES) :: ph_times
-  
+
   ! start/end times for signal and noise
   double precision :: noise_start, noise_end, signal_start, signal_end
 
@@ -197,7 +197,7 @@
   if (DEBUG) write(*,*) '       DLNA_BASE',DLNA_BASE
   if (DEBUG) write(*,*) '       DLNA_REFERENCE',DLNA_REFERENCE
 
-  ! limit on CC 
+  ! limit on CC
   read(IIN,*)
   read(IIN,*)
   read(IIN,*)
@@ -264,20 +264,30 @@
   end subroutine
 !----------------------------------------------------------------------
 
-  subroutine read_sac_files(file_s, file_o)
+  subroutine read_sac_files(file_s, file_o,ier)
   use seismo_variables
 
   character (len=240) :: file_s, file_o
+  integer :: ier
+  ! local parameters
   real :: b1, dt1, b2, dt2, synt_sngl(NDIM), obs_sngl(NDIM)
   integer :: npts1, npts2, nerr
+
+  ! initialize
+  ier = 0
 
 ! read synthetic
   call rsac1(file_s,synt_sngl,npts1,b1,dt1,NDIM,nerr)
   if (nerr.ne.0) then
     write(*,*)
     write(*,*)' !!! Error reading file ', file_s
-    write(*,*)'     Program stop !!!'
+    !write(*,*)'     Program stop !!!'
     write(*,*)
+    write(*,*)'  npts1:',npts1,'b1:',b1,'dt1:',dt1,'NDIM:',NDIM
+    write(*,*)'  error: ',nerr
+    !stop
+    ier = 1
+    return
   endif
   synt(:) = 0.
   synt(1:npts1) = dble(synt_sngl(1:npts1))
@@ -287,8 +297,14 @@
   if (nerr.ne.0) then
     write(*,*)
     write(*,*)' !!! Error reading file ', file_o
-    write(*,*)'     Program stop !!!'
+    !write(*,*)'     Program stop !!!'
     write(*,*)
+    write(*,*)'  npts2:',npts2,'b2:',b2,'dt2:',dt2,'NDIM:',NDIM
+    write(*,*)'  error: ',nerr
+    write(*,*)
+    !stop
+    ier = 1
+    return
   endif
   obs(:) = 0.
   obs(1:npts1) = dble(obs_sngl(1:npts1))
@@ -296,15 +312,18 @@
 ! check sample rates are equal
   if( abs(dt1-dt2).gt.1e-05) then
     write(*,*)
-    write(*,*) 'dt1-syn, dt2-dat,  abs(dt1-dt2):'
+    !write(*,*) 'dt1-syn, dt2-dat,  abs(dt1-dt2):'
+    write(*,*) 'error: dt1-syn, dt2-dat,  abs(dt1-dt2):'
     write(*,*) dt1, dt2,  abs(dt1-dt2)
     write(*,*)' !!! sampling rates differ, program stop !!!'
     write(*,*)
-    stop
-  endif       
+    !stop
+    ier = 1
+    return
+  endif
 
 ! set global variable dt
-  dt = dble(dt1) 
+  dt = dble(dt1)
   !write(*,*)'sampling rate dt=',dt
 
 ! check start times are equal
@@ -314,8 +333,10 @@
     write(*,*) b1, b2, dt, abs(b1-b2), 2.0*dt
     write(*,*)' !!! start times differ, program stop !!!'
     write(*,*)
-    stop
-  endif        
+    !stop
+    ier = 1
+    return
+  endif
 
 ! set global variable b
   b=dble(b1)
@@ -418,7 +439,7 @@
   integer, intent(in) :: n, t_type
   double precision, dimension(*), intent(inout) :: x
   real, intent(in) :: width
-  
+
   integer i, n_width
   double precision omega, f0, f1
 
@@ -443,8 +464,8 @@
 
   ! apply the taper symmetrically to both ends of the data
   do i = 1, n_width
-    x(i) = x(i) * (f0-f1*cos(omega*(i-1))) 
-    x(n+1-i) = x(n+1-i) * (f0-f1*cos(omega*(i-1))) 
+    x(i) = x(i) * (f0-f1*cos(omega*(i-1)))
+    x(n+1-i) = x(n+1-i) * (f0-f1*cos(omega*(i-1)))
   end do
 
   end subroutine t_taper
@@ -493,7 +514,7 @@
   double precision, intent(in) :: delta_t
 
   real, dimension(:), allocatable :: x_sngl
-!  real delta_t_sngl 
+!  real delta_t_sngl
 
   allocate(x_sngl(n))
 
@@ -535,7 +556,7 @@
   use seismo_variables
   implicit none
 
-  ! make filtered envelopes 
+  ! make filtered envelopes
   env_obs_lp(:) = 0.
   env_synt_lp(:) = 0.
   if (DEBUG) write(*,*) 'DEBUG first point of obs/synt envelope before ',env_obs_lp(1), env_synt_lp(1)
@@ -551,8 +572,15 @@
   use seismo_variables
 
   double precision :: TOL, Cs, Cl, sta, lta, noise
-  integer :: i, n_extend 
+  integer :: i, n_extend
   double precision, dimension(:), allocatable :: extended_syn
+
+  ! the sta_lta value peaks at the begining of the trace.
+  ! there is no phase incoming at that time, but there is some small trend to positive values.
+  ! tweak only sets the sta/lta value when a threshold value in the envelope is reached
+  logical,parameter:: TWEAK = .false.
+  integer :: thres_noise
+  double precision :: lta_max, lta_org
 
 ! set the Cs Cl for STA/LTA ratio using the Bai & Kennett (2001) expressions
 
@@ -570,7 +598,18 @@
 !  noise=sum(env_synt_lp(1:n_sample))/n_sample
   noise=maxval(env_synt_lp)/10**5
 
-! copy the original synthetic into the extended array, right justified  
+  ! determines the onset of the envelope (above some threshold value)
+  if( TWEAK ) then
+    do i=1,npts
+      if( env_synt_lp(i) >= noise*1000. ) then
+        thres_noise = i
+        exit
+      endif
+    enddo
+  endif
+
+
+! copy the original synthetic into the extended array, right justified
 !  call random_number(extended_syn)
 !  extended_syn=noise*extended_syn
   extended_syn=noise
@@ -589,11 +628,35 @@
     lta=(Cl*lta+extended_syn(i))
   enddo
 
+  ! determine long term average maximum value
+  if( TWEAK ) then
+    lta_org = lta
+    lta_max = 0.0
+    do i = 1, npts
+      lta=(Cl*lta+extended_syn(n_extend+i))
+      if( lta > lta_max ) lta_max = lta
+    enddo
+    if (DEBUG) write(*,*) 'DEBUG : lta_max = ', lta_max
+    lta = lta_org
+  endif
+
 ! calculate sta/lta for the envelope
   do i = 1, npts
     sta=(Cs*sta+extended_syn(n_extend+i))
     lta=(Cl*lta+extended_syn(n_extend+i))
-    if (lta.gt.TOL) STA_LTA(i)=sta/lta
+    if (lta.gt.TOL) then
+      if( TWEAK ) then
+        ! additional envelope criteria
+        if( lta .gt. TOL*lta_max ) then
+          if( i >= thres_noise) then
+            STA_LTA(i)=sta/lta
+          endif
+        endif
+      else
+        STA_LTA(i)=sta/lta
+      endif
+    endif
+
   enddo
 
   deallocate(extended_syn)
@@ -604,18 +667,18 @@
 !----------------------------------------------------------------------
 
   subroutine detrend(x,n)
-  
+
   integer, intent(in) :: n
   double precision, dimension(*) :: x
 
   double precision :: ds1,ds2,dan,davei,davex,dslope,dai
   integer :: i, an
 
-  an = n 
-  dan=n 
-  ds1=0 
-  ds2=0 
-  
+  an = n
+  dan=n
+  ds1=0
+  ds2=0
+
   do i=1,n
     ds1 = ds1+ x(i)
     ds2 = ds2 + ds1
@@ -637,7 +700,7 @@
   character*8, intent(out) :: istring
 
   if(i.lt.0) stop 'Complete subroutine for negative integers'
- 
+
   if(abs(i).lt.10) then
     write(istring,'(i1)') i
   elseif(abs(i).lt.100) then
@@ -680,8 +743,8 @@
   ! inputs:
   ! s(npts) = synthetic
   ! d(npts) = data (or observed)
-  ! i1, i2 = start and stop indexes of window within s and d 
-  
+  ! i1, i2 = start and stop indexes of window within s and d
+
   double precision, dimension(*), intent(in) :: s,d
   integer, intent(in) :: npts, i1, i2
 

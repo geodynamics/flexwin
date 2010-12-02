@@ -7,7 +7,7 @@
   subroutine select_windows_stalta2()
   use seismo_variables
 
-  integer, dimension(NWINDOWS) :: maxima_lp, minima_lp 
+  integer, dimension(NWINDOWS) :: maxima_lp, minima_lp
   integer, dimension(NWINDOWS*NWINDOWS) :: iM, iL, iR
   double precision, dimension(NWINDOWS) :: CC_local, Tshift_local, dlnA_local
   integer :: nmax, nwin
@@ -32,7 +32,7 @@
 ! make all preparatory steps (create envelopes and sta_lta time series)
   if(DEBUG) print *, "Preparing windows for stalta"
   call prepare_for_window_sel_stalta
-  
+
   ! check data quality (signal-to-noise ratios)
   if(DATA_QUALITY) then
     if(DEBUG) print *, "Checking data quality"
@@ -160,7 +160,7 @@
 
      ! resolve the overlaps
      call resolve_overlaps(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
-     if(DEBUG) call display_windows_full(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local) 
+     if(DEBUG) call display_windows_full(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
 
 !!$  endif
 
@@ -179,7 +179,7 @@
     if(win_start(k) .lt. b) win_start(k) = b
     if(win_end(k) .gt. b+(npts-1)*dt) win_end(k) = b+(npts-1)*dt
 
-    ! calculate indexes for start and and of windows 
+    ! calculate indexes for start and and of windows
     i_start(k) = 1+int((win_start(k)-b)/dt)
     i_end(k)   = 1+int((win_end(k)  -b)/dt)
 
@@ -192,7 +192,7 @@
 
   end subroutine select_windows_stalta2
 
-  
+
   subroutine check_window_s2n(nwin,iM,iL,iR)
     use seismo_variables
 
@@ -261,9 +261,9 @@
   subroutine check_data_quality(data_ok,signal_int,noise_int,snr_int,signal_amp,noise_amp,snr_amp)
     use seismo_variables
 
-    ! data_ok is a logical value to indicate whether or not 
-    ! to continue on with the window selection algorithm. 
-    ! If noise to signal ratio is too high, data_ok is false, 
+    ! data_ok is a logical value to indicate whether or not
+    ! to continue on with the window selection algorithm.
+    ! If noise to signal ratio is too high, data_ok is false,
     ! and that particular station will be rejected.
 
     logical, intent(out) :: data_ok
@@ -364,37 +364,42 @@
     ! only continue if there are available minima on either side
     if (maxima_lp(i) > minima_lp(1) .and. maxima_lp(i) < minima_lp(nmin) ) then
       ! only continue if this maximum is above the water level
-      if (STA_LTA(maxima_lp(i)) .gt. STALTA_W_LEVEL(maxima_lp(i))) then 
+      if (STA_LTA(maxima_lp(i)) .gt. STALTA_W_LEVEL(maxima_lp(i))) then
 
         ! find the first minimum right of this maximum
         R = 0
         do ii = 1,nmin
           if (minima_lp(ii) > maxima_lp(i)) then
             R = ii
-            exit 
+            exit
           endif
-        enddo 
+        enddo
         ! find the first minimum left of this maximum
         L = 0
         do ii = nmin,1,-1
           if (minima_lp(ii) < maxima_lp(i)) then
             L = ii
-            exit 
+            exit
           endif
-        enddo 
+        enddo
 
         ! iterate over minima to get all possible windows around this maximum
         do i_left = L,1,-1
           do i_right = R,nmin,1
-            nwin = nwin+1
-            if (nwin .gt. NWINDOWS*NWINDOWS) then
+            ! checks number of windows so far
+            if (nwin .ge. NWINDOWS*NWINDOWS) then
                print *, 'setup_M_L_R: ', nwin, NWINDOWS, NWINDOWS*NWINDOWS
-               print *, 'setup_M_L_R: ignoring trace (nwin > NWINDOWS*NWINDOWS)'
-               nwin = 0
-               return
-               !stop 'setup_M_L_R: Increase NWINDOWS' 
+               print *, 'setup_M_L_R: limit number (nwin = NWINDOWS*NWINDOWS)'
+               !print *, 'setup_M_L_R: ignoring trace (nwin > NWINDOWS*NWINDOWS)'
+               !nwin = 0
+               !exit do-loop
+               exit
+               !return
+               !stop 'setup_M_L_R: Increase NWINDOWS'
             endif
+
             ! set the index of the maximum, left and right boundaries
+            nwin = nwin+1
             iM(nwin) = maxima_lp(i)
             iL(nwin) = minima_lp(i_left)
             iR(nwin) = minima_lp(i_right)
@@ -403,6 +408,7 @@
 
       endif
     endif
+    if (nwin .ge. NWINDOWS*NWINDOWS) exit
   end do
   if (DEBUG) write(*,*) 'DEBUG : window generation found ', nwin, ' possible windows'
 
@@ -423,6 +429,10 @@
   logical :: accept
 
   nwin_new = 0
+  iM_new(:) = 0
+  iL_new(:) = 0
+  iR_new(:) = 0
+
   ! for each proto-window, check that no internal minima fall below the
   ! local water level of the window center
   do iwin = 1, nwin
@@ -440,13 +450,17 @@
     enddo
     ! if the proto-window is acceptable, then accept it
     if (accept) then
-      nwin_new = nwin_new + 1
-      if (nwin_new .gt. NWINDOWS) then
-         print *, 'reject_on_water_level: ignoring trace (nwin > NWINDOWS*NWINDOWS)'
-         nwin = 0
-         return
+      ! checks windows
+      if (nwin_new .ge. NWINDOWS) then
+         print *, 'reject_on_water_level: limit windows number (nwin = NWINDOWS)',nwin_new
+         !print *, 'reject_on_water_level: ignoring trace (nwin > NWINDOWS*NWINDOWS)'
+         !nwin = 0
+         ! exit do-loop
+         exit
+         !return
          !stop 'reject_on_water_level : Increase NWINDOWS'
       endif
+      nwin_new = nwin_new + 1
       iM_new(nwin_new) = iM(iwin)
       iR_new(nwin_new) = iR(iwin)
       iL_new(nwin_new) = iL(iwin)
@@ -486,7 +500,7 @@
 
     ! find the lowest minimum within the window
     stalta_min = STA_LTA(iL(iwin))
-    do imin = 1,nmin 
+    do imin = 1,nmin
        min_index = minima_lp(imin)
        if ( min_index .gt. iL(iwin) &
            .and. min_index .le. iR(iwin) &
@@ -513,14 +527,14 @@
           if (d_time .ge. c_value2) then
             f_time = exp(-((d_time-c_value2)/c_value2)**2)
           else
-            f_time = 1.0 
+            f_time = 1.0
           endif
           ! check condition
           if (d_stalta .gt. c_value*d_stalta_center*f_time) then
             accept = .false.
             exit
           endif
-       end if 
+       end if
     end do
 
     ! if the proto-window is acceptable, then accept it
@@ -549,7 +563,7 @@
   integer, dimension(*), intent(inout) :: iM, iL, iR
   double precision, intent(in) :: c_value
 
-  integer :: iwin 
+  integer :: iwin
   integer :: nwin_new
   integer, dimension(NWINDOWS) :: iM_new, iL_new, iR_new
   logical :: accept
@@ -566,13 +580,16 @@
     end if
 
     if (accept) then
-      nwin_new = nwin_new + 1
-      if (nwin_new .gt. NWINDOWS) then
-         print *, 'reject_on_window_width: ignoring trace (nwin > NWINDOWS*NWINDOWS)'
-         nwin = 0
-         return
+      ! checks windows
+      if (nwin_new .ge. NWINDOWS) then
+         print *, 'reject_on_window_width: limit (nwin = NWINDOWS)'
+         exit
+         !print *, 'reject_on_window_width: ignoring trace (nwin > NWINDOWS*NWINDOWS)'
+         !nwin = 0
+         !return
          !stop 'Increase NWINDOWS'
       endif
+      nwin_new = nwin_new + 1
       iM_new(nwin_new) = iM(iwin)
       iR_new(nwin_new) = iR(iwin)
       iL_new(nwin_new) = iL(iwin)
@@ -713,7 +730,7 @@
   nwin_new=0
   do iwin = 1,nwin
     accept = .true.
-   
+
     i_right = 0
     i_left = 0
     ! find index of minimum on the right of the central maximum
@@ -782,7 +799,7 @@
   n_left = 0
   n_right = 0
   do iwin = 1,nwin
-   
+
     i_right = 0
     i_left = 0
     ! find index of maximum on the right of left boundary
@@ -801,7 +818,7 @@
     enddo
 
     delta_left = i_left - iL(iwin)
-    delta_right = iR(iwin) - i_right 
+    delta_right = iR(iwin) - i_right
 
     ! check condition
     if (delta_left .gt. time_decay_left) then
@@ -890,7 +907,7 @@
 
 !!$  ! CHT: this is done by display_windows_full
 !!$  if(DEBUG) then
-!!$    write(*,'(" DEBUG : iwin, iL, iM, iR,  CC,  Tshift,  dlnA")') 
+!!$    write(*,'(" DEBUG : iwin, iL, iM, iR,  CC,  Tshift,  dlnA")')
 !!$    do iwin = 1, nwin
 !!$      write(*,'(" DEBUG : ",i2,1x,3(i4,1x),3(f6.2,1x))') iwin, iL(iwin), iM(iwin), iR(iwin), &
 !!$            CC_local(iwin), Tshift_local(iwin), dlnA_local(iwin)
@@ -955,7 +972,7 @@
   integer, dimension(*), intent(inout) :: iM, iL, iR
   double precision, dimension(*), intent(inout) :: CC_local, Tshift_local, dlnA_local
 
-  integer :: iwin, iwin2 
+  integer :: iwin, iwin2
   integer :: nwin_new, n_groups
   integer, dimension(NWINDOWS) :: iM_new, iL_new, iR_new
   double precision, dimension(NWINDOWS) :: CC_new, Tshift_new, dlnA_new
@@ -967,7 +984,7 @@
   ! for combinations of overlapping windows
   logical :: iterate
   integer :: ii, igroup, igroup_window
-  integer :: n_comb, icomb, win_length, group_length 
+  integer :: n_comb, icomb, win_length, group_length
   integer :: prev_comb_start, prev_comb_end
   integer, dimension(NWINDOWS) :: iL_comb, iR_comb
   integer, dimension(NWINDOWS) :: comb_size
@@ -983,7 +1000,7 @@
   ! initialise assigned for each window to false
   assigned(1:nwin) = .false.
 
-  ! create groups 
+  ! create groups
   n_groups = 0
   do iwin = 1, nwin
     if (.not.assigned(iwin)) then
@@ -997,7 +1014,7 @@
       endif
       group_size(n_groups) = 1
       ! initialise group listing
-      groups(n_groups,group_size(n_groups)) = iwin 
+      groups(n_groups,group_size(n_groups)) = iwin
       ! set left and right limits of group
       iL_group(n_groups) = iL(iwin)
       iR_group(n_groups) = iR(iwin)
@@ -1010,7 +1027,7 @@
           ! assign this window to the current overlap list
           assigned(iwin2) = .true.
           group_size(n_groups) = group_size(n_groups) + 1
-          groups(n_groups,group_size(n_groups)) = iwin2 
+          groups(n_groups,group_size(n_groups)) = iwin2
           ! update the group boundaries
           if ( iL(iwin2).lt.iL_group(n_groups) ) iL_group(n_groups) = iL(iwin2)
           if ( iR(iwin2).gt.iR_group(n_groups) ) iR_group(n_groups) = iR(iwin2)
@@ -1052,12 +1069,12 @@
     ! list in the previous iteration
     prev_comb_start = 1
     prev_comb_end   = n_comb
-    do while (iterate) 
+    do while (iterate)
       ! for each of the current combinations
       do icomb = prev_comb_start, prev_comb_end
         ! check if we can add another window to this combination (only on the
         ! right, so only if this combination does not already reach the group
-        ! right limit) 
+        ! right limit)
         if (iR_comb(icomb).lt.iR_group(igroup)) then
           do igroup_window = 1, group_size(igroup)
             iwin=groups(igroup,igroup_window)
@@ -1065,7 +1082,7 @@
             if(iL(iwin).ge.iR_comb(icomb)) then
               ! make a new combination with this window added
               n_comb = n_comb+1
-	      ! checks bounds	
+	      ! checks bounds
               if( n_comb > NWINDOWS ) then
                 write(*,*) '  too many combinations: set NWINDOWS higher!'
                 stop 'error too many combinations (n_comb)'
@@ -1102,18 +1119,18 @@
       win_length = 0
       do ii = 1,comb_size(icomb)
         iwin = comb(icomb,ii)
-        ! add the window length to the total 
+        ! add the window length to the total
         win_length = win_length + (iR(iwin)-iL(iwin))
       enddo
       space_coverage(icomb) = float(win_length)/float(group_length)
-      
+
       ! score the average CC
-      ! If the longer window has a better cross-correlation than the 
+      ! If the longer window has a better cross-correlation than the
       ! average of the constituent windows, then you want the longer window.
       average_CC(icomb) = 0.
       do ii = 1,comb_size(icomb)
         iwin = comb(icomb,ii)
-        ! add the window length to the total 
+        ! add the window length to the total
         average_CC(icomb) = average_CC(icomb) + CC_local(iwin)
       enddo
       average_CC(icomb) = average_CC(icomb)/float(comb_size(icomb))
@@ -1148,7 +1165,7 @@
     endif
 
     if (DEBUG) write(*,*) 'DEBUG : Chosen combination is ', chosen_combination
-    
+
     ! loop over chosen combination, adding its windows to the final list of windows
     do ii = 1,comb_size(chosen_combination)
       iwin = comb(chosen_combination,ii)
@@ -1188,7 +1205,7 @@
     integer :: iwin
 
     if(DEBUG) then
-       write(*,'(" DEBUG : iwin, iL, iM, iR, t_start, t_end, Tshift, dlnA, CC")') 
+       write(*,'(" DEBUG : iwin, iL, iM, iR, t_start, t_end, Tshift, dlnA, CC")')
        do iwin = 1, nwin
           write(*,'(" DEBUG : ",i4,1x,3(i4,1x),2(f8.2,1x),3(f8.2,1x))') iwin, iL(iwin), iM(iwin), &
                iR(iwin), b+(iL(iwin)-1)*dt, b+(iR(iwin)-1)*dt, &
@@ -1208,7 +1225,7 @@
    integer :: iwin
 
    if(DEBUG) then
-      write(*,'(" DEBUG : iwin, iL, iM, iR, t_start, t_end")') 
+      write(*,'(" DEBUG : iwin, iL, iM, iR, t_start, t_end")')
       do iwin = 1, nwin
          write(*,'(" DEBUG : ",i4,1x,3(i4,1x),2(f8.2,1x))') iwin, iL(iwin), iM(iwin), iR(iwin), b+(iL(iwin)-1)*dt, b+(iR(iwin)-1)*dt
       enddo

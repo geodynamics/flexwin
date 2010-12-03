@@ -1054,10 +1054,13 @@
       ! extract the window from the group
       iwin = groups(igroup,igroup_window)
       ! increment the number of combinations
-      n_comb = n_comb+1
       ! checks bounds
-      if (n_comb .gt. NWINDOWS) stop 'Too many window combinations'
-
+      if (n_comb .ge. NWINDOWS) then
+        print*,'limiting number of combinations: n_comb=',n_comb
+        !stop 'Too many window combinations'
+        exit
+      endif
+      n_comb = n_comb+1
       comb_size(n_comb) = 1
       ! set the combination to this window
       comb(n_comb,comb_size(n_comb)) = iwin
@@ -1081,13 +1084,13 @@
             ! if the window is to the right of (or adjacent to) the current combination
             if(iL(iwin).ge.iR_comb(icomb)) then
               ! make a new combination with this window added
-              n_comb = n_comb+1
-	      ! checks bounds
-              if( n_comb > NWINDOWS ) then
-                write(*,*) '  too many combinations: set NWINDOWS higher!'
-                stop 'error too many combinations (n_comb)'
+              ! checks bounds
+              if( n_comb >= NWINDOWS ) then
+                write(*,*) '  limits combinations: set NWINDOWS higher!'
+                exit
+                !stop 'error too many combinations (n_comb)'
               endif
-
+              n_comb = n_comb+1
               ! copy the old combination to the new combination
               comb(n_comb,1:comb_size(icomb)) = comb(icomb,1:comb_size(icomb))
               ! extend it by one window
@@ -1099,6 +1102,7 @@
             endif
           enddo
         endif
+        if(n_comb >= NWINDOWS) exit
       enddo
       ! check if we have added some new combinations
       if (n_comb.gt.prev_comb_end) then
@@ -1169,6 +1173,8 @@
     ! loop over chosen combination, adding its windows to the final list of windows
     do ii = 1,comb_size(chosen_combination)
       iwin = comb(chosen_combination,ii)
+      ! checks bounds
+      if( nwin_new >= NWINDOWS ) exit
       nwin_new = nwin_new + 1
       iL_new(nwin_new) = iL(iwin)
       iR_new(nwin_new) = iR(iwin)

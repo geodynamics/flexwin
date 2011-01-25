@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Similar to Carl's plot_windows_all.pl script
 # Qinya Liu, Oct 2009, UofT
 # plots are sort by distance and then components

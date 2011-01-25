@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # similar to Carl's prepare_meas_all.pl script
 # Qinya Liu, Oct 2009, UofT
 

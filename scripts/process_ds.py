@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # find matching data and synthetics from data and syn directories, process them
 # and write input to flexwin package

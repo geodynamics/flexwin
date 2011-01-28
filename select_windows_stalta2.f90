@@ -6,11 +6,12 @@
 
   subroutine select_windows_stalta2()
   use seismo_variables
+  implicit none
 
   integer, dimension(NWINDOWS) :: maxima_lp, minima_lp
   integer, dimension(NWINDOWS*NWINDOWS) :: iM, iL, iR
   double precision, dimension(NWINDOWS) :: CC_local, Tshift_local, dlnA_local
-  integer :: nmax, nwin
+  integer :: nmin, nmax, nwin
   integer :: k
   double precision :: w_level_local
 
@@ -195,6 +196,7 @@
 
   subroutine check_window_s2n(nwin,iM,iL,iR)
     use seismo_variables
+    implicit none
 
     integer, intent(inout) :: nwin
     integer, dimension(*), intent(inout) :: iM, iL, iR
@@ -260,6 +262,7 @@
 
   subroutine check_data_quality(data_ok,signal_int,noise_int,snr_int,signal_amp,noise_amp,snr_amp)
     use seismo_variables
+    implicit none
 
     ! data_ok is a logical value to indicate whether or not
     ! to continue on with the window selection algorithm.
@@ -270,7 +273,7 @@
     double precision, intent(out) :: signal_int,noise_int,snr_int,signal_amp,noise_amp,snr_amp
 
     double precision :: time_obs_noise, time_obs_signal
-    integer :: i, j, k
+    integer :: i, j, k, m
 
     ! initialize values
     data_ok = .true.
@@ -416,6 +419,7 @@
 
   subroutine reject_on_water_level(nwin,iM,iL,iR,nmin,minima_lp,c_value)
   use seismo_variables
+  implicit none
 
   integer, intent(inout) :: nwin
   integer, dimension(*), intent(inout) :: iM, iL, iR
@@ -479,6 +483,7 @@
 
   subroutine reject_on_phase_separation(nwin,iM,iL,iR,nmin,minima_lp,nmax,maxima_lp,c_value,c_value2)
   use seismo_variables
+  implicit none
 
   integer, intent(inout) :: nwin
   integer, dimension(*), intent(inout) :: iM, iL, iR
@@ -558,6 +563,7 @@
 
   subroutine reject_on_window_width(nwin,iM,iL,iR,c_value)
   use seismo_variables
+  implicit none
 
   integer, intent(inout) :: nwin
   integer, dimension(*), intent(inout) :: iM, iL, iR
@@ -610,7 +616,7 @@
 
 !!$  subroutine reject_on_duplicate(nwin,iM,iL,iR)
 !!$  use seismo_variables
-!!$
+!!$  implicit none
 !!$  integer, intent(inout) :: nwin
 !!$  integer, dimension(*), intent(inout) :: iM, iL, iR
 !!$
@@ -657,12 +663,13 @@
 
   subroutine reject_on_duplicate(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
   use seismo_variables
+  implicit none
 
   integer, intent(inout) :: nwin
   integer, dimension(*), intent(inout) :: iM, iL, iR
   double precision, dimension(*), intent(inout) :: CC_local,Tshift_local,dlnA_local
 
-  integer :: iwin, nwin_new, ikeep
+  integer :: iwin, nwin_new, ikeep, iwin2
   integer, dimension(NWINDOWS) :: iwin_keep
   logical :: accept
   logical, dimension(NWINDOWS) :: duplicate
@@ -713,6 +720,7 @@
 
   subroutine reject_on_prominence(nwin,iM,iL,iR,nmin,minima_lp,c_value)
   use seismo_variables
+  implicit none
 
   integer, intent(inout) :: nwin
   integer, dimension(*), intent(inout) :: iM, iL, iR
@@ -782,6 +790,7 @@
 
   subroutine curtail_window_length(nwin,iL,iR,nmax,maxima_lp,cl_value,cr_value)
   use seismo_variables
+  implicit none
 
   integer, intent(inout) :: nwin
   integer, dimension(*), intent(inout) :: iL, iR
@@ -841,6 +850,7 @@
 
   subroutine reject_on_fit_criteria(nwin,iM,iL,iR,CC_local,Tshift_local, dlnA_local)
   use seismo_variables
+  implicit none
 
   integer, intent(inout) :: nwin
   integer, dimension(*), intent(inout) :: iM, iL, iR
@@ -920,6 +930,7 @@
 
   subroutine sort_on_start_time(nwin,iM,iL,iR)
   use seismo_variables
+  implicit none
 
   integer, intent(inout) :: nwin
   integer, dimension(*), intent(inout) :: iM, iL, iR
@@ -1204,6 +1215,7 @@
 
   subroutine display_windows_full(nwin,iM,iL,iR,CC_local,Tshift_local,dlnA_local)
     use seismo_variables
+    implicit none
 
     integer, intent(in) :: nwin
     integer, dimension(*), intent(in) :: iM, iL, iR
@@ -1225,6 +1237,7 @@
 
  subroutine display_windows(nwin,iM,iL,iR)
    use seismo_variables
+   implicit none
 
    integer, intent(in) :: nwin
    integer, dimension(*), intent(in) :: iM, iL, iR

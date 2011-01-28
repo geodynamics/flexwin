@@ -7,6 +7,7 @@
 
 
   subroutine find_maxima(x,nx,maxima,nindex,w_level)
+  implicit none
 
   integer, parameter :: UP = 1
   integer, parameter :: DOWN = -1
@@ -47,6 +48,7 @@ end subroutine find_maxima
 
 
   integer function direction(a,b,w_level)
+  implicit none
 
   integer, parameter :: UP = 1
   integer, parameter :: DOWN = -1
@@ -80,6 +82,7 @@ end subroutine find_maxima
 ! level
 
   subroutine bracket_maximum(x, nx, imax , w_level, i1, i2) 
+  implicit none
   double precision, dimension(*), intent(in) :: x
   integer, intent(in) :: nx , imax
   double precision, intent(in) :: w_level
@@ -132,6 +135,7 @@ end subroutine find_maxima
 
 
   subroutine find_minima(x,nx,minima,nindex,w_level)
+  implicit none
 
   integer, parameter :: UP = 1
   integer, parameter :: DOWN = -1

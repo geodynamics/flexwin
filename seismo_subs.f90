@@ -3,6 +3,7 @@
 
   module seismo_variables
   use user_parameters
+  implicit none
 
   !=========================================
   ! Declaration of parameters from PAR_FILE
@@ -266,6 +267,7 @@
 
   subroutine read_sac_files(file_s, file_o,ier)
   use seismo_variables
+  implicit none
 
   character (len=240) :: file_s, file_o
   integer :: ier
@@ -399,6 +401,8 @@
 
   subroutine calculate_windows_before_quality
   use seismo_variables
+  implicit none
+  integer i
 
   do i = 1, num_win
     call calc_criteria(obs_lp,synt_lp,npts,i_start(i),i_end(i),dt,Tshift(i),CC(i),dlnA(i))
@@ -409,6 +413,8 @@
 
   subroutine calculate_windows_aux_quality
   use seismo_variables
+  implicit none
+  integer i
 
   do i = 1, num_win
     call calc_criteria(obs_lp,synt_lp,npts,i_start(i),i_end(i),dt,Tshift_aux(i),CC_aux(i),dlnA_aux(i))
@@ -435,6 +441,7 @@
   subroutine t_taper(x, n, t_type, width)
 
   use user_parameters
+  implicit none
 
   integer, intent(in) :: n, t_type
   double precision, dimension(*), intent(inout) :: x
@@ -476,6 +483,7 @@
 
   ! AM : added this to fix memory bug
   use user_parameters
+  implicit none
 
   integer, intent(in) :: n
   double precision, intent(in), dimension(*) :: seis
@@ -507,6 +515,7 @@
 
   subroutine bandpass(x, n, delta_t, x_filt)
   use seismo_variables
+  implicit none
 
   integer, intent(in) :: n
   double precision, intent(in),  dimension(*) :: x
@@ -539,7 +548,6 @@
 !----------------------------------------------------------------------
   subroutine prepare_bp_seis
   use seismo_variables
-
   implicit none
 
   ! make filtered seismograms
@@ -570,6 +578,7 @@
 !----------------------------------------------------------------------
   subroutine prepare_STA_LTA
   use seismo_variables
+  implicit none
 
   double precision :: TOL, Cs, Cl, sta, lta, noise
   integer :: i, n_extend
@@ -667,6 +676,7 @@
 !----------------------------------------------------------------------
 
   subroutine detrend(x,n)
+  implicit none
 
   integer, intent(in) :: n
   double precision, dimension(*) :: x
@@ -695,6 +705,7 @@
 
 !------------------------------------------------------------------------
   subroutine int2string(i,istring)
+  implicit none
 
   integer, intent(in) :: i
   character*8, intent(out) :: istring
@@ -718,6 +729,7 @@
 !------------------------------------------------------------------------
   subroutine phases_in_window(t_start, t_end, n, indexes)
   use seismo_variables
+  implicit none
 
   double precision, parameter :: TOL = 1
 
@@ -739,6 +751,7 @@
 
 !------------------------------------------------------------------------
   subroutine xcorr_calc(d,s,npts,i1,i2,ishift,cc_max)
+  implicit none
 
   ! inputs:
   ! s(npts) = synthetic
@@ -820,6 +833,7 @@ end subroutine xcorr_calc
 
 subroutine calc_criteria(d,s,npts,i1,i2,dt,tshift,cc_max,dlnA)
   use user_parameters  ! for NDIM in d_win and s_win
+  implicit none
 
   ! CHT: modified version of calc_criteria_original
   ! The point here is that we only look EXACTLY within the time window of interest,
@@ -858,6 +872,7 @@ end subroutine calc_criteria
 !------------------------------------------------------------------------
 
 subroutine calc_criteria_original(d,s,npts,i1,i2,dt,tshift,cc_max,dlnA)
+  implicit none
 
   double precision, parameter :: TOL = 1e-7
 
@@ -867,7 +882,7 @@ subroutine calc_criteria_original(d,s,npts,i1,i2,dt,tshift,cc_max,dlnA)
   double precision, intent(out) ::  tshift,cc_max,dlnA
 
   double precision, dimension(:), allocatable :: s_cor,d_loc
-  integer :: ishift, npts_win
+  integer :: ishift, npts_win, i
 
   npts_win = i2-i1+1
 

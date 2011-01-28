@@ -7,6 +7,7 @@
 
   subroutine modify_T0_T1_on_condition
   use seismo_variables
+  implicit none
 
   ! do nothing
 
@@ -25,6 +26,7 @@
 
   subroutine set_up_criteria_arrays
   use seismo_variables 
+  implicit none
 
   integer :: i
   double precision :: time

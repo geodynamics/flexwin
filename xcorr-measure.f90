@@ -27,6 +27,7 @@
 !     ------------------------------------------------------------------
 
       module xcorr_constants
+        implicit none
 
       integer, parameter :: lnpt=14, npt=2**lnpt
 

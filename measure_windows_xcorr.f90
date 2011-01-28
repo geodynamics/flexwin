@@ -8,6 +8,7 @@
   use xcorr_constants
   use seismo_variables
   use measurement_variables
+  implicit none
 
   double precision, dimension(npt) :: syn_lp_local, obs_lp_local
   double precision :: dtau_local, dlnA_local

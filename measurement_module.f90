@@ -1,5 +1,6 @@
   module measurement_variables
   use seismo_variables
+  implicit none
 
   ! measurement parameters / variables
   integer, parameter :: N_FREQ_MAX = 9000

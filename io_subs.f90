@@ -291,6 +291,7 @@
 
   subroutine write_seismos_gmt(basename)
   use seismo_variables
+  implicit none
 
   character*120 :: basename
 
@@ -323,10 +324,11 @@
 ! -----------------------------------------------------------------------
   subroutine write_lp_sac(basename)
   use seismo_variables
+  implicit none
 
   character*120 :: basename
   character*240 :: file_obs, file_syn
-  integer :: io_error, i
+  integer :: io_error, i, nerr
   real, dimension(NDIM) :: obs_filt, syn_filt, time
 
   obs_filt(1:npts) = sngl(obs_lp(1:npts))
@@ -357,10 +359,11 @@
 !----------------------------------------------------------------------
 
   subroutine slash_index(filename,spos)
+  implicit none
   character*120, intent(in) :: filename
   integer, intent(out) :: spos
 
-  integer :: pos, prev_pos
+  integer :: pos, prev_pos, k
 
   spos=0
   k=0
@@ -382,6 +385,7 @@
 
   subroutine write_mt_input(basename)
     use seismo_variables
+    implicit none
 
     character*120 :: basename
     character*240 :: file_s, file_o
@@ -409,6 +413,7 @@
 
   subroutine write_mt_input_2(basename,file_o,file_s)
     use seismo_variables
+    implicit none
 
     character*120 :: basename
     character*240 :: file_o, file_s

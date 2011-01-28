@@ -2,10 +2,11 @@
 program flexwin
 
 use seismo_variables
+implicit none
 
 character*120, dimension (1000):: basename
 character*240, dimension (1000):: obs_name, syn_name
-integer :: n_seis
+integer :: n_seis, i
 integer :: ier
 
 ! read the parameter file

@@ -68,12 +68,12 @@ region=$t_start/$t_end/-$max/$max
 # do plot
 
 psbasemap -R$region -J$proj -B${t_step}::.${label}:"Time (s)":/S -K $orient $origin > $out
-tail -$nwin $win | awk '{printf "%f %f\n%f %f\n%f %f\n%f %f\n>\n", $2,-1*m,$2,m,$3,m,$3,-1*m}' m=$max | psxy -R$region -J$proj -M -W1 -G$paleblue -O -K >> $out
+tail -$nwin $win | awk '{printf "%f %f\n%f %f\n%f %f\n%f %f\n>\n", $2,-1*m,$2,m,$3,m,$3,-1*m}' m=$max | psxy -R$region -J$proj -m -W1 -G$paleblue -O -K >> $out
 psxy $obs -R$region -J$proj -H$nhead -W2 -O -K >> $out
 psxy $syn -R$region -J$proj -H$nhead -W2/$red -O -K >> $out
 
 #SCSN stuff
-#psxy -R$region -J$proj -W2/${blue} -M -O -K << END >> $out
+#psxy -R$region -J$proj -W2/${blue} -m -O -K << END >> $out
 #$scsn_1 -$max
 #$scsn_1 $max
 #>
@@ -85,9 +85,9 @@ psxy $syn -R$region -J$proj -H$nhead -W2/$red -O -K >> $out
 #>
 #END
 
-#tail -$nwin $win | awk '{printf "> %f %f 8 0 0 LB 10p 0.5i l\n%s\n", $2,-m,substr($0,31,200)}' m=$max | pstext -R$region -J$proj -M -N -O -K -V >> $out
-tail -$nwin $qual | awk '{printf "> %f %f 8 90 0 RT 10p 0.5i l\nCC=%.2f\ndT=%.2f\ndA=%.2f\n",$2,m,$5,$4,$6}' m=$max | pstext -R$region -J$proj -M -N -O -K >> $out
-#tail -$nwin $qual | awk '{printf "> %f %f 8 90 0 RT 10p 0.5i l\nCC=%.2f\n", $2,m,$5,$4}' m=$max | pstext -R$region -J$proj -M -N -O -K >> $out
+#tail -$nwin $win | awk '{printf "> %f %f 8 0 0 LB 10p 0.5i l\n%s\n", $2,-m,substr($0,31,200)}' m=$max | pstext -R$region -J$proj -m -N -O -K -V >> $out
+tail -$nwin $qual | awk '{printf "> %f %f 8 90 0 RT 10p 0.5i l\nCC=%.2f\ndT=%.2f\ndA=%.2f\n",$2,m,$5,$4,$6}' m=$max | pstext -R$region -J$proj -m -N -O -K >> $out
+#tail -$nwin $qual | awk '{printf "> %f %f 8 90 0 RT 10p 0.5i l\nCC=%.2f\n", $2,m,$5,$4}' m=$max | pstext -R$region -J$proj -m -N -O -K >> $out
 pstext -R$region -J$proj -N -O -K <<  END >> $out
 $t_start $max 12 0 0 LT Seismograms
 END
@@ -104,13 +104,13 @@ max=`grep STA_LTA_MAX ${stalta} | awk '{print $NF}'`
 region=$t_start/$t_end/0/$max
 
 psbasemap -R$region -J$proj -B${t_step}:"Time (s)":/S -O -K $shift >> $out
-tail -$nwin $win | awk '{printf "%f %f\n%f %f\n%f %f\n%f %f\n>\n", $2,-1*m,$2,m,$3,m,$3,-1*m}' m=$max | psxy -R$region -J$proj -M -W1 -G$paleblue -O -K >> $out
+tail -$nwin $win | awk '{printf "%f %f\n%f %f\n%f %f\n%f %f\n>\n", $2,-1*m,$2,m,$3,m,$3,-1*m}' m=$max | psxy -R$region -J$proj -m -W1 -G$paleblue -O -K >> $out
 
 awk '{print $1, $2}' $stalta | psxy -R$region -J$proj -H$nhead -W2/$blue -O -K >> $out
 awk '{print $1, $3}' $stalta | psxy -R$region -J$proj -H$nhead -W2ta/$blue -O -K >> $out
 
 region=$t_start/$t_end/0/1
-pstext -R$region -J$proj -N -M -O -K <<  END >> $out
+pstext -R$region -J$proj -N -m -O -K <<  END >> $out
 > $t_start 0.9 12 0 0 LT 1 10 l 
 @;$blue;STA/LTA @;;
 END
@@ -128,7 +128,7 @@ region=$t_start/$t_end/0/$max
 
 # do plot
 psbasemap -R$region -J$proj -B${t_step}:"Time (s)":/S -O -K $shift >> $out
-tail -$nwin $win | awk '{printf "%f %f\n%f %f\n%f %f\n%f %f\n>\n", $2,-1*m,$2,m,$3,m,$3,-1*m}' m=$max | psxy -R$region -J$proj -M -W1 -G$paleblue -O -K >> $out
+tail -$nwin $win | awk '{printf "%f %f\n%f %f\n%f %f\n%f %f\n>\n", $2,-1*m,$2,m,$3,m,$3,-1*m}' m=$max | psxy -R$region -J$proj -m -W1 -G$paleblue -O -K >> $out
 psxy $envobs -R$region -J$proj -H$nhead -W2 -O -K >> $out
 psxy $envsyn -R$region -J$proj -H$nhead -W2/$red -O -K >> $out
 pstext -R$region -J$proj -N -O -K <<  END >> $out

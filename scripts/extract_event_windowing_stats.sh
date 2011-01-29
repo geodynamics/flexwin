@@ -118,7 +118,7 @@ proj=W$evlo/5
 echo $proj
 psbasemap -Rg -J$proj -Bg30/g30 -K -P -Y5 -V > $out
 pscoast -Rg -J$proj -Dl -A5000/0 -W1 -G$grey -O -K -V >> $out
-psxy $t3 -Rg -J$proj -: -M -W2 -O -K -V >> $out
+psxy $t3 -Rg -J$proj -: -m -W2 -O -K -V >> $out
 
 proj=X3/2
 pstext -R0/1/0/1 -J$proj -N  -O -K -X5.5 << END >> $out
@@ -131,10 +131,10 @@ END
 
 ## plot window number statistics
 proj=X2/2
-#awk '{print $6}' $t0 | pshistogram  -J$proj -C -B:"CC":/WS -W0.02 -Lthin -G$grey -O -K -X-4.5 -Y-3.5 >> $out
-awk '{print $6}' $t0 | pshistogram  -J$proj -C -B:"CC":/WS -W0.02 -Lthin -G$grey -O -K -X-5.5 -Y-3.5 >> $out
-awk '{print $5}' $t0 | pshistogram  -J$proj -C -B:"@~t@~ / s":/WS -W1 -Lthin -G$grey -O -K -X3 >> $out
-awk '{print $7}' $t0 | pshistogram  -J$proj -C -B:"@~D@~lnA":/WS -W0.1 -Lthin -G$grey -O -X3 >> $out
+#awk '{print $6}' $t0 | pshistogram  -J$proj -F -B:"CC":/WS -W0.02 -Lthin -G$grey -O -K -X-4.5 -Y-3.5 >> $out
+awk '{print $6}' $t0 | pshistogram  -J$proj -F -B:"CC":/WS -W0.02 -Lthin -G$grey -O -K -X-5.5 -Y-3.5 >> $out
+awk '{print $5}' $t0 | pshistogram  -J$proj -F -B:"@~t@~ / s":/WS -W1 -Lthin -G$grey -O -K -X3 >> $out
+awk '{print $7}' $t0 | pshistogram  -J$proj -F -B:"@~D@~lnA":/WS -W0.1 -Lthin -G$grey -O -X3 >> $out
 
 
 echo "%!PS-Adobe-3.0" >t1
@@ -153,13 +153,13 @@ region=$min_time/$max_time/$min_ddg/$max_ddg
 proj=X8/-2
 
 psbasemap -R$region -J$proj -B${timestep}:"Time(s)":/${degstep}:"Distance / degree":WS -K -P -Y8 > $out2
-pswiggle $t2z -R$region -J$proj -Z20 -M -P -W1/$black -G$red -O -K >> $out2 
+pswiggle $t2z -R$region -J$proj -Z20 -m -P -W1/$black -G$red -O -K >> $out2 
 psbasemap -R$region -J$proj -B:"Vertical component":/N -O -K >> $out2
 psbasemap -R$region -J$proj -B${timestep}:"Time(s)":/${degstep}:"Distance / degree":WS -O -K -Y-3.5 >> $out2
-pswiggle $t2r -R$region -J$proj -Z20 -M -P -W1/$black -G$green -O -K >> $out2 
+pswiggle $t2r -R$region -J$proj -Z20 -m -P -W1/$black -G$green -O -K >> $out2 
 psbasemap -R$region -J$proj -B:"Radial component":/N -O -K >> $out2
 psbasemap -R$region -J$proj -B${timestep}:"Time(s)":/${degstep}:"Distance / degree":WS -O -K -Y-3.5 >> $out2
-pswiggle $t2t -R$region -J$proj -Z20 -M -P -W1/$black -G$blue -O -K >> $out2 
+pswiggle $t2t -R$region -J$proj -Z20 -m -P -W1/$black -G$blue -O -K >> $out2 
 psbasemap -R$region -J$proj -B:"Transverse component":/N -O >> $out2
 
 echo "%!PS-Adobe-3.0" >t1

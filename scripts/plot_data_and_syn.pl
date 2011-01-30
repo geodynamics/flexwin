@@ -14,9 +14,9 @@ use Getopt::Std;
 use List::Util qw[min max];
 
 
-if (@ARGV == 0) {die("Usage: plot_data_and_syn.pl -d data_dir,data_ext -s syn_dir,syn_ext -Snew_syn_dir,new_syn_ext -M flexwin_file -m CMTSOLUTION -A Z/R/T(0.03/0.03/0.01)\n");}
+if (@ARGV == 0) {die("Usage: plot_data_and_syn.pl [-d data_dir,data_ext -s syn_dir,syn_ext -Snew_syn_dir,new_syn_ext]/-M flexwin_file -m CMTSOLUTION -A Z/R/T(0.03/0.03/0.01) -C\n");}
 
-if (!getopts('d:s:S:m:M:A:')) {die("Check input options\n");}
+if (!getopts('d:s:S:m:M:A:C')) {die("Check input options\n");}
 
 # data/syn dir and extension
 if ($opt_M) {
@@ -41,6 +41,7 @@ if ($opt_S) {$plot_new = 1;
 if ($opt_m) {$cmt_file=$opt_m;} else {die("Input cmt file \n");}
 ($moment) = split(" ",`cmtsol2faultpar.pl $cmt_file | awk 'NR == 3 {print \$3}'`);
 
+if ($opt_c) {$socal = 1;} else {$socal = 0;}
 # comps
 $ncols=3; @comps=("Z","R","T");#Z R T
 
@@ -52,7 +53,9 @@ $nfiles=12; # this is number of files per plot
 
 ($jx,$jy) = shift_xy("1 1","$ncols 1","7  7", \@xy,"0.95 0.95");
 print "xy = $xy[0][0], $xy[0][1], $xy[0][2]\n";
-$JX = "-JX$jx/$jy"; $B1="-B20/4"; @B=("${B1}WSN","${B1}SN","${B1}ESN");
+$JX = "-JX$jx/$jy"; 
+if ($socal) {$B1="-B20/4";} else {$B1="-B1000/4";}
+@B=("${B1}WSN","${B1}SN","${B1}ESN");
 
 $Vl=3.0; # surface wave velocity to determine tend
 $bp=10; $bp2=10;# start time before t1 header and end time after tend
@@ -149,7 +152,7 @@ for ($j=0;$j<$nplot;$j++) {
   $C="-C$tmin/$tmax"; # cutting
   $tt1=$tmin-$bp/2; $tt2=$tmax+$bp2/2;
   $R="-R$tt1/$tt2/-1/$nfiles"; # region
-  print "*** plot $j === @stas === $tt1/$tt2\n";
+  print "*** plot $j === @stas === $tt1/$tt2 === \n";
 
   print BASH "# ---- Plot $j ------\n";
   $psfile=sprintf("ds_%02d.ps",$j);
@@ -199,7 +202,7 @@ for ($j=0;$j<$nplot;$j++) {
     # plot windows
     if ($flexwin) {
       chomp($win_files);chomp($win_files);
-      plot_psxy(\*BASH,$psfile,"$JX $R $B[$i] -L -M $gwin ","$win_files");}
+      plot_psxy(\*BASH,$psfile,"$JX $R $B[$i] -L -m $gwin ","$win_files");}
 
     # plot data/syn
     plot_pssac2_raw(\*BASH,$psfile,"$JX $R $B[$i] $E $C -M$size/0 $wdata -N","$data_files");
@@ -221,7 +224,11 @@ for ($j=0;$j<$nplot;$j++) {
   $rlat0=$file{$stlas[0]}{stla}-0.1; $rlat1=$file{$stlas[-1]}{stla}+0.1; 
   $rlon0=$file{$stlos[0]}{stlo}-0.1; $rlon1=$file{$stlos[-1]}{stlo}+0.1;
   $region="$rlon0/$rlon1/$rlat0/$rlat1";
-  plot_sc_all(\*BASH,$psfile,"$JM -W1 -w0.5 -R$region $jxy_map -B2/2WesN","");
+  $BB=ceil(($rlon1-$rlon0)/10.);
+  if ($socal) {
+    plot_sc_all(\*BASH,$psfile,"$JM -W1 -w0.5 -R$region $jxy_map -B$BB/${BB}WesN","");}
+  else{
+    plot_pscoast(\*BASH,$psfile,"$JM  -R$region $jxy_map -B$BB/${BB}WesN");}
   if (defined $opt_m) {
     plot_psmeca(\*BASH,$psfile,"-JM -R -Sm0.2 ","$cmt_file");}
 #  plot_psxy(\*BASH,$psfile,"-JM -R -St0.06 -W1 -G0/0/255","$xy_file");

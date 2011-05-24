@@ -39,7 +39,9 @@ cd test_data
 ./flexwin < input.test
 ./plot_seismos_gmt.sh MEASURE/ABKT.II.LHZ
 
-If all goes well, you should see the file flexwin/test_data/MEASURE/ABKT.II.LHZ.seis.ps
+If all goes well, you should see the file flexwin/test_data/MEASURE/ABKT.II.LHZ.seis.ps,
+which should have serveral time series as well as seven windows.
+Compare output files with those in flexwin/test_data/MEASURE.orig/, described below.
 Note that the plotting script requires GMT (http://gmt.soest.hawaii.edu/).
 
 Last tested 19-Nov-2010 with the following:

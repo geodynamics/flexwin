@@ -5,7 +5,6 @@
 Alessia Maggi
 alessia@sismo.u-strasbg.fr
 
-
 Welcome to the flexwin package.  The purpose of this package is to
 select windows on pairs of observed and synthetic seismograms on which
 measurements can subsequently be made.
@@ -27,13 +26,13 @@ QUICK TEST
 -------------
 
 For quick start-to-finish testing with the sample data set provided,
-execute these commands within the base directory:
+execute these commands from within the base directory:
 
-cd flexwin
 cd ttimes_mod
 make -f make_gfortran
 make -f make_gfortran install
 cd ..
+make -f make_gfortran
 make -f make_gfortran test
 
 If all goes well, it should pick 7 time windows:
@@ -53,9 +52,9 @@ Test the plotting script:
 cd test_data
 ./plot_seismos_gmt.sh MEASURE/ABKT.II.LHZ
 
-You should see the file test_data/MEASURE/ABKT.II.LHZ.seis.ps,
+You should see the file MEASURE/ABKT.II.LHZ.seis.ps,
 which should have serveral time series as well as seven windows.
-Compare output files with those in test_data/MEASURE.orig/, described below.
+Compare output files with those in MEASURE.orig/, described below.
 Note that the plotting script requires GMT (http://gmt.soest.hawaii.edu/).
 
 Last tested 26-May-2011 with the following:

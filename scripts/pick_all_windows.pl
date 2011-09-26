@@ -74,11 +74,17 @@ if($imeas==1) {$bmeas = ".true."} else {$bmeas = ".false."}
 if($ibody==1) {$bbody = ".true."} else {$bbody = ".false."}
 if($ibp==1) {$bbp = ".true."} else {$bbp = ".false."}
 
+#-------------------------------------
+# USER INPUT -- CHANGE FOR EACH USER
+
 # directories for data and synthetics
 # 1=socal; 2=Japan
 if($idataset == 1) {
-  $dir_data  = "/home/carltape/SOCAL_ADJOINT/DATA/FINAL";
-  $dir_syn  = "/home/carltape/SOCAL_ADJOINT/SYN/model_${smodel}";
+  #$dir_data  = "/home/carltape/SOCAL_ADJOINT/DATA/FINAL";
+  #$dir_syn  = "/home/carltape/SOCAL_ADJOINT/SYN/model_${smodel}";
+  #$dir_data  = "/data2/data/TEST";
+  $dir_data  = "/data2/data/calif/FINAL";  
+  $dir_syn  = "/data2/syn/socal/model_${smodel}";  
   $sdataset = "socal";
 } elsif ($idataset == 2) {
   $dir_data  = "/home/mchen/DATA/TEST";
@@ -88,29 +94,37 @@ if($idataset == 1) {
   die("\n idataset must be 1 (socal) or 2 (japan)\n");
 }
 
-#-------------------------------------
-
 # specify various directories (MUST BE MODIFIED FOR EACH USER)
-$dir0 = "/data1/cig/seismo/3D";    # SVN path
+# note: may want a second copy to run simultaneously
+$dir0 = "/data2/SVN/seismo/3D";    # path to CIG SVN repository
 $dir_win_code = "$dir0/ADJOINT_TOMO/flexwin_work";
 $dir_win_run  = "$dir0/flexwin_run";
 #$dir_win_code = "$dir0/ADJOINT_TOMO/flexwin_work_copy2";
 #$dir_win_run  = "$dir0/flexwin_run_copy2";
 $dir_scripts  = "${dir_win_code}/scripts";
 
+# directory to collect COPIES of various output files
+$odir = "/home/carltape/results/WINDOWS/model_${smodel}";
+
+# run directory for windows, measurements, adjoint sources, and kernels
+#$rundir = "/home/carltape/SOCAL_ADJOINT/RUNS";
+$rundir = "/data2/RUNS";
+
+# channels to use for data and synthetics
+# NOTE: update prepare_input also ($pinput)
+#@chans = ("BHZ","BHT","BHR","HHZ","HHR","HHT");
+@dchans = ("BHZ","BHT","BHR","HHZ","HHR","HHT");
+#@schans = ("BHZ","BHT","BHR","BHZ","BHR","BHT");   # original
+@schans = ("HXZ","HXT","HXR","HXZ","HXR","HXT");
+$nchan = @dchans;
+
+#-------------------------------------
+
 # scripts for preparing data and synthetics
 $dir_prepare = "${dir_scripts}/prepare_scripts/${sdataset}";
 
 # scripts for user files
 $dir_user = "${dir_win_code}/user_files";
-
-# directory to collect COPIES of various output files
-$odir = "/home/carltape/results/WINDOWS/model_${smodel}";
-
-# run directory for windows, measurements, adjoint sources, and kernels
-$rundir = "/home/carltape/SOCAL_ADJOINT/RUNS";
-
-#-------------------------------------
 
 # check that directories exist
 if (not -e ${dir_data}) {die("check if ${dir_data} exist or not\n")}
@@ -132,10 +146,6 @@ if ($idataset == 1) {
   $suffix_syn = "bp12_150s";
   $suffix_dat = "bp12_150s";
 }
-
-# channels to use for data and synthetics
-@chans = ("BHZ","BHT","BHR","HHZ","HHR","HHT");
-$nchan = @chans;
 
 # directories for windowing code
 $dir_win_run_syn  = "${dir_win_run}/SYN";
@@ -328,9 +338,10 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
       # copy data and synthetics into windowing directory (BHZ,BHR,BHT)
       print CSH "echo copying data and syn files to ${dir_win_run}\n";
       for ($j = 1; $j <= $nchan; $j++) {
-	$chan = $chans[$j-1];
-	print CSH "cp $syndir1/*${chan}.${suffix_syn} ${dir_win_run_syn}\n"; # synthetics
-	print CSH "cp $datadir1/*${chan}.${suffix_dat} ${dir_win_run_data}\n"; # data
+	$dchan = $dchans[$j-1];
+	$schan = $schans[$j-1];
+	print CSH "cp $syndir1/*${schan}.${suffix_syn} ${dir_win_run_syn}\n"; # synthetics
+	print CSH "cp $datadir1/*${dchan}.${suffix_dat} ${dir_win_run_data}\n"; # data
       }
 
       #  print CSH "cp $syndir1/$sfile1  ${dir_win_run_syn}\n";
@@ -343,7 +354,7 @@ for ($ievent = $imin; $ievent <= $imax; $ievent++) {
       # prepare sac files for windowing code (BHZ,BHR,BHT)
       # NOTE: the file extensions must be checked within prepare_seis.pl and prepare_input
       print CSH "cd ${dir_win_run}\n";
-      #print CSH "${pseis}\n";    # this is done in PRE-PROCESSING
+      #print CSH "${pseis}\n";    # now this is done in PRE-PROCESSING
       print CSH "${pinput}\n";
 
       # copy prepared data and synthetic files into a directory for measurement code

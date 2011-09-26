@@ -165,7 +165,7 @@ short_basename=`echo $basename | awk -F"/" '{print $NF}'`
 #echo $proj
 #psbasemap -Rg -J$proj -Bg30/g30 -K -P -Y8 -V > $out
 #pscoast -Rg -J$proj -Dl -A5000/0 -W1 -G$grey -O -K -V >> $out
-#psxy $t3 -Rg -J$proj -: -M -W2 -O -K -V >> $out
+#psxy $t3 -Rg -J$proj -: -m -W2 -O -K -V >> $out
 
 # CHT
 # set projection for map plotting
@@ -175,7 +175,7 @@ tick="-Ba1dWeSn"
 echo $proj
 psbasemap $bounds $proj $tick -K -Y7.5 -X0.8 -P -V > $out
 pscoast $bounds $proj -Df -A100 -W1p -Na/1.0p -S150/200/255 -G200/255/150 -O -K -V >> $out
-psxy $t3 $bounds $proj -: -M -W2 -O -K -V >> $out
+psxy $t3 $bounds $proj -: -m -W2 -O -K -V >> $out
 psxy $proj $bounds -W1p -Sa0.2 -G250/0/0 -O -K >> $out <<EFX
 $evlo $evla
 EFX
@@ -255,13 +255,13 @@ region=$min_time/$max_time/$min_ddg/$max_ddg
 proj=X3.0/-6.8
 
 psbasemap -R$region -J$proj -B${timestep}:"Time(s) -- Z":/${degstep}:"Distance (deg)":WN -K -X1.0 -Y0.75 -U/0/-0.25/${basename} > $out2
-pswiggle $t2z -R$region -J$proj -Z20 -M -W1 -G$red -O -K >> $out2 
+pswiggle $t2z -R$region -J$proj -Z20 -m -W1 -G$red -O -K >> $out2 
 
 psbasemap -R$region -J$proj -B${timestep}:"Time(s) -- R":/${degstep}:"Distance (deg)":wN -O -K -X3.0 >> $out2
-pswiggle $t2r -R$region -J$proj -Z20 -M -W1 -G$green -O -K >> $out2 
+pswiggle $t2r -R$region -J$proj -Z20 -m -W1 -G$green -O -K >> $out2 
 
 psbasemap -R$region -J$proj -B${timestep}:"Time(s) -- T":/${degstep}:"Distance (deg)":wN -O -K -X3.0 >> $out2
-pswiggle $t2t -R$region -J$proj -Z20 -M -W1 -G$blue -O -K >> $out2 
+pswiggle $t2t -R$region -J$proj -Z20 -m -W1 -G$blue -O -K >> $out2 
 
 pstext $rectxt -R$region -J$proj -N -O -G0 >> $out2   # FINISH (no -K)
 
@@ -273,13 +273,13 @@ echo $out2
 #proj=X5/-2
 
 #psbasemap -R$region -J$proj -B${timestep}:"Time(s)":/${degstep}:"Distance / degree":WS -K -P -Y8 > $out2
-#pswiggle $t2z -R$region -J$proj -Z20 -M -P -W1/$black -G$red -O -K >> $out2 
+#pswiggle $t2z -R$region -J$proj -Z20 -m -P -W1/$black -G$red -O -K >> $out2 
 #psbasemap -R$region -J$proj -B:"Vertical component":/N -O -K >> $out2
 #psbasemap -R$region -J$proj -B${timestep}:"Time(s)":/${degstep}:"Distance / degree":WS -O -K -Y-3.5 >> $out2
-#pswiggle $t2r -R$region -J$proj -Z20 -M -P -W1/$black -G$green -O -K >> $out2 
+#pswiggle $t2r -R$region -J$proj -Z20 -m -P -W1/$black -G$green -O -K >> $out2 
 #psbasemap -R$region -J$proj -B:"Radial component":/N -O -K >> $out2
 #psbasemap -R$region -J$proj -B${timestep}:"Time(s)":/${degstep}:"Distance / degree":WS -O -K -Y-3.5 >> $out2
-#pswiggle $t2t -R$region -J$proj -Z20 -M -P -W1/$black -G$blue -O -K >> $out2 
+#pswiggle $t2t -R$region -J$proj -Z20 -m -P -W1/$black -G$blue -O -K >> $out2 
 #psbasemap -R$region -J$proj -B:"Transverse component":/N -O >> $out2
 
 #echo "%!PS-Adobe-3.0" >t1

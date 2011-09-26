@@ -185,7 +185,7 @@ tick="-Ba10dWeSn"
 echo $proj
 psbasemap $bounds $proj $tick -K -Y12 -X0.8 -P -V > $out
 pscoast $bounds $proj -Dh -A100 -W0.5 -S150/200/255 -W2 -G200/255/150  -O -K -V >> $out
-psxy $t3 $bounds $proj -: -M -W2 -O -K -V >> $out
+psxy $t3 $bounds $proj -: -m -W2 -O -K -V >> $out
 psxy $proj $bounds -W1 -Sa0.2 -G250/0/0 -O -K -: >> $out <<EFX
 $evla $evlo
 EFX
@@ -214,11 +214,11 @@ region=$min_time/$max_time/$min_ddg/$max_ddg
 proj=X1.4/-2.5
 
 psbasemap -R$region -J$proj -B${timestep}:"Time(s)":/${degstep}:"Distance / degree":WN -O -K -X-3.8 -Y-3.7 -U/0/-0.25/${basename} >> $out
-pswiggle $t2z -R$region -J$proj -Z20 -M -W1 -G$red -O -K >> $out 
+pswiggle $t2z -R$region -J$proj -Z20 -m -W1 -G$red -O -K >> $out 
 psbasemap -R$region -J$proj -B${timestep}:"Time(s)":/${degstep}WN -O -K -X1.9>> $out
-pswiggle $t2r -R$region -J$proj -Z20 -M -W1 -G$green -O -K >> $out 
+pswiggle $t2r -R$region -J$proj -Z20 -m -W1 -G$green -O -K >> $out 
 psbasemap -R$region -J$proj -B${timestep}:"Time(s)":/${degstep}WN -O -K -X1.9 >> $out
-pswiggle $t2t -R$region -J$proj -Z20 -M -W1 -G$blue -O >> $out 
+pswiggle $t2t -R$region -J$proj -Z20 -m -W1 -G$blue -O >> $out 
 
 bbox=`grep "%%BoundingBox: " $out | tail -1 `
 sed s/"$bbox"/"%"/ $out | sed s/"%%BoundingBox: (atend)"/"$bbox"/ > t1
@@ -237,13 +237,13 @@ out=${basename}/event_winstats_rs.ps
 proj=X3.0/-6.8    # negative sign to flip the y-axis
 
 psbasemap -R$region -J$proj -B${timestep}:"Time(s) -- Z":/${degstep}:"Distance (deg)":WN -K -X1.0 -Y0.75 -U/0/-0.25/${basename} > $out
-pswiggle $t2z -R$region -J$proj -Z20 -M -W1 -G$red -O -K >> $out 
+pswiggle $t2z -R$region -J$proj -Z20 -m -W1 -G$red -O -K >> $out 
 
 psbasemap -R$region -J$proj -B${timestep}:"Time(s) -- R":/${degstep}:"Distance (deg)":wN -O -K -X3.0 >> $out
-pswiggle $t2r -R$region -J$proj -Z20 -M -W1 -G$green -O -K >> $out 
+pswiggle $t2r -R$region -J$proj -Z20 -m -W1 -G$green -O -K >> $out 
 
 psbasemap -R$region -J$proj -B${timestep}:"Time(s) -- T":/${degstep}:"Distance (deg)":wN -O -K -X3.0 >> $out
-pswiggle $t2t -R$region -J$proj -Z20 -M -W1 -G$blue -O -K >> $out 
+pswiggle $t2t -R$region -J$proj -Z20 -m -W1 -G$blue -O -K >> $out 
 
 pstext $rectxt -R$region -J$proj -N -O -G0 >> $out   # FINISH (no -K)
 

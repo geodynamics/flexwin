@@ -312,12 +312,13 @@
        time_obs_signal = b+(j-1)*dt
        if (time_obs_signal > signal_start) exit
     enddo
-    is1 = j-1     ! index corresponding to signal_start
+    is1 = j     ! index corresponding to signal_start
     do k = 1, npts
        time_obs_signal = b+(k-1)*dt
        if (time_obs_signal > signal_end) exit
     enddo
     is2 = k-1     ! index corresponding to signal_end
+    print *, 'is1 = ', is1, ', is2 = ', is2
     signal_int = sum( (obs_lp(is1:is2))**2 )/(is2-is1)
     signal_amp = maxval( abs(obs_lp(is1:is2)) )
 

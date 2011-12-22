@@ -57,14 +57,11 @@ which should have serveral time series as well as seven windows.
 Compare output files with those in MEASURE.orig/, described below.
 Note that the plotting script requires GMT (http://gmt.soest.hawaii.edu/).
 
-Last tested 26-May-2011 with the following:
+Last tested 22-Dec-2011 with the following:
   linux: 64-bit, opensuse 11.3
-  sac 101.3b
+  sac 101.5
   gfortran 4.5.0
   GMT 4.5.3 (for plotting)
-
-NOTE: The current version of sac (101.4) requires a patch;
-      thus, we recommend using 101.3b for now.
 
 COMPILATION
 -----------

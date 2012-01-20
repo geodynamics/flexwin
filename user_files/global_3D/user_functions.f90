@@ -1,3 +1,21 @@
+! -------------------------------------------------------------
+! edit here to change T0 and T1 on some condition 
+! Note, this function is called AFTER the seismogram has been 
+! read but before it is filtered.
+! -------------------------------------------------------------
+
+  subroutine modify_T0_T1_on_condition
+  use seismo_variables
+  implicit none
+
+  ! do nothing
+
+  ! adjust fstart and fend accordingly
+  FSTART=1./WIN_MAX_PERIOD
+  FEND=1./WIN_MIN_PERIOD
+
+  end subroutine
+
   ! -------------------------------------------------------------
   ! edit here to change the time dependent properties of the 
   ! selection criteria

@@ -2,18 +2,22 @@
 # note: geometrical spreading factor needs to be significantly improved,
 # right now only scale by 1/dist**exp
 from numpy import *
-import os,sys,commands,glob,getopt
+import os,sys,commands,glob,getopt,re
 
 # command-line options
 usage="""
 write_flexwin_shift_weight.py  [-C]
      [-c Z/R/T  -d B/R/L -a az_weight -r corr_weight -t ]
-     -s MEASURE/  [-o adj-dir]
+     -D data_dir -s measure_dir  [-o adj-dir] 
      flexwin_summary_file new_flexwin_summary_file
+   -c Z/R/T component weights; -d B/R/L body/rayleigh/love wave weights
+   -a azimuthal weight -r correlation weight -t apply time shift
+   -C socal (regional) weight scheme in which -d pnl/rayleigh/love waves
+   -D and -s gives data and measure dir prefixes
 """
 
 try:
-  opts,args=getopt.getopt(sys.argv[1:],'c:d:a:s:r:o:tC')
+  opts,args=getopt.getopt(sys.argv[1:],'c:d:a:D:s:r:o:tC')
 except getopt.GetoptError:
   sys.exit(usage)
 if len(args) != 2:
@@ -22,7 +26,7 @@ if len(args) != 2:
 # default weight values
 comp_z_weight=1.; comp_r_weight=1.; comp_t_weight=1.
 pnl_dist_weigth=0.; rayleigh_dist_weight=0.; love_dist_weight=0.
-az_exp_weigth=0.; corr_exp_weight = 0.
+az_exp_weigth=0.; corr_exp_weight = 0.; data_dir='data'
 adj_dir='.'; write_tshift=False; write_adj_dir=False; socal=False
 
 #opts
@@ -30,12 +34,12 @@ for o,a in opts:
   if o == '-c':
     tmp=a.split('/')
     if len(tmp)!=3:
-      sys.exit('-c Z/R/T')
+      sys.exit('-c Z/R/T '+a)
     comp_z_weight=float(tmp[0]); comp_r_weight=float(tmp[1]); comp_t_weight=float(tmp[2])
   if o == '-d':
     tmp=a.split('/')
     if len(tmp)!=3:
-      sys.exit('-c P/R/L')
+      sys.exit('-d P/R/L '+a)
     pnl_dist_weight =float(tmp[0]); rayleigh_dist_weight=float(tmp[1]); love_dist_weight=float(tmp[2])
   if o == '-a':
     az_exp_weight=float(a)
@@ -43,8 +47,8 @@ for o,a in opts:
     corr_exp_weight=float(a)
   if o == '-s':
     measure_dir=a
-    if not os.path.isdir(measure_dir):
-      sys.exit('Check if '+measure_dir+' exist or not')
+#    if not os.path.isdir(measure_dir): # measure_dir is just a prefix
+#      sys.exit('Check if '+measure_dir+' exist or not')
   if o == '-o':
     write_adj_dir=True
     adj_dir=a.rstrip('/')
@@ -54,6 +58,8 @@ for o,a in opts:
     write_tshift=True
   if o == '-C':
     socal=True
+  if o == '-D':
+    data_dir=a # data_dir is a prefix 
 
 infile=args[0]; outfile=args[1]
 
@@ -71,12 +77,12 @@ else:
   ref_dist=60 # degree
   vr=3.1; vl=4.1
 naz=10; daz=360/naz;
-eps=1.0e-4; pi=3.1416926
+eps=1.0e-2; pi=3.1416926;
 naz_array=ones((naz))
 
-alldata=commands.getoutput('grep data '+infile).split('\n')
+alldata=commands.getoutput('grep '+data_dir+'  '+infile).split('\n')
 if (len(alldata) == 0):
-  sys.exit('Right now I assume data directories contain the name "data"')
+  sys.exit('No selected files of '+data_dir+' in '+infile)
 output=commands.getoutput('saclst az f '+' '.join(alldata)+"|awk '{print $2}'").split('\n')
 nfile_az=len(output)
 for i in range(0,nfile_az):
@@ -105,13 +111,14 @@ for i in range(0,nfile):
 
   # read data and synthetics, check headers
   [status1,out1]=commands.getstatusoutput('saclst kstnm knetwk kcmpnm az dist gcarc f '+datfile)
-  [status2,out2]=commands.getstatusoutput('saclst kstnm knetwk kcmpnm az dist f '+synfile)
+  [status2,out2]=commands.getstatusoutput('saclst kstnm knetwk kcmpnm az dist gcarc f '+synfile)
   if status1 != 0 or status2 != 0:
     sys.exit('Error taking kcmpnm az dist from '+datfile+' and '+synfile)
   [sta,net,comp,az,dist,gcarc]=out1.split()[1:7]
   az=float(az); dist=float(dist); gcarc=float(gcarc)
-  [sta2,net2,comp2,az2,dist2]=out2.split()[1:6]; az2=float(az2); dist2=float(dist2)
-  if (sta != sta2 or net != net2 or comp != comp2 or abs(az-az2) >eps or abs(dist-dist2) > eps):
+  [sta2,net2,comp2,az2,dist2,gcarc2]=out2.split()[1:7]
+  az2=float(az2); dist2=float(dist2); gcarc2=float(gcarc2)
+  if (sta != sta2 or net != net2 or comp != comp2 or abs(az-az2) >eps or abs(dist-dist2)/dist > eps):
 #    sys.exit('Check if kstnm knetwk kcmpnm az dist are the same for '+datfile+' and '+synfile)
     print 'Unmatching sta, net, comp, az, dist for =====\n',out1, '\n', out2
 
@@ -125,7 +132,7 @@ for i in range(0,nfile):
   else:
     sys.exit('Only deal with Z/R/T components right now')
 
-  filename=sta+'.'+net+'.'+comp+'.win.qual'
+  filename=re.sub(data_dir,measure_dir,os.path.dirname(datfile))+'/'+ sta+'.'+net+'.'+comp+'.win.qual'
   if write_adj_dir:
     g.write(adj_dir+'/'+sta+'.'+net+'.'+comp+'.adj.sac\n')
 
@@ -158,7 +165,7 @@ for i in range(0,nfile):
 
     # azimuth
     nn=3+j;
-    [istat,out]=commands.getstatusoutput("awk 'NF == 6 {print $2,$3,$4,$5}' "+measure_dir+'/'+filename)
+    [istat,out]=commands.getstatusoutput("awk 'NF == 6 {print $2,$3,$4,$5}' "+filename)
     if (istat != 0  or len(out)== 0):
       sys.exit('Error with '+"awk 'NF == 6 {print $2,$3,$4,$5}' "+measure_dir+'/'+filename)
 

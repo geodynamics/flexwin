@@ -110,6 +110,7 @@ degstep=`echo $min_ddg $max_ddg | awk '{print int(5*($2-$1)/25)}'`
 
 # set output filename
 out=${basename}/event_winstats.eps
+outpdf=${basename}/event_winstats.pdf
 short_basename=`echo $basename | awk -F"/" '{print $NF}'`
 
 #evlo=`echo $evlo | awk '{printf "%.0f",  $1}'`
@@ -143,10 +144,11 @@ tail -n +3 $out >> t1
 mv t1 $out
 
 echo $out
-
+ps2pdf $out $outpdf
 # plot window recordsection
 
 out2=${basename}/event_recordsection.eps
+out2pdf=${basename}/event_recordsection.pdf
 gmtset PAPER_MEDIA a4+ MEASURE_UNIT inch
 
 region=$min_time/$max_time/$min_ddg/$max_ddg
@@ -168,6 +170,7 @@ tail -n +3 $out2 >> t1
 mv t1 $out2
 
 echo $out2
+ps2pdf $out2 $out2pdf
 
 rm -f $t0 $t1 $t2z $t2r $t2t $t3
 

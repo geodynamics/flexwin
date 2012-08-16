@@ -334,7 +334,8 @@
   obs_filt(1:npts) = sngl(obs_lp(1:npts))
   syn_filt(1:npts) = sngl(synt_lp(1:npts))
   do i = 1, npts
-    time(i) = b + (i-1)*dt
+    !time(i) = b + (i-1)*dt       ! compilation warning
+    time(i) = sngl(b + (i-1)*dt)
   enddo
 
   file_obs=trim(basename)//'.obs_lp.sac'

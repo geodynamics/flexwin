@@ -35,8 +35,10 @@ cd ..
 make -f make_gfortran
 make -f make_gfortran test
 
-If all goes well, it should pick 7 time windows:
+NOTE 1: the last command will run flexwin in test_data/ and also plot
+NOTE 2: to clean: make clean -f make_gfortran 
 
+If all goes well, it should pick 7 time windows:
  Selected windows, start and end time, CC, Tshift, dlnA  
    1   1054.600  1484.600     0.957    -3.000     0.073
    2   1719.600  2067.600     0.973     0.000     0.172
@@ -47,20 +49,15 @@ If all goes well, it should pick 7 time windows:
    7   3502.600  3937.600     0.833    -9.000    -0.636
  DEBUG : writing output seismos
 
-Test the plotting script:
-
-cd test_data
-./plot_seismos_gmt.sh MEASURE/ABKT.II.LHZ
-
 You should see the file MEASURE/ABKT.II.LHZ.seis.ps,
-which should have serveral time series as well as seven windows.
+which should have several time series as well as seven windows.
 Compare output files with those in MEASURE.orig/, described below.
 Note that the plotting script requires GMT (http://gmt.soest.hawaii.edu/).
 
-Last tested 22-Dec-2011 with the following:
-  linux: 64-bit, opensuse 11.3
+Last tested 15-Aug-2012 with the following:
+  linux: 64-bit, opensuse 12.1
   sac 101.5
-  gfortran 4.5.0
+  gfortran 4.6.2
   GMT 4.5.3 (for plotting)
 
 COMPILATION

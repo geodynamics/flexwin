@@ -111,28 +111,27 @@ end subroutine find_maxima
 
   end subroutine
 
-! given an array and the index of two end points, calculate the 
-! area under the curve by simple trapezium integration
-
-  function area_under_curve(x,dx,i1,i2)
-  double precision, dimension(*) :: x
-  double precision :: dx
-  integer :: i1, i2
-
-  integer :: i
-  double precision :: area
-
-  area=0
-
-  do i = i1, i2-1
-    area=area+dx*(x(i)+x(i+1))/2
-  enddo
-
-  area_under_curve = area
-
-  end function
-
-
+!!$! given an array and the index of two end points, calculate the 
+!!$! area under the curve by simple trapezium integration
+!!$
+!!$  function area_under_curve(x,dx,i1,i2)
+!!$  double precision, dimension(*) :: x
+!!$  double precision :: dx
+!!$  integer :: i1, i2
+!!$
+!!$  integer :: i
+!!$  double precision :: area
+!!$
+!!$  area=0.0
+!!$
+!!$  do i = i1, i2-1
+!!$    area=area + dx*(x(i)+x(i+1))/2.0
+!!$  enddo
+!!$
+!!$  ! compilation warning for this line, but do we use this?
+!!$  area_under_curve = area
+!!$
+!!$  end function
 
   subroutine find_minima(x,nx,minima,nindex,w_level)
   implicit none

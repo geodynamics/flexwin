@@ -599,7 +599,7 @@
 
 ! set pre-extension for synthetic data and allocate extended_syn
 !  n_extend=5*12*WIN_MIN_PERIOD/dt
-  n_extend=1000*WIN_MIN_PERIOD/dt
+  n_extend=1000*int(WIN_MIN_PERIOD/dt)
   allocate(extended_syn(npts+n_extend))
 
 ! set noise level

@@ -93,6 +93,11 @@
      call sort_on_start_time(nwin,iM,iL,iR)
      !if(DEBUG) call display_windows(nwin,iM,iL,iR)
 
+     ! remove window whose starttime(iL) is in noise region 
+     if(DEBUG) print *, "Rejecting on noise region "
+     call reject_on_noise_region(nwin, iM, iL, iR)
+     if(DEBUG) call display_windows(nwin,iM,iL,iR)
+
      ! remove small windows
      if(DEBUG) print *, "Rejecting on size "
      call reject_on_window_width(nwin,iM,iL,iR,C_1)
@@ -193,6 +198,54 @@
 
   end subroutine select_windows_stalta2
 
+
+  subroutine reject_on_noise_region(nwin, iM, iL, iR)
+    ! WJL: Reject window whose starttime is in the noise region(before
+    ! noise_end). It is nice to put this function on the top cause
+    ! it could reject a large amount of windows but also acts very
+    ! fast and cheap.
+    use seismo_variables
+    implicit none
+
+    integer, intent(inout) :: nwin
+    integer, dimension(*), intent(inout) :: iM, iR, iL
+
+    logical :: accept
+    integer :: nwin_new, iwin
+    integer, dimension(NWINDOWS) :: iM_new, iL_new, iR_new
+
+    nwin_new = 0
+    do iwin = 1,nwin
+      accept = .true.
+      ! check window length against minimum acceptable length
+      if (iL(iwin) .lt. noise_end  ) then
+        !print *, "iL < noise_end:", iL(iwin), noise_end
+        accept = .false.
+      end if
+
+      if (accept) then
+        ! checks windows
+        if (nwin_new .ge. NWINDOWS) then
+          print *, 'reject_on_noise_region: limit (nwin = NWINDOWS)'
+          exit
+        endif
+        nwin_new = nwin_new + 1
+        iM_new(nwin_new) = iM(iwin)
+        iR_new(nwin_new) = iR(iwin)
+        iL_new(nwin_new) = iL(iwin)
+      endif
+    enddo
+
+    ! update the iM, iR, iL arrays to contain only accepted proto-windows
+    nwin = nwin_new
+    iM(1:nwin) = iM_new(1:nwin_new)
+    iL(1:nwin) = iL_new(1:nwin_new)
+    iR(1:nwin) = iR_new(1:nwin_new)
+
+    if (DEBUG) write(*,*) 'DEBUG : window noise region retained ', nwin, ' acceptable windows'
+
+  end subroutine
+    
 
   subroutine check_window_s2n(nwin,iM,iL,iR)
     use seismo_variables

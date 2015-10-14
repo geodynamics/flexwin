@@ -50,7 +50,7 @@
   ! if DATA_QUALITY=.true.
   if (DATA_QUALITY) then
     noise_start=b
-    noise_end=max(ph_times(1)-WIN_MIN_PERIOD,b+dt)
+    noise_end=max(ph_times(1)-WIN_MIN_PERIOD*1.5,b+dt)
     signal_start=noise_end
     signal_end=b+(npts-1)*dt
   endif

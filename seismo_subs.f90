@@ -513,7 +513,7 @@
 
 !----------------------------------------------------------------------
 
-  subroutine bandpass(x, n, delta_t, x_filt)
+  subroutine bandpass_seismo_subs(x, n, delta_t, x_filt)
   use seismo_variables
   implicit none
 
@@ -543,7 +543,7 @@
 
   deallocate(x_sngl)
 
-  end subroutine bandpass
+  end subroutine bandpass_seismo_subs
 
 !----------------------------------------------------------------------
   subroutine prepare_bp_seis
@@ -553,8 +553,8 @@
   ! make filtered seismograms
   obs_lp(:) = 0.
   synt_lp(:) = 0.
-  call bandpass(obs,npts,dt,obs_lp)
-  call bandpass(synt,npts,dt,synt_lp)
+  call bandpass_seismo_subs(obs,npts,dt,obs_lp)
+  call bandpass_seismo_subs(synt,npts,dt,synt_lp)
 
   end subroutine prepare_bp_seis
 

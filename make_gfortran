@@ -4,6 +4,7 @@ CFLAGS= ${OPT}
 
 TAULIBDIR=ttimes_mod
 SACLIBDIR=${SACHOME}/lib
+%.o: %.mod
 
 LIBS= -lsacio -lsac -ltau -lm
 
